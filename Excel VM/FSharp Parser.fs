@@ -25,6 +25,7 @@ let parseSyntax (text:string)=
     text.ToCharArray()
      |> Array.fold (fun (row,col,acc)->function
           |'\t' -> failwith "no tabs allowed"
+          |'\r' -> row,col,acc
           |'\n' -> row+1,1,{t=V "\n"; row=row; col=col}::acc
           |e -> row,col+1,{t=V(string e); row=row; col=col}::acc
          ) (1,1,[])
@@ -68,7 +69,10 @@ let parseSyntax (text:string)=
     |_::T"while"::_,(T"do" as a)::restr
     |T"do"::_::T"while"::_,a::restr->
       parse (a::left) restr
-    |({t=Bind(_,_)} as a)::_,b::restr when a.col=b.col -> parse (b::left) restr
+    |_::T"="::_::(T"let" as a)::_,b::restr when a.col=b.col->
+      parse (b::left) restr
+    //|(Bind(_,_,_) as a)::_,b::restr-> this case should never occur, since Bind requires a finishing state
+//    |({t=Bind(_,_)} as a)::_,b::restr when a.col=b.col -> parse (b::left) restr
     //brackets
     |(T")" as a)::(T"(" as b)::restl,_->
       parse restl (merge' b a::right)
@@ -76,8 +80,10 @@ let parseSyntax (text:string)=
     |a::T"("::restl,T")"::restr -> parse restl (a::restr)
     //let statements
     |T"let"::_,T"rec"::restr -> parse left restr
-    |{t=c}::T"="::T s::(T"let" as a)::restl,b::_ when not(indented a b)->
-      parse restl ({a with t=Bind(s,c)}::right)
+    |r::b::T"="::T s::(T"let" as a)::restl,_ when finished {a with col=a.col-1} right->
+      parse restl ({a with t=Bind(s,b.t,r.t)}::right)
+//    |{t=c}::T"="::T s::(T"let" as a)::restl,b::_ when not(indented a b)->
+//      parse restl ({a with t=Bind(s,c)}::right)
     //anonymous functions
     |{t=c}::T"->"::T s::(T"fun" as a)::restl,_ when finished a right->
       parse restl ({a with t=Define(s,c)}::right)
@@ -88,12 +94,16 @@ let parseSyntax (text:string)=
       parse restl ({a with t=Condition(d,c,V"()")}::right)
     //whiles
     |{t=c}::T"do"::{t=d}::(T"while" as a)::restl,_ when finished a right->
-      Apply(
-        Bind("loop-=",     //when detecting type of variable, this will appear as Literal
-          Define("()",Apply(Bind("_",c),Condition(d,Apply(V "loop-=",V "()"),V "()")))
-         ),
-        Apply(V "loop-=",V "()")
+      Bind("loop$",
+        Define("()",Bind("_",c,Condition(d,Apply(V "loop$",V "()"),V "()"))),
+        Apply(V "loop$",V "()")
        )
+//      Apply(
+//        Bind("loop-=",     //when detecting type of variable, this will appear as Literal
+//          Define("()",Apply(Bind("_",c),Condition(d,Apply(V "loop-=",V "()"),V "()")))
+//         ),
+//        Apply(V "loop-=",V "()")
+//       )
     //prefix operators
     |Infix _::_,(Infix(T fA) as a)::restr -> parse ({a with t=V("~"+fA)}::left) restr
     //infix operators
@@ -104,17 +114,22 @@ let parseSyntax (text:string)=
       parse restl ({a with t=Apply(Apply(V("("+s+")"),b.t),c.t)}::right)
     |Infix _::_,a::restr -> parse (a::left) restr
     //expression separation
-    |a::restl,T";"::restr -> parse restl ({a with t=Bind("_",a.t)}::restr)
-    |a::({t=Bind(_,_)} as b)::restl,_ when finished a right->  // && a.col<>right.Head.col is implicit
-      parse restl ({b with t=Apply(b.t,a.t)}::right)
+//    |a::restl,T";"::restr -> parse restl ({a with t=Bind("_",a.t)}::restr)
+//             ^ no replacement for the above yet
+//    |a::({t=Bind(_,_)} as b)::restl,_ when finished a right->  // && a.col<>right.Head.col is implicit
+//             ^ shouldn't happen anymore
+//      parse restl ({b with t=Apply(b.t,a.t)}::right)
     |a::restl,(Variable b | Literal b)::_ when a.col=b.col->
-      parse restl ({a with t=Bind("_",a.t)}::right)
+      parse (a::{a with t=V"="}::{a with t=V"_"}::{a with t=V"let"}::restl) right
+//      parse restl ({a with t=Bind("_",a.t)}::right)
     //function application
     |({t=fA} as a)::restl,({t=fB} as b)::restr when indented a b->
       parse restl ({a with t=Apply(fA,fB)}::restr)
 
     |_->
-      printfn "unknown expression: %O | %O" left right
+      printfn "unknown expression"
+      List.iter (printfn "%O") left
+      List.iter (printfn "%O") right
       ignore (System.Console.ReadLine())
       failwith "unknown expression"
 
@@ -130,7 +145,7 @@ let rec rewrite=function
   |Brief->function
     |V e -> e
     |Define(s,a) -> sprintf "(fun %s -> %s)" s (rewrite Brief a)
-    |Bind(s,b) -> sprintf "let %s = %s in" s (rewrite Brief b)
+    |Bind(s,b,r) -> sprintf "let %s = %s in %s" s (rewrite Brief b) (rewrite Brief r)
     |Apply(a,b) -> sprintf "(%s %s)" (rewrite Brief a) (rewrite Brief b)
     |Condition(a,b,c)->
       sprintf "(if %s then %s else %s)" (rewrite Brief a) (rewrite Brief b) (rewrite Brief c)
@@ -138,8 +153,8 @@ let rec rewrite=function
     let rec rewrite' indent=function
       |V e -> e
       |Define(s,a) -> sprintf "(fun %s ->\n%s  %s\n%s )" s indent (rewrite' (indent+"  ") a) indent
-      |Bind(s,b) -> sprintf "let %s =\n%s  %s" s indent (rewrite' (indent+"  ") b)
-      |Apply(Bind(_,_) as a,b) -> sprintf "%s\n%s%s" (rewrite' indent a) indent (rewrite' indent b)
+      |Bind(s,b,r) -> sprintf "let %s =\n%s  %s\n%s%s" s indent (rewrite' (indent+"  ") b) indent (rewrite' indent r)
+//      |Apply(Bind(_,_) as a,b) -> sprintf "%s\n%s%s" (rewrite' indent a) indent (rewrite' indent b)
       |Apply(a,b) -> sprintf "(%s %s)" (rewrite' indent a) (rewrite' indent b)
       |Condition(a,b,c)->
         sprintf "(\n%sif %s\n%s then\n%s  %s\n%s else\n%s  %s\n%s)"

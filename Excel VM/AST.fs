@@ -3,7 +3,7 @@
 type Expr=
   |V of string
   |Define of string*Expr
-  |Bind of string*Expr
+  |Bind of string*Expr*Expr
   |Apply of Expr*Expr
   |Condition of Expr*Expr*Expr
 type Token=
@@ -29,7 +29,7 @@ let (|Ignore|Special|Literal|Variable|Prefix|Infix|) tk=
     (s.Length>=3 && s.[0]='(' && s.[s.Length-1]=')') ||
     (('A'<=s.[0] && s.[0]<='_') || ('a'<=s.[0] && s.[0]<='z')) &&
     String.forall (fun e->
-      List.exists ((=) e) (['0'..'9'] @ ['A'..'Z'] @ ['a'..'z'] @ ['_'; '\''])
+      List.exists ((=) e) (['0'..'9'] @ ['A'..'Z'] @ ['a'..'z'] @ ['_'; '\''; '$'])
      ) s -> Variable tk
   |_ when s.[0]='~' -> Prefix tk
   |_ when

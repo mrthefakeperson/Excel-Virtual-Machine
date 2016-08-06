@@ -51,8 +51,8 @@ let interpret iterations maxChange cellNames (cells:Formula[])=
   let primary=Array.findIndex (fun (e:Formula) -> e.hasReference()) cells
   buffer.[primary] <- evaluateCell "F1" cells.[primary]
   for _ in 1..iterations do
-    //Array.iter2 (fun (a:string) b -> if a.[0]>'D' then printfn "cell %s: %A" a b) cellNames buffer
-    //Console.ReadLine() |> ignore
+    Array.iter2 (fun (a:string) b -> if a.[0]>'D' then printfn "cell %s: %A" a b) cellNames buffer
+    Console.ReadLine() |> ignore
     Array.iteri2
      (fun i s e -> buffer.[i] <- evaluateCell s e)
      cellNames cells
