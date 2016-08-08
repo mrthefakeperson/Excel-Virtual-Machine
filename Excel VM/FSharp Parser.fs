@@ -32,6 +32,9 @@ let parseSyntax (text:string)=
      |> fun (_,_,e) -> List.rev e
      |> List.fold (fun tokens e->
           match tokens,e with
+          //escape sequences don't work
+          |s::(T "\"" as a)::rest,T "\"" -> merge' (merge' a s) e::rest
+          |a::(T "\""::_ as rest),_ -> merge' a e::rest
           |(Literal a | Variable a)::rest,Variable b
           |(Prefix a | Infix a)::rest,Infix b
           |Literal a::rest,Literal b -> merge' a b::rest
@@ -40,7 +43,6 @@ let parseSyntax (text:string)=
          ) []
      |> List.rev
      |> List.filter (function (T " " | T "\n") -> false | _ -> true)
-  //printfn "%A" tokenized
   let rec parse left right=
     //printfn "%O | %O" left right
     //ignore (System.Console.ReadLine())
