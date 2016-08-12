@@ -12,14 +12,16 @@ let main argv =
 
       |_ -> failwith "language not recognized"
      )
-     |> debug
-     |> PseudoAsm.convert
-     |> debug
+     |> FSharp_Parser.rewrite FSharp_Parser.Light
+     |> printfn "%O"
+//     |> debug
+//     |> PseudoAsm.convert
+//     |> debug
 (*
      |> PseudoAsm.interpret
      |> printfn "%A"
 *)
-     |> Excel_Conversion.writeExcel
+//     |> Excel_Conversion.writeExcel
 (*
      |> Seq.map (function Excel_Language.Cell(a,b) -> (a,b))
      |> Seq.sortBy (fun (e,_) -> (int e.[1..],e.[0]))
@@ -27,7 +29,7 @@ let main argv =
      ||> Excel_Language_Interpreter.interpret 200 0
      |> ignore
 *)
-     |> Excel_Conversion.ActualWriteExcel.actually_write_the_excel fileName_output
+//     |> Excel_Conversion.ActualWriteExcel.actually_write_the_excel fileName_output
 
     System.Console.ReadLine() |> ignore
 

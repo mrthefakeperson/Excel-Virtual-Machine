@@ -1,1 +1,4 @@
-while true do printfn "%A" 1
+let a =
+  let b = fun e -> fun e -> e
+  b 2
+a 1

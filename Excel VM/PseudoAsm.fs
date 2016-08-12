@@ -4,8 +4,7 @@ open Type_Inference
 open System
 
 //unfinished:
-//proper, non-tail recursive recursion
-//optimize memory for variables which fall out of scope (careful with the correct types)
+//partial application of functions in parallel currently does not work
 
 [<Literal>]
 let MAXSTACK=15
@@ -41,7 +40,7 @@ let convert e=
   let nuif=nextUnused (ref 0) incr
   let rec deabstract stackVariables scopeVariables e=
     match e with
-    |V s when Map.containsKey s scopeVariables -> [Load scopeVariables.[s]]
+    |_ when Map.containsKey e scopeVariables -> scopeVariables.[e]
     |V s -> [Push (parsePrimitive s)]
     |Define(s,b) ->
       let s_var,funcID,contID=nuv(),sprintf "f%i" (nuf()),sprintf "c%i" (nuc())
@@ -50,14 +49,14 @@ let convert e=
         GotoIfTrue
         Marker funcID
         Store s_var        ]
-       @ deabstract (s_var::stackVariables) (scopeVariables.Add(s,s_var)) b
+       @ deabstract (s_var::stackVariables) (scopeVariables.Add(V s,[Load s_var])) b
        @ [Store 0; Push (Bln true); GotoIfTrue]    //store result, then go back to the calling code
        @ [Marker contID; Push (Goto funcID)]
     |Bind(s,b,r) ->
       let s_var=nuv()
-      deabstract stackVariables (scopeVariables.Add(s,s_var)) b
+      deabstract stackVariables (scopeVariables.Add(V s,[Load s_var])) b
        @ [Store s_var]
-       @ deabstract stackVariables (scopeVariables.Add(s,s_var)) r
+       @ deabstract stackVariables (scopeVariables.Add(V s,[Load s_var])) r
     |Apply(V "printfn",V "\"%A\"") -> [Command "print"]
     |Apply(a,b) ->
       let callingID=sprintf "f%i" (nuf())
@@ -79,7 +78,25 @@ let convert e=
        @ [Push (Goto rest); Push (Bln true); GotoIfTrue]
        @ [Marker neg] @ deabstract stackVariables scopeVariables c
        @ [Marker rest]
-  [Command (sprintf "maxstack %i" MAXSTACK); Command "locals 10"] @ deabstract [] Map.empty e @ [Command "end"]
+(*     in progress
+  let header=
+    let addSpace,add=nuv(),nuf()
+    [ Command (sprintf "maxstack %i" MAXSTACK)
+      Command "locals 20"
+      //adding
+      Marker "addition0"
+      Store add
+    ]
+  let predefined =
+    Map
+      [
+        Apply(V "printfn",V "\"%A\""), [Command "print"]
+        V "(+)", []
+      ]
+*)
+  [Command (sprintf "maxstack %i" MAXSTACK); Command "locals 10"]
+   @ deabstract [] Map.empty e
+   @ [Command "end"]
 
 let interpret commands=
   let commands=Array.ofList commands
