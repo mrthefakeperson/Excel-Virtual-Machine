@@ -1,7 +1,7 @@
 ﻿module Type_Inference
 open System
 open AST
-
+(*
 type Type=
   |A of string
   |Function of Type*Type
@@ -103,4 +103,4 @@ let infer=
        |> map_merge a_types
        |> Map.add e res_type
   adjustNaming Map.empty >> infer Map.empty
- 
+*)

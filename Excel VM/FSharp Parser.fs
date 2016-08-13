@@ -1,5 +1,4 @@
 ﻿module FSharp_Parser
-open AST
 
 (*
   rest :: Bind(name,body) :: restr -> Apply(Bind(name,body),rest) as a special case
@@ -22,7 +21,6 @@ let (|Ignore|Special|Literal|Variable|Prefix|Infix|) s =
   |"" -> Ignore
   |"(*" | "*)" | "<-" | "\n" | ";" | " " | "(" | ")" | "->" -> Special s
   |_ when
-    (s.Length>=3 && s.[0]='(' && s.[s.Length-1]=')') ||
     (('A'<=s.[0] && s.[0]<='_') || ('a'<=s.[0] && s.[0]<='z')) &&
     String.forall (fun e->
       List.exists ((=) e) (['0'..'9'] @ ['A'..'Z'] @ ['a'..'z'] @ ['_'; '\''; '$'])
@@ -115,7 +113,7 @@ let parseSyntax (text:string)=
         Some (l,{a with t=Let(s.t,d.t,rs.t)}::r)
       |e::T"do"::c::(T"while" as a)::l,_ when finished a r ->
         Some (l,{a with t=While(c.t,e.t)}::r)
-      |t::T"then"::c::(T"if" as a)::l,_ when finished a r ->
+      |t::T"then"::c::(T"if" as a)::l,_ when finished a r && (match r with T"else"::_ -> false | _ -> true) ->
         Some (l,{a with t=If(c.t,t.t,Single "()")}::r)
       |e::T"else"::t::T"then"::c::(T"if" as a)::l,_ when finished a r ->
         Some (l,{a with t=If(c.t,t.t,e.t)}::r)
@@ -139,15 +137,17 @@ let parseSyntax (text:string)=
     |DelimN2 (l,r) -> parse l r
     |DelimX (l,r) -> parse l r
     //push rules
-    |BeginRule
-    |_,Context1
-    |Context1,_::_ ->
-      parse (right.Head::left) right.Tail
-    |(T"fun" as a)::b::_,_ -> parse ({b with t=a.t}::left.Tail) right
-    |Context2 x
-    |Context3 x ->
+    |Context3 x
+    |Context2 x ->
+      printfn "%A" (x,right.Head)
       parse (indent x right.Head::left) right.Tail
+    |b::_,(T"fun" as a)::_ -> parse (indent b a::left) right.Tail
+    |BeginRule //-> parse (right.Head::left) right.Tail
+    |_,Context1 //-> parse (indent left.Head right.Head::left) right.Tail
+    |Context1,_::_ -> parse (right.Head::left) right.Tail
     //application rules, including infixes
+    |a::restl,b::_ when a.col=b.col ->
+      parse (a::{a with t=Single"="}::{a with t=Single"_"}::{a with t=Single"let"}::restl) right
     |a::restl,b::restr -> parse restl ({a with t=Apply(a.t,b.t)}::restr)
 
 (*
@@ -182,16 +182,103 @@ let parseSyntax (text:string)=
 
   parse [] tokenized
 
+type Type =
+//  |Literal
+  |Generic of int
+  |Function of Type*Type
+let typeInfer =
+  let nu v () =
+    incr v
+    !v
+  let nuName,nuGen = nu (ref 0),nu (ref 0) >> Generic
+  let rec replace a b = function
+    |e when e=a -> b
+    |Function(c,d) -> Function(replace a b c,replace a b d)
+    |e -> e
+  let rec changeNames used = function
+    |Let(Single a,b,c) ->
+      let a' = sprintf "%s%i" a (nuName())
+      if Map.containsKey a used
+       //then Bind(Single a',changeNames used b,changeNames (Map.add a a' used) c)
+              //Incomplete: only replace a in the definition if recursively defined
+       then Let(Single a',changeNames (Map.add a a' used) b,changeNames (Map.add a a' used) c)
+       else Let(Single a,changeNames used b,changeNames used c)
+    |Fun(Single a,b) ->
+      let a' = sprintf "%s%i" a (nuName())
+      if Map.containsKey a used
+       then Fun(Single a',changeNames (Map.add a a' used) b)
+       else Fun(Single a,changeNames used b)
+    |Single x -> Single (if Map.containsKey x used then used.[x] else x)
+    |While(a,b) -> While(changeNames used a,changeNames used b)
+    |If(a,b,c) -> If(changeNames used a,changeNames used b,changeNames used c)
+    |Apply(a,b) -> Apply(changeNames used a,changeNames used b)
+  let mergeMaps = Map.fold (fun acc k v -> Map.add k v acc)
+  let rec leastGeneric = function
+    |Generic _,x | x,Generic _ -> x
+    |Function(a,b),Function(aa,bb) -> Function(leastGeneric (a,b),leastGeneric (a,b))
+  let rec infer known e =
+    match e with
+    |_ when Map.containsKey e known -> Map.empty.Add(e,known.[e])
+    |Single _ -> Map.empty.Add(e,nuGen())
+    |Let(a,b,c) ->
+      let b_types = infer known b   
+      let a's_type = b_types.[b]
+      let c_types = infer (Map.add a a's_type known) c
+      (mergeMaps c_types b_types).Add(a,a's_type)
+    |Apply(a,b) ->
+      let a_types,b_types = infer known a,infer known b
+      let e's_type,a's_type,b's_type =
+        match a_types.[a],b_types.[b] with
+        |Function(Generic _ as c,d),b' -> replace c b' d,a_types.[a],b'
+        |Function(c,d),b' -> d,Function(leastGeneric (c,b'),d),leastGeneric (c,b')
+        |Generic _,b' ->
+          let g=nuGen()
+          g,Function(b',g),b'
+      (mergeMaps a_types b_types).Add(e,e's_type).Add(a,a's_type).Add(b,b's_type)
+    |Fun(a,b) ->
+      let b_types = infer known b
+      if b_types.ContainsKey a
+       then b_types
+       else b_types.Add(a,nuGen())
+    |While(a,b) ->
+      (mergeMaps (infer known a) (infer known b)).Add(e,nuGen())
+    |If(a,b,c) ->
+      let b_types,c_types = infer known b,infer known c
+      let e's_type = leastGeneric (b_types.[b],c_types.[c])
+      (mergeMaps (infer known a) (mergeMaps b_types c_types)).Add(e,e's_type).Add(b,e's_type).Add(c,e's_type)
+  changeNames Map.empty >> infer Map.empty
+
+open AST
+let translate construct =
+  let types = typeInfer construct
+  let rec translate = function
+    |Single s -> V s
+    |Fun(a,b) ->
+      match translate b with
+      |Define(c,d) -> Define(translate a::c,d)
+      |o -> Define([translate a],o)
+    |Let(a,b,c) -> Bind(translate a,translate b,translate c)
+    |While(a,b) ->
+      Bind(V "loop$",
+        Define([V "()"],
+          Bind(V "_",translate b,Condition(translate a,Apply(V "loop$",[V "()"]),V "()"))),
+        Apply(V "loop$",[V "()"]) )
+    |Construct.Apply(a,b) as e ->
+      match types.[e] with
+      |Function _ -> Struct [|translate a;translate b|]
+      |_ -> Apply(V "callFunction$",[Struct [|translate a;translate b|]])
+    |If(a,b,c) -> Condition(translate a,translate b,translate c)
+  translate construct
+
 ///represents different syntax modes/styles
 type rewriteMode=
   |Brief
   |Light
-  //|Verbose
 ///write F# code to evaluate an abstract syntax tree construct
 let rec rewrite = function
   |Brief -> function
     |Single s -> s
-    |Apply(a,b) -> sprintf "(%s %s)" (rewrite Brief a) (rewrite Brief b)
+    |Construct.Apply(a,b) -> sprintf "(%s %s)" (rewrite Brief a) (rewrite Brief b)
     |Let(a,b,c) -> sprintf "let %s = %s in %s" (rewrite Brief a) (rewrite Brief b) (rewrite Brief c)
     |If(a,b,c) -> sprintf "(if %s then %s else %s)" (rewrite Brief a) (rewrite Brief b) (rewrite Brief c)
     |While(a,b) -> sprintf "(while %s do %s);" (rewrite Brief a) (rewrite Brief b)
@@ -204,7 +291,7 @@ let rec rewrite = function
       |Let(a,b,c) ->
         sprintf "let %s =\n%s  %s\n%s%s"
          (rewrite' (indent+"  ") a) indent (rewrite' (indent+"  ") b) indent (rewrite' indent c)
-      |Apply(a,b) -> sprintf "(%s %s)" (rewrite' indent a) (rewrite' indent b)
+      |Construct.Apply(a,b) -> sprintf "(%s %s)" (rewrite' indent a) (rewrite' indent b)
       |If(a,b,c) ->
         sprintf "(\n%sif %s\n%s then\n%s  %s\n%s else\n%s  %s\n%s)"
          indent (rewrite' indent a) indent indent

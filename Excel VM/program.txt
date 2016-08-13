@@ -1,4 +1,5 @@
-let a =
-  let b = fun e -> fun e -> e
-  b 2
+let a = fun e ->
+  if e
+   then
+    ()
 a 1
