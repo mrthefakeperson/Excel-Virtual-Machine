@@ -1,5 +1,1 @@
-let a = fun e ->
-  if e
-   then
-    ()
-a 1
++.>++.<.

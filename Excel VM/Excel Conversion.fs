@@ -20,22 +20,20 @@ type Group(formulaSequence:Formula[])=
     Group [|for e in start..finish -> Reference(sprintf "%s%i" column e)|]
   member x.Item o = Choose(o, formulaSequence)
 let writeExcel (allInstructions:AsmST list)=
-  let stackSize, localSize, instructions =
+  let stackSize, memPt, localSize, instructions =
     match allInstructions with
-     Command maxstack::Command locals::rest ->
-      match maxstack.Split ' ', locals.Split ' ' with
-       [|"maxstack"; n|], [|"locals"; nn|] -> (int n, int nn, Command ""::Command ""::rest)
-      |_ -> failwith "header wrong"
+    Entrypoint(maxstack,mem,locals)::_ -> maxstack, mem, locals, Entrypoint(0,0,0)::allInstructions
     |_ -> failwith "header wrong"
   //cell address declarations
   let ``*instIndex`` = Reference "F1"
   let ``*instName`` = Reference "G1"
   let ``*instArgument`` = Reference "H1"
   let ``*topstack`` = Reference "I1"
-  let ``*stdin`` = Reference "J1"
-  let ``*stdout`` = Reference "K1"
-  let ``*stack`` = Group("L", 1, stackSize)
-  let ``*local`` = Group("M", 1, localSize)
+  let ``*memPt`` = Reference "J1"
+  let ``*stdin`` = Reference "K1"
+  let ``*stdout`` = Reference "L1"
+  let ``*stack`` = Group("M", 1, stackSize)
+  let ``*local`` = Group("N", 1, localSize)
   let n = instructions.Length
   let ``*cmdColA``, ``*cmdColB``, ``*cmdColC`` = Group("A", 1, n), Group("B", 1, n), Group("C", 1, n)
   //cells
@@ -66,6 +64,14 @@ let writeExcel (allInstructions:AsmST list)=
         ``*topstack`` +. ``*cmdColC``.[``*instIndex``]
        )
      )
+  let memoryPt =
+    Cell(name ``*memPt``,
+      If(``*instIndex`` =. num 2,
+        num memPt,
+        ``*memPt``
+       )
+       +. If(``*instName`` =. str "allocate next", num 1, num 0)
+     )
   let stdin=
     Cell(name ``*stdin``, str "")
   let stdout=
@@ -79,7 +85,7 @@ let writeExcel (allInstructions:AsmST list)=
        )
      )
   let stack n=
-    let label=sprintf "L%i" n
+    let label=sprintf "M%i" n
     Cell(label,
       If(``*instIndex`` =. num 1,
         str "",
@@ -88,21 +94,33 @@ let writeExcel (allInstructions:AsmST list)=
           If(``*instName`` =. str "push",
             ``*instArgument``,
             If(``*instName`` =. str "load",
-              ``*local``.[``*instArgument`` +. num 1],
+              ``*local``.[Reference label +. num 1],
+              If(``*instName`` =. str "add",
+                Reference label +. Reference (sprintf "M%i" (n+1)),
+                If(``*instName`` =. str "eql",
+                  Reference label =. Reference (sprintf "M%i" (n+1)),
+                  If(``*instName`` =. str "allocate",
+                    ``*memPt``,
+                    If(``*instName`` =. str "allocate next",
+                      ``*memPt`` -. num 1,
 
-              Reference label     // nothing else
+                      Reference label
+                     )
+                   )
+                 )
+               )
              )
            )
          )
        )
      )
   let local n=
-    let label=sprintf "M%i" n
+    let label=sprintf "N%i" n
     Cell(label,
       If(``*instIndex`` =. num 1,
         str "",
         If(``*instName`` =. str "store",
-          If(``*instArgument`` +. num 1 =. num n,
+          If(``*stack``.[``*topstack`` +. num 2] +. num 1 =. num n,
             ``*stack``.[``*topstack`` +. num 1],
             Reference label
            ),
@@ -116,11 +134,17 @@ let writeExcel (allInstructions:AsmST list)=
         match e with
         |Push _ -> "push"
         |Pop -> "pop"
-        |Load _ -> "load"
-        |Store _ -> "store"
+        |Load -> "load"
+        |Store -> "store"
         |Marker s -> sprintf "%s:" s
         |GotoIfTrue -> "goto if true"
-        |Command s -> s
+        |Allocate -> "allocate"
+        |AllocateNext -> "allocate next"
+        |Print -> "print"
+        |End -> "end"
+        |Entrypoint _ -> ""
+        |Add -> "add"
+        |Eql -> "eql"
       Cell(sprintf "A%i" (i+1), str x)
      ) instructions
   let cmdColB =
@@ -136,8 +160,7 @@ let writeExcel (allInstructions:AsmST list)=
         |Push (Bln v) -> bln v
         |Push (Goto v) -> num markedLines.[v]
         |Push Unit -> num 0
-        |Pop | Marker _ | GotoIfTrue | Command _ -> str ""
-        |Load i | Store i -> num i
+        |_ -> str ""
       Cell(sprintf "B%i" (i+1), x)
      ) instructions
   let cmdColC =
@@ -146,12 +169,17 @@ let writeExcel (allInstructions:AsmST list)=
         match e with
         |Push _ -> 1
         |Pop -> -1
-        |Load _ -> 1
-        |Store _ -> -1
+        |Load -> 0
+        |Store -> -2
         |Marker _ -> 0
         |GotoIfTrue -> -2
-        |Command "print" -> -1
-        |Command _ -> 0
+        |Allocate -> 1
+        |AllocateNext -> 1
+        |Print -> -1
+        |Entrypoint _ -> 0
+        |End -> 0
+        |Add -> -1
+        |Eql -> -1
       Cell(sprintf "C%i" (i+1), num x)
      ) instructions
   List.zip3 cmdColA cmdColB cmdColC
@@ -161,6 +189,7 @@ let writeExcel (allInstructions:AsmST list)=
     yield instName
     yield instArgument
     yield topstack
+    yield memoryPt
     yield stdin
     yield stdout
     yield! Seq.init stackSize ((+) 1 >> stack)

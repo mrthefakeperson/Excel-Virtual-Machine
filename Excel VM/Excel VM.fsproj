@@ -55,9 +55,9 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AST.fs" />
-    <Compile Include="Type Inference.fs" />
-    <Compile Include="PseudoAsm.fs" />
+    <Compile Include="Brainf___ Parser.fs" />
     <Compile Include="FSharp Parser.fs" />
+    <Compile Include="PseudoAsm.fs" />
     <Compile Include="Excel Language.fs" />
     <Compile Include="Excel Language Interpreter.fs" />
     <Compile Include="Excel Conversion.fs" />

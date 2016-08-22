@@ -139,7 +139,6 @@ let parseSyntax (text:string)=
     //push rules
     |Context3 x
     |Context2 x ->
-      printfn "%A" (x,right.Head)
       parse (indent x right.Head::left) right.Tail
     |b::_,(T"fun" as a)::_ -> parse (indent b a::left) right.Tail
     |BeginRule //-> parse (right.Head::left) right.Tail
@@ -181,37 +180,38 @@ let parseSyntax (text:string)=
       failwith "unknown expression"
 
   parse [] tokenized
-
+  
+let nu v () =
+  incr v
+  !v
+let nuName = nu (ref 0)
+let rec changeNames used = function
+  |Let(Single a,b,c) ->
+    let a' = sprintf "%s%i" a (nuName())
+    if Map.containsKey a used
+     //then Bind(Single a',changeNames used b,changeNames (Map.add a a' used) c)
+            //Incomplete: only replace a in the definition if recursively defined
+     then Let(Single a',changeNames (Map.add a a' used) b,changeNames (Map.add a a' used) c)
+     else Let(Single a,changeNames used b,changeNames used c)
+  |Fun(Single a,b) ->
+    let a' = sprintf "%s%i" a (nuName())
+    if Map.containsKey a used
+     then Fun(Single a',changeNames (Map.add a a' used) b)
+     else Fun(Single a,changeNames used b)
+  |Single x -> Single (if Map.containsKey x used then used.[x] else x)
+  |While(a,b) -> While(changeNames used a,changeNames used b)
+  |If(a,b,c) -> If(changeNames used a,changeNames used b,changeNames used c)
+  |Apply(a,b) -> Apply(changeNames used a,changeNames used b)
 type Type =
 //  |Literal
   |Generic of int
   |Function of Type*Type
 let typeInfer =
-  let nu v () =
-    incr v
-    !v
-  let nuName,nuGen = nu (ref 0),nu (ref 0) >> Generic
+  let nuGen = nu (ref 0) >> Generic
   let rec replace a b = function
     |e when e=a -> b
     |Function(c,d) -> Function(replace a b c,replace a b d)
     |e -> e
-  let rec changeNames used = function
-    |Let(Single a,b,c) ->
-      let a' = sprintf "%s%i" a (nuName())
-      if Map.containsKey a used
-       //then Bind(Single a',changeNames used b,changeNames (Map.add a a' used) c)
-              //Incomplete: only replace a in the definition if recursively defined
-       then Let(Single a',changeNames (Map.add a a' used) b,changeNames (Map.add a a' used) c)
-       else Let(Single a,changeNames used b,changeNames used c)
-    |Fun(Single a,b) ->
-      let a' = sprintf "%s%i" a (nuName())
-      if Map.containsKey a used
-       then Fun(Single a',changeNames (Map.add a a' used) b)
-       else Fun(Single a,changeNames used b)
-    |Single x -> Single (if Map.containsKey x used then used.[x] else x)
-    |While(a,b) -> While(changeNames used a,changeNames used b)
-    |If(a,b,c) -> If(changeNames used a,changeNames used b,changeNames used c)
-    |Apply(a,b) -> Apply(changeNames used a,changeNames used b)
   let mergeMaps = Map.fold (fun acc k v -> Map.add k v acc)
   let rec leastGeneric = function
     |Generic _,x | x,Generic _ -> x
@@ -237,9 +237,11 @@ let typeInfer =
       (mergeMaps a_types b_types).Add(e,e's_type).Add(a,a's_type).Add(b,b's_type)
     |Fun(a,b) ->
       let b_types = infer known b
-      if b_types.ContainsKey a
-       then b_types
-       else b_types.Add(a,nuGen())
+      let e_types=
+        if b_types.ContainsKey a
+         then b_types
+         else b_types.Add(a,nuGen())
+      e_types.Add(e,Function(e_types.[a],e_types.[b]))
     |While(a,b) ->
       (mergeMaps (infer known a) (infer known b)).Add(e,nuGen())
     |If(a,b,c) ->
@@ -253,22 +255,16 @@ let translate construct =
   let types = typeInfer construct
   let rec translate = function
     |Single s -> V s
-    |Fun(a,b) ->
-      match translate b with
-      |Define(c,d) -> Define(translate a::c,d)
-      |o -> Define([translate a],o)
+    |Fun(a,b) -> Define(translate a,translate b)
     |Let(a,b,c) -> Bind(translate a,translate b,translate c)
     |While(a,b) ->
       Bind(V "loop$",
-        Define([V "()"],
-          Bind(V "_",translate b,Condition(translate a,Apply(V "loop$",[V "()"]),V "()"))),
-        Apply(V "loop$",[V "()"]) )
-    |Construct.Apply(a,b) as e ->
-      match types.[e] with
-      |Function _ -> Struct [|translate a;translate b|]
-      |_ -> Apply(V "callFunction$",[Struct [|translate a;translate b|]])
+        Define(V "()",
+          Bind(V "_",translate b,Condition(translate a,Apply(V "loop$",V "()"),V "()"))),
+        Apply(V "loop$",V "()") )
+    |Construct.Apply(a,b) as e -> Apply(translate a,translate b)
     |If(a,b,c) -> Condition(translate a,translate b,translate c)
-  translate construct
+  translate (changeNames Map.empty construct)
 
 ///represents different syntax modes/styles
 type rewriteMode=
