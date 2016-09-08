@@ -148,30 +148,6 @@ let parseSyntax (text:string)=
     |a::restl,b::_ when a.col=b.col ->
       parse (a::{a with t=Single"="}::{a with t=Single"_"}::{a with t=Single"let"}::restl) right
     |a::restl,b::restr -> parse restl ({a with t=Apply(a.t,b.t)}::restr)
-
-(*
-    |_::T"="::_::(T"let" as a)::_,b::restr when a.col=b.col->
-      parse (b::left) restr
-    //brackets
-    |Infix(T s as a)::T"("::restl,T")"::restr -> parse ({a with t=V("("+s+")")}::restl) restr
-     -> parse restl (a::restr)
-    //let statements
-    |T"let"::_,T"rec"::restr -> parse left restr
-    //prefix operators
-    |Infix _::_,(Infix(T fA) as a)::restr -> parse ({a with t=V("~"+fA)}::left) restr
-    //infix operators
-    |a::_,Infix b::restr -> parse (indent a b::left) restr
-    |Infix d::c::Infix(T s as a)::b::restl,_ when priorityOfOperation a>=priorityOfOperation d->
-      parse restl ({a with t=Apply(Apply(V("("+s+")"),b.t),c.t)}::d::right)
-    |c::Infix(T s as a)::b::restl,_ when finished {b with col=b.col-1} right->
-      parse restl ({a with t=Apply(Apply(V("("+s+")"),b.t),c.t)}::right)
-    |Infix _::_,a::restr -> parse (a::left) restr
-    |a::restl,(Variable b | Literal b)::_ when a.col=b.col->
-      parse (a::{a with t=V"="}::{a with t=V"_"}::{a with t=V"let"}::restl) right
-    //function application
-    |({t=fA} as a)::restl,({t=fB} as b)::restr when indented a b->
-      parse restl ({a with t=Apply(fA,fB)}::restr)
-*)
     |_->
       printfn "unknown expression"
       List.iter (printfn "%O") left

@@ -9,7 +9,7 @@ let interpret_cells e =
 
 [<EntryPoint>]
 let main argv = 
-  let argv = "program.txt program.xlsx Brainfuck".Split ' ' //System.Console.ReadLine().Split ' '     //DEBUG
+  let argv = "program.txt program.xlsx Python2".Split ' ' //System.Console.ReadLine().Split ' '     //DEBUG
   match argv with
   |[|fileName_input; fileName_output; fileLanguage|] ->
     let fileName_input = sprintf @"%s\%s" __SOURCE_DIRECTORY__ fileName_input
@@ -18,11 +18,12 @@ let main argv =
     ( match fileLanguage with
       |"Brainfuck" -> Brainf____Parser.parseSyntax
       |"F#" -> FSharp_Parser.parseSyntax >> FSharp_Parser.translate
+      |"Python2" -> Python_2_Parser.parseSyntax >> Python_2_Parser.translate
 
       |_ -> failwith "language not recognized"
      ) (File.ReadAllText fileName_input)
      |> debug
-
+//     |> ignore
      |> PseudoAsm.convert       |> debug
 
 //     |> PseudoAsm.interpret     |> printfn "%A"
