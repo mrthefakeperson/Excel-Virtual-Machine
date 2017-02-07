@@ -1,0 +1,5 @@
+﻿push 5
+push 9
+add
+push 14
+equals

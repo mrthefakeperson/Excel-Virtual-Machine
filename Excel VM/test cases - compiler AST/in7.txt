@@ -1,0 +1,3 @@
+﻿let a = fun e ->
+  e 10
+a (fun e -> e + 3)

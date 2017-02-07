@@ -1,0 +1,4 @@
+﻿let f x =
+  let y = 1
+  let g z = x y z
+  g

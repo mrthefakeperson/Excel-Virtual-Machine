@@ -54,15 +54,6 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
-    <Compile Include="AST.fs" />
-    <Compile Include="Brainf___ Parser.fs" />
-    <Compile Include="FSharp Parser.fs" />
-    <Compile Include="Python 2 Parser.fs" />
-    <Compile Include="PseudoAsm.fs" />
-    <Compile Include="Excel Language.fs" />
-    <Compile Include="Excel Language Interpreter.fs" />
-    <Compile Include="Excel Conversion.fs" />
-    <Compile Include="Main.fs" />
     <None Include="App.config" />
     <COMReference Include="Microsoft Excel 15.0 Object Library">
       <Guid>{00020813-0000-0000-c000-000000000046}</Guid>
@@ -80,6 +71,14 @@
       <Isolated>False</Isolated>
       <WrapperTool>primary</WrapperTool>
     </COMReference>
+    <Compile Include="Token.fs" />
+    <Compile Include="Lexer.fs" />
+    <Compile Include="Parser.fs" />
+    <Compile Include="Excel Language.fs" />
+    <Compile Include="Compiler.fs" />
+    <Compile Include="Excel Conversion.fs" />
+    <Compile Include="Write File.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
@@ -89,6 +88,34 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="test cases - compiler AST\in1.txt" />
+    <Content Include="test cases - compiler AST\in2.txt" />
+    <Content Include="test cases - compiler AST\in3.txt" />
+    <Content Include="test cases - compiler AST\in4.txt" />
+    <Content Include="test cases - compiler AST\in5.txt" />
+    <Content Include="test cases - compiler AST\in6.txt" />
+    <Content Include="test cases - compiler AST\in7.txt" />
+    <Content Include="test cases - compiler AST\in8.txt" />
+    <Content Include="test cases - compiler AST\in9.txt" />
+    <Content Include="test cases - Excel pseudo-asm\in1.txt" />
+    <Content Include="test cases - Excel pseudo-asm\in2.txt" />
+    <Content Include="test cases - Excel pseudo-asm\in3.txt" />
+    <Content Include="test cases - Excel pseudo-asm\in4.txt" />
+    <Content Include="test cases - Excel pseudo-asm\in5.txt" />
+    <Content Include="test cases - Excel pseudo-asm\in6.txt" />
+    <Content Include="test cases - Excel pseudo-asm\in7.txt" />
+    <Content Include="test cases - Excel pseudo-asm\in8.txt" />
+    <Content Include="test cases - parser\in1.txt" />
+    <Content Include="test cases - parser\in2.txt" />
+    <Content Include="test cases - parser\in3.txt" />
+    <Content Include="test cases - parser\in4.txt" />
+    <Content Include="test cases - parser\in5.txt" />
+    <Content Include="test cases - parser\in6.txt" />
+    <Content Include="test cases - parser\in7.txt" />
+    <Content Include="test cases - parser\in8.txt" />
+    <Content Include="test cases - parser\in9.txt" />
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

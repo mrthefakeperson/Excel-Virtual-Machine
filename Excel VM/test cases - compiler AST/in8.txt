@@ -1,0 +1,4 @@
+﻿let plus a b = a + b
+let x = plus 3
+let y = plus 5
+x 9

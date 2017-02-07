@@ -1,0 +1,5 @@
+﻿push true
+gotoiftrue 4
+push 8
+goto 5
+push 9

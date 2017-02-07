@@ -1,3 +1,2 @@
-def a(b,c,d):
-  return c
-print a(1,2,3)
+while True:
+  print "a"

@@ -1,0 +1,5 @@
+﻿goto 3
+push 4
+return
+push 1
+call

@@ -1,0 +1,3 @@
+﻿a+b
+function
+|c & d -> k

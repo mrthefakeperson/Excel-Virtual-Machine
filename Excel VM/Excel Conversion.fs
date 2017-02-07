@@ -1,222 +1,175 @@
+﻿//fix heap indexing before anything else
+//more arithmetic
+//test arithmetic
+
 module Excel_Conversion
-
-open System
-open PseudoAsm
 open Excel_Language
-open Excel_Language_Interpreter
+open System
 
-//shortcuts
-//let rf (Cell(s,_))=Reference s
-let name (Reference s) = s
-let num n=Literal (Choice1Of3 n)
-let str s=Literal (Choice2Of3 s)
-let bln b=Literal (Choice3Of3 b)
-let [(<.); (<=.); (=.); (<>.); (>.); (>=.)]=List.init 6 (fun e a b -> Compare(a, enum e, b))
-let [(+.); (-.); ( *. ); (/.)]=List.init 4 (fun e a b -> Combine(a, enum e, b))
-let (^.) a b = Concatenate [|a; b|]
-type Group(formulaSequence:Formula[])=
-  //take a column
-  new(column,start,finish) =
-    Group [|for e in start..finish -> Reference(sprintf "%s%i" column e)|]
-  member x.Item o = Choose(o, formulaSequence)
-let writeExcel (allInstructions:AsmST list)=
-  let stackSize, memPt, localSize, instructions =
-    match allInstructions with
-    Entrypoint(maxstack,mem,locals)::_ -> maxstack, mem, locals, Entrypoint(0,0,0)::allInstructions
-    |_ -> failwith "header wrong"
-  //cell address declarations
-  let ``*instIndex`` = Reference "F1"
-  let ``*instName`` = Reference "G1"
-  let ``*instArgument`` = Reference "H1"
-  let ``*topstack`` = Reference "I1"
-  let ``*memPt`` = Reference "J1"
-  let ``*stdin`` = Reference "K1"
-  let ``*stdout`` = Reference "L1"
-  let ``*stack`` = Group("M", 1, stackSize)
-  let ``*local`` = Group("N", 1, localSize)
-  let n = instructions.Length
-  let ``*cmdColA``, ``*cmdColB``, ``*cmdColC`` = Group("A", 1, n), Group("B", 1, n), Group("C", 1, n)
-  //cells
-  let instIndex=
-    Cell(name ``*instIndex``,
-      If(``*instIndex`` =. num 0,
-        num 1,
-        If(``*instName`` =. str "goto if true",
-          If(``*stack``.[``*topstack`` +. num 2],
-            ``*stack``.[``*topstack`` +. num 1],
-            num 1 +. ``*instIndex``
-           ),
-          If(``*instName`` =. str "end",
-            ``*instIndex``,
-            num 1 +. ``*instIndex``
-           )
-         )
-       )
-     )
-  let instName=
-    Cell(name ``*instName``, ``*cmdColA``.[``*instIndex``])
-  let instArgument=
-    Cell(name ``*instArgument``, ``*cmdColB``.[``*instIndex``])
-  let topstack=
-    Cell(name ``*topstack``,
-      If(``*instIndex`` =. num 2,
-        ``*cmdColC``.[``*instIndex``],
-        ``*topstack`` +. ``*cmdColC``.[``*instIndex``]
-       )
-     )
-  let memoryPt =
-    Cell(name ``*memPt``,
-      If(``*instIndex`` =. num 2,
-        num memPt,
-        ``*memPt``
-       )
-       +. If(``*instName`` =. str "allocate next", num 1, num 0)
-     )
-  let stdin=
-    Cell(name ``*stdin``, str "")
-  let stdout=
-    Cell(name ``*stdout``,
-      If(``*instIndex`` =. num 1,
-        str "",
-        If(``*instName`` =. str "print",
-          ``*stdout`` ^. ``*stack``.[``*topstack`` +. num 1],
-          ``*stdout``
-         )
-       )
-     )
-  let stack n=
-    let label=sprintf "M%i" n
-    Cell(label,
-      If(``*instIndex`` =. num 1,
-        str "",
-        If(``*topstack`` <>. num n,
-          Reference label,
-          If(``*instName`` =. str "push",
-            ``*instArgument``,
-            If(``*instName`` =. str "load",
-              ``*local``.[Reference label +. num 1],
-              If(``*instName`` =. str "add",
-                Reference label +. Reference (sprintf "M%i" (n+1)),
-                If(``*instName`` =. str "eql",
-                  Reference label =. Reference (sprintf "M%i" (n+1)),
-                  If(``*instName`` =. str "allocate",
-                    ``*memPt``,
-                    If(``*instName`` =. str "allocate next",
-                      ``*memPt`` -. num 1,
+let name row col = sprintf "%s%i" col row
+let Int a = Literal (string a)
+let defaultTo x e = If(Reference "A1" =. Literal "2", x, e)
 
-                      Reference label
-                     )
-                   )
-                 )
-               )
-             )
-           )
-         )
-       )
-     )
-  let local n=
-    let label=sprintf "N%i" n
-    Cell(label,
-      If(``*instIndex`` =. num 1,
-        str "",
-        If(``*instName`` =. str "store",
-          If(``*stack``.[``*topstack`` +. num 2] +. num 1 =. num n,
-            ``*stack``.[``*topstack`` +. num 1],
-            Reference label
-           ),
-          Reference label
-         )
-       )
-     )
-  let cmdColA =
-    List.mapi (fun i e ->
-      let x =
-        match e with
-        |Push _ -> "push"
-        |Pop -> "pop"
-        |Load -> "load"
-        |Store -> "store"
-        |Marker s -> sprintf "%s:" s
-        |GotoIfTrue -> "goto if true"
-        |Allocate -> "allocate"
-        |AllocateNext -> "allocate next"
-        |Print -> "print"
-        |End -> "end"
-        |Entrypoint _ -> ""
-        |Add -> "add"
-        |Eql -> "eql"
-      Cell(sprintf "A%i" (i+1), str x)
-     ) instructions
-  let cmdColB =
-    let markedLines=
-      Array.mapi (fun i e -> (e,i)) (Array.ofList instructions)
-       |> Array.choose (function Marker e,i -> Some(e,i+1) | _ -> None)
-       |> dict
-    List.mapi (fun i e ->
-      let x =
-        match e with
-        |Push (Int v) -> num v
-        |Push (Str v) -> str v
-        |Push (Bln v) -> bln v
-        |Push (Goto v) -> num markedLines.[v]
-        |Push Unit -> num 0
-        |_ -> str ""
-      Cell(sprintf "B%i" (i+1), x)
-     ) instructions
-  let cmdColC =
-    List.mapi (fun i e ->
-      let x =
-        match e with
-        |Push _ -> 1
-        |Pop -> -1
-        |Load -> 0
-        |Store -> -2
-        |Marker _ -> 0
-        |GotoIfTrue -> -2
-        |Allocate -> 1
-        |AllocateNext -> 1
-        |Print -> -1
-        |Entrypoint _ -> 0
-        |End -> 0
-        |Add -> -1
-        |Eql -> -1
-      Cell(sprintf "C%i" (i+1), num x)
-     ) instructions
-  List.zip3 cmdColA cmdColB cmdColC
-   |> List.iteri (fun i (Cell(_,a),Cell(_,b),Cell(_,c)) -> printfn "%A: %A, %A, %A" (i+1) a b c)
+[<Literal>]
+let SZ = 50
+let makeVerticalStack _name pushCondition pushValue =
+  let column, row = separate _name
+  let row = int row
+  let _name = name (row+1) column
   seq {
-    yield instIndex
-    yield instName
-    yield instArgument
-    yield topstack
-    yield memoryPt
-    yield stdin
-    yield stdout
-    yield! Seq.init stackSize ((+) 1 >> stack)
-    yield! Seq.init localSize ((+) 1 >> local)
-    yield! cmdColA
-    yield! cmdColB
-    yield! cmdColC
+    yield  //topstack value
+      Cell(name row column,
+        Index(Range(name (row+2) column, name (row+SZ+1) column), Reference _name)
+       )
+    //stack size (pushCondition is the change in size)
+    yield Cell(_name, (Reference _name +. pushCondition) |> defaultTo (Int 1))
+    //stack cells (pushValue is the new value)
+    for e in row+1+1..row+1+SZ ->
+      Cell(name e column,
+        If(Int (e-row-1) =. Reference _name,
+          pushValue (Reference (name e column)),
+          Reference (name e column)
+         )
+         |> defaultTo (Int 1) )
    }
 
-module ActualWriteExcel=
-  open Microsoft.Office.Core
-  open Microsoft.Office.Interop.Excel
-  open System.Reflection
-  open System.IO
-  let actually_write_the_excel fileName cells=
-    if File.Exists fileName then File.Delete fileName
-    let back=ApplicationClass()
-    let sheet=back.Workbooks.Add().Worksheets.[1] :?> _Worksheet
-    back.Calculation<-XlCalculation.xlCalculationManual
-    back.CalculateBeforeSave<-false
-    back.Iteration<-true
-    back.MaxIterations<-1
-    back.MaxChange<-0.
-    back.Visible<-true
-    let set cellname txt=
-      sheet.Range(cellname).Value(Missing.Value) <- txt
-    Seq.iter (fun (Cell(s,_) as f) -> set s (f.ToString())) cells
-    sheet.SaveAs fileName
-    back.Quit()
+//where each topstack is located
+let ``instr*`` = "A2"
+let ``value*``, ``heap*`` = "B2", "C2"
+let ``input*``, ``output*`` = "D2", "E2"
 
+let instr_index i = Index(Range("B1", "XFD1"), Reference ``instr*`` +. Int i)     //16383 spaces in total, to XFD1
+let currentInstruction = instr_index 0
+let currentValue, valueTopstackPt = Reference ``value*``, Reference "B3"
+
+let rec conditionTable defaultVal = function
+  |(condFormula, action)::tl ->
+    If(condFormula, action, conditionTable defaultVal tl)
+  |[] -> defaultVal
+let matchTable defaultVal =   //match the current instruction
+  (List.map (fun (s, a) -> Literal s =. currentInstruction, a)) >> (conditionTable defaultVal)
+
+let instructionStack =
+  makeVerticalStack ``instr*``
+   ([ "call", Int 1
+      "return", Int -1
+     ]
+     |> matchTable (Int 0) )
+   (fun self ->
+    [ "call", currentValue *. Int 2 +. Int 1           // ? | call | ?
+      "goto", instr_index 1 *. Int 2 +. Int 1          // ? | goto | arg1 | ?
+      "gotoiftrue", If(currentValue, instr_index 1 *. Int 2 +. Int 1, self +. Int 2)
+     ]
+     |> matchTable (self +. Int 2) )
+
+let valueStack =
+  makeVerticalStack ``value*``
+   ([ "push", Int 1
+      "pop", Int -1
+      "load", Int 1
+      "store", Int -1
+      "call", Int -1
+      "newheap", Int 1
+      "writeheap", Int -2
+      "inputline", Int 1
+      "outputline", Int -1
+      "gotoiftrue", Int -1
+      "add", Int -1
+      "equals", Int -1
+     ]
+     |> matchTable (Int 0) )
+   (fun self ->
+    [ "push", instr_index 1
+      "load", Index(Range("F2", "XFD2"), instr_index 1)
+      "newheap", Reference "C3" -. Int 2    //size of heap
+      "getheap", Index(Range("C4", "C54"), self +. Int 1)     //change C14 when changing stack constant
+      "add", Index(Range("B4", "B54"), valueTopstackPt +. Int 1) +. self
+      "equals", Index(Range("B4", "B54"), valueTopstackPt +. Int 1) =. self
+     ]
+     |> matchTable self )
+
+let heap =
+  makeVerticalStack ``heap*``
+   (matchTable (Int 0) ["newheap", Int 1])
+   id
+   |> Seq.mapi (fun i (Cell(s, e)) ->
+        if i < 2 then Cell(s, e)
+        else
+          Cell(s,
+            If((currentInstruction =. Literal "writeheap")
+                &&. (Index(Range("B4", "B54"), valueTopstackPt +. Int 1) =. Int (i-2)),    //remember to change this when changing stack size constant
+             Index(Range("B4", "B54"), valueTopstackPt +. Int 2),
+             e)
+             |> defaultTo (Int 1)
+           )
+       )
+
+let input =
+  makeVerticalStack ``input*``
+   (matchTable (Int 0) ["inputline", Int 1])
+   id
+let output =
+  makeVerticalStack ``output*``
+   (matchTable (Int 0) ["outputline", Int 1])
+   (fun self -> matchTable self ["outputline", currentValue])
+
+let variableStack row col =
+  makeVerticalStack (name row col)
+   (conditionTable (Int 0) [
+      If(currentInstruction =. Literal "store", instr_index 1 =. Literal col, Literal "false"),
+       Int 1     //`store` pushes the value to the top of the stack, remembering previous values for recursion
+      If(currentInstruction =. Literal "popv", instr_index 1 =. Literal col, Literal "false"),
+       Int -1    //`popv` pops this variable
+     ])
+   (fun self ->
+    conditionTable self [
+      // ? | store | at | ?
+      If(currentInstruction =. Literal "store", instr_index 1 =. Literal col, Literal "false"),
+       Reference "B2"    //top value of valueStack
+     ])
+
+let seed = Cell("A1", Reference("A1") +. Literal "1")
+
+open Compiler
+open System.Collections.Generic
+let cmdToStrPair (mapping: IDictionary<string, string>) i = function
+  |Push e -> "push", e | PushFwdShift x -> "push", string(i + x) | Pop -> "pop", ""
+  |Store e -> "store", mapping.[e] | Load e -> "load", string(alphaToNumber mapping.[e] - 5) | Popv e -> "popv", mapping.[e]
+  |GotoFwdShift x -> "goto", string(i + x) | GotoIfTrueFwdShift x -> "gotoiftrue", string(i + x)
+  |Call -> "call", "" | Return -> "return", ""
+  |GetHeap -> "getheap", "" | NewHeap -> "newheap", "" | WriteHeap -> "writeheap", ""
+  |InputLine -> "inputline", "" | OutputLine -> "outputline", ""
+  |Add -> "add", "" | Equals -> "equals", "" | Greater -> "greater", ""
+let packageProgram instructions vars =
+  let variables = Seq.map (numberToAlpha >> (variableStack 2)) vars
+  let cells =
+    Seq.concat [
+      Seq.singleton seed
+      instructions
+      instructionStack
+      valueStack
+      heap
+      input
+      output
+      Seq.concat variables
+     ]
+     |> Array.ofSeq
+  Array.sortBy (function Cell(e, _) -> coordinates e) cells
+let makeProgram cmds =
+  let cmds = Array.append cmds [|GotoFwdShift 0|]
+  let p = Array.map string [|'A'..'E'|]
+  let mapping =
+    Array.append (Array.zip p p) (
+      let k =
+        Array.choose (function Store e | Load e | Popv e -> Some e | _ -> None) cmds
+         |> Set.ofArray |> Set.toArray
+      Array.zip k (Array.map string [|'F'..'E' + char k.Length|])
+     )
+     |> dict
+  let instructions =
+    Array.mapi (cmdToStrPair mapping) cmds
+     |> Array.collect (fun (a, b) -> [|a; b|])
+     |> Array.map2 (fun col cmd -> Cell(col + "1", Literal cmd))
+         (Array.map numberToAlpha [|2..1 + cmds.Length * 2|])
+  let variables = {alphaToNumber "F"..mapping.Count}
+  packageProgram instructions variables

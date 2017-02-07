@@ -1,0 +1,7 @@
+﻿push 5
+call
+push 5
+push 6
+goto 7
+push 7
+return

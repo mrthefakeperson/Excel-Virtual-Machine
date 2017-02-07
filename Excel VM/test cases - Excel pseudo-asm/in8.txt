@@ -1,0 +1,10 @@
+﻿newheap
+newheap
+push 1
+push 7
+writeheap
+push 0
+push 9
+writeheap
+push 1
+getheap
