@@ -1,0 +1,2 @@
+﻿for e in 1 .. 30 do printfn "%A" 77
+for e in 1..2..30 do printfn "%A" 154

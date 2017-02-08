@@ -72,9 +72,19 @@ let rec parse (stop:Token list->bool) (fail:Token list->bool) left right =
     let name, T "in"::restr =
       parsePattern (function T "in"::_ -> true | _ -> false)
        (fun e -> stop e || fail e) [] right
-    let iterable, T "do"::restr =
-      parse (function T "do"::_ -> true | _ -> false)
-       (fun e -> stop e || fail e) [] restr
+    let iterable, restr =
+      match parse (function T("do" | "..")::_ -> true | _ -> false)
+       (fun e -> stop e || fail e) [] restr with
+      |iterable, T "do"::restr -> iterable, restr
+      |a, T ".."::restr ->
+        match parse (function T("do" | "..")::_ -> true | _ -> false)
+         (fun e -> stop e || fail e) [] restr with
+        |b, T "do"::restr -> Token("..", [a; b]), restr
+        |step, T ".."::restr ->
+          let b, T "do"::restr =
+            parse (function T "do"::_ -> true | _ -> false)
+             (fun e -> stop e || fail e) [] restr
+          Token("..", [a; step; b]), restr
     let body, restr = parse stop fail [] (Token("do", t.Indentation)::restr)
     let parsed = Token("for", t.Indentation, [name; iterable; body])
     parse stop fail restl (parsed::restr)

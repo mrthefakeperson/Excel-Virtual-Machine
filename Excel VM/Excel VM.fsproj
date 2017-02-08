@@ -79,17 +79,6 @@
     <Compile Include="Excel Conversion.fs" />
     <Compile Include="Write File.fs" />
     <Compile Include="Program.fs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="test cases - compiler AST\in1.txt" />
     <Content Include="test cases - compiler AST\in2.txt" />
     <Content Include="test cases - compiler AST\in3.txt" />
@@ -116,6 +105,16 @@
     <Content Include="test cases - parser\in7.txt" />
     <Content Include="test cases - parser\in8.txt" />
     <Content Include="test cases - parser\in9.txt" />
+    <Content Include="test cases - parser\in10.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

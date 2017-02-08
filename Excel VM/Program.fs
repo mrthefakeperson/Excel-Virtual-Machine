@@ -18,6 +18,7 @@ let rec test folderName runFile n =
     test folderName runFile (n + 1)
     
 let debug e = printfn "%O" e; e
+let debugList e = printfn "[%s]" (String.concat "; " (List.map (sprintf "%O") e)); e
 let interpret iterations cells =
   Array.map (fun (Cell(a, b)) -> (a, b)) cells
    |> Array.unzip
@@ -62,6 +63,7 @@ let testParser =
        |> preprocess
        |> parse (function [] -> true | _ -> false) (fun _ -> false) []
        |> fst
+    printfn "%A" parsed
     parsed.Clean()
      .ToStringExpr()
      |> printfn "%s\n%O" (File.ReadAllText file)
@@ -146,9 +148,9 @@ let testExcelCompiler =
     writeExcelFile (file + ".xlsx") cmds
    )
 
-testExcelInterpreter 1
-testParser 1
-testCompilerAST 1
-testPAsm 1
+//testExcelInterpreter 1
+testParser 10
+//testCompilerAST 1
+//testPAsm 1
 //testExcelFile 1
 //testExcelCompiler 9

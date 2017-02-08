@@ -1,11 +1,11 @@
 ## Purpose
 
-This project aims to accurately compile basic programming features into Microsoft Excel (2015) spreadsheets.
+This project aims to accurately compile common programming features into Microsoft Excel (2015) files.
 
 ## Motivation
 
-This was created for my (the creator's) personal interest, as a learning experience for compiler design, and to explore programming language design.
+This was created for my (the creator's) personal interest, and as a learning experience in compiler design.
 
-## Note
+## How to Use
 
-Press F9 repeatedly to execute the program in the resulting excel sheet.
+The project is currently incomplete - once completed, it will output a compiled file when executed which can be executed by triggering iterative calculation (pressing F9 repeatedly) in Microsoft Excel.

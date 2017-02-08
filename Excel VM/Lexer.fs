@@ -58,8 +58,18 @@ let ruleset =
     |"~",Symbolic -> true
     |_ when charIDs.[int a.[0]] = 0 || charIDs.[int b.[0]] = 0 -> false
     |_ -> charIDs.[int a.[0]] = charIDs.[int b.[0]]
+//special rules: if a subsequence of characters matches one of the patterns below, it is always parsed as a token
+let specialRules =
+  List.fold (fun acc e ->
+    match acc, e with       // `..` is the only known one for now, a different method might be used for the future
+    |"."::tl, "." -> ".."::tl
+    |_ -> e::acc
+   ) []
+   >> List.rev
 let groupByRuleset (text:string) =
   text.Replace("\r", "\n").ToCharArray()
    |> List.ofArray
    |> List.map string
+   |> specialRules
+   //normal rules
    |> groupTokens ruleset
