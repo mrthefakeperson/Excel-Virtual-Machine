@@ -27,7 +27,7 @@ type AST =
         |Get(a, i) -> indent + sprintf "%s[%s]" (str "" a) (str "" i)
         |Assign(a, i, e) -> indent + sprintf "%s[%s] <- %s" (str "" a) (str "" i) (str "" e)
       str "" x
-  
+
 let (|X|) (t:Token) = X(t.Name, t.Dependants)
 let (|Var|Cnst|Other|) = function               //todo: non-numeric constants (eg. chars)
   |T ("true" | "false" as s) -> Cnst s
@@ -68,11 +68,25 @@ let rec ASTCompile' (capture, captured as cpt) = function
     Sequence [
       Define("$loop", ["()"],
         If(ASTCompile' cpt cond,
-          Sequence [ASTCompile' cpt b; Apply(Value "$loop", [Value "()"])],
-          Apply(Value "ignore", [Value "()"])
+          Sequence [ASTCompile' cpt b; Apply(Value "$loop", [Const "()"])],
+          Const "()"     //Apply(Value "ignore", [Const "()"])
          ) )
       Apply(Value "$loop", [Const "()"])
      ]
+  |X("for", [name; iterable; body]) ->
+    //todo: flatten name pattern, change call to loop function accordingly
+    let name = match name with X(name, []) -> name | _ -> failwith "patterns not supported yet"
+    match iterable with
+    |X("..", [a; step; b]) ->
+      Sequence [
+        Define("$loop", [name],
+          If(Apply(Apply(Value "<=", [Value name]), [ASTCompile' cpt b]),          //todo: negative step values
+            Sequence [ASTCompile' cpt body; Apply(Value "$loop", [Apply(Apply(Value "+", [Value name]), [ASTCompile' cpt step])])],
+            Const "()"
+           ) )
+        Apply(Value "$loop", [ASTCompile' cpt a])
+       ]
+    |_ -> failwith "iterable objects not supported yet"
   |X("sequence", list) -> //Sequence (List.map (ASTCompile' capture) list)
     List.fold (fun (acc, (capt', capd' as cpt')) e ->
       let compiled = ASTCompile' cpt' e
@@ -110,6 +124,7 @@ type PseudoAsm =
   |Add
   |Equals
   |Greater
+  |LEq
 let interpretPAsm cmds =
   let pushstack stack v = stack := v :: !stack
   let popstack stack = stack := match !stack with _ :: tl -> tl | [] -> []
@@ -149,36 +164,58 @@ let interpretPAsm cmds =
     |OutputLine -> push output (top value); pop value
     |Add -> let a = top value in pop value; let b = top value in pop value; push value (string(int a + int b))
     |Equals -> let a = top value in pop value; let b = top value in pop value; push value (string(a = b))
-    |Greater -> let a = top value in pop value; let b = top value in pop value; push value (string(a > b))
+    |Greater -> failwith "do later"//let a = top value in pop value; let b = top value in pop value; push value (string(a > b))
+    |LEq ->
+      let a = top value in pop value; let b = top value in pop value
+      if System.Int32.TryParse(a, ref 0) && System.Int32.TryParse(b, ref 0)
+       then push value (string(int a <= int b))
+       else push value (string(a <= b))
 
+  let debug = false
   push instr "0"
   while int(top instr) < Array.length cmds do
     let i = int(top instr)
-    //printfn "%A" cmds.[i]
+    if debug then printfn "%A" stacks.["e"]
+    if debug then printfn "%A" cmds.[i]
     interpretCmd i cmds.[i]
-    //printfn "stack %A" !stacks.[value]
-    //printfn "heap [%s]" (String.concat "; " (Seq.map (sprintf "%A") heap))
+    if debug then printfn "stack %A" !stacks.[value]
+    if debug then printfn "heap [%s]" (String.concat "; " (Seq.map (sprintf "%A") heap))
     let pt = int(top instr)
     pop instr; push instr (string(pt+1))
-    //ignore (stdin.ReadLine())
+    if debug then ignore (stdin.ReadLine())
   !stacks.[value], heap
   
 let x = "F"    //just a place to store values
 let rec operationsPrefix = [
   Add
   Return
-  Store x   //(+): 3   (one instruction before all of this)
-  NewHeap; Store x; Load x; PushFwdShift -6; WriteHeap; Load x; Popv x;
-  NewHeap; Load x; WriteHeap; Popv x; NewHeap; Push "endArr"; WriteHeap
+  Store x;   //(+): 3   (one instruction goes before all of this)
+    NewHeap; Store x; Load x; PushFwdShift -6; WriteHeap; Load x; Popv x;
+    NewHeap; Load x; WriteHeap; Popv x; NewHeap; Push "endArr"; WriteHeap
   Return
 
   OutputLine    //print: 19
   Push "()"
   Return
+
+  Equals
+  Return
+  Store x;        //(=): 24
+    NewHeap; Store x; Load x; PushFwdShift -6; WriteHeap; Load x; Popv x;
+    NewHeap; Load x; WriteHeap; Popv x; NewHeap; Push "endArr"; WriteHeap
+  Return
+
+  LEq
+  Return
+  Store x;        //(<=): 42
+    NewHeap; Store x; Load x; PushFwdShift -6; WriteHeap; Load x; Popv x;
+    NewHeap; Load x; WriteHeap; Popv x; NewHeap; Push "endArr"; WriteHeap
+  Return
  ]
 let (|Inline|_|) = function
   |Value "+" -> Some [NewHeap; Store x; Load x; Push "3"; WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
-  |Value "=" -> Some [Push "not implemented"]
+  |Value "=" -> Some [NewHeap; Store x; Load x; Push "24"; WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
+  |Value "<=" -> Some [NewHeap; Store x; Load x; Push "42"; WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
   |Value "ignore" -> Some [Push "not implemented"]
   |Apply(Value "printfn", [Value "\"%A\""]) -> Some [NewHeap; Store x; Load x; Push "19"; WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
   |_ -> None

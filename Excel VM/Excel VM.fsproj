@@ -88,6 +88,7 @@
     <Content Include="test cases - compiler AST\in7.txt" />
     <Content Include="test cases - compiler AST\in8.txt" />
     <Content Include="test cases - compiler AST\in9.txt" />
+    <Content Include="test cases - compiler AST\in10.txt" />
     <Content Include="test cases - Excel pseudo-asm\in1.txt" />
     <Content Include="test cases - Excel pseudo-asm\in2.txt" />
     <Content Include="test cases - Excel pseudo-asm\in3.txt" />

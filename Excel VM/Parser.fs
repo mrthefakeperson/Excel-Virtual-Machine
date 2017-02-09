@@ -79,7 +79,7 @@ let rec parse (stop:Token list->bool) (fail:Token list->bool) left right =
       |a, T ".."::restr ->
         match parse (function T("do" | "..")::_ -> true | _ -> false)
          (fun e -> stop e || fail e) [] restr with
-        |b, T "do"::restr -> Token("..", [a; b]), restr
+        |b, T "do"::restr -> Token("..", [a; Token("1", []); b]), restr
         |step, T ".."::restr ->
           let b, T "do"::restr =
             parse (function T "do"::_ -> true | _ -> false)

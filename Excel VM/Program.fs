@@ -88,7 +88,7 @@ let testCompilerAST =
     printfn "stack %A" stack
     printfn "heap [%s]" (String.concat "; " (Seq.map (sprintf "%A") heap))
     makeProgram cmds
-     |> interpret 1000
+     |> interpret 800
      |> printCells
    )
    
@@ -149,8 +149,8 @@ let testExcelCompiler =
    )
 
 //testExcelInterpreter 1
-testParser 10
-//testCompilerAST 1
+//testParser 10
+//testCompilerAST 10
 //testPAsm 1
 //testExcelFile 1
-//testExcelCompiler 9
+testExcelCompiler 10

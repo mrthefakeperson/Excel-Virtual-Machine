@@ -1,0 +1,2 @@
+﻿for e in 4..6 do
+  printfn "%A" e

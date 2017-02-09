@@ -11,7 +11,7 @@ let Int a = Literal (string a)
 let defaultTo x e = If(Reference "A1" =. Literal "2", x, e)
 
 [<Literal>]
-let SZ = 50
+let SZ = 60
 let makeVerticalStack _name pushCondition pushValue =
   let column, row = separate _name
   let row = int row
@@ -76,6 +76,7 @@ let valueStack =
       "gotoiftrue", Int -1
       "add", Int -1
       "equals", Int -1
+      "leq", Int -1
      ]
      |> matchTable (Int 0) )
    (fun self ->
@@ -85,6 +86,7 @@ let valueStack =
       "getheap", Index(Range("C4", "C54"), self +. Int 1)     //change C14 when changing stack constant
       "add", Index(Range("B4", "B54"), valueTopstackPt +. Int 1) +. self
       "equals", Index(Range("B4", "B54"), valueTopstackPt +. Int 1) =. self
+      "leq", Index(Range("B4", "B54"), valueTopstackPt +. Int 1) <=. self
      ]
      |> matchTable self )
 
@@ -139,7 +141,7 @@ let cmdToStrPair (mapping: IDictionary<string, string>) i = function
   |Call -> "call", "" | Return -> "return", ""
   |GetHeap -> "getheap", "" | NewHeap -> "newheap", "" | WriteHeap -> "writeheap", ""
   |InputLine -> "inputline", "" | OutputLine -> "outputline", ""
-  |Add -> "add", "" | Equals -> "equals", "" | Greater -> "greater", ""
+  |Add -> "add", "" | Equals -> "equals", "" | Greater -> "greater", "" | LEq -> "leq", ""
 let packageProgram instructions vars =
   let variables = Seq.map (numberToAlpha >> (variableStack 2)) vars
   let cells =
