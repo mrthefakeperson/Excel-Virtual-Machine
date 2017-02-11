@@ -1,6 +1,8 @@
-﻿//testing file
+﻿module Testing
+//testing file
 open Parser
 open Lexer
+open Compiler_Definitions
 open Compiler
 open Excel_Language
 open Excel_Conversion
@@ -148,9 +150,10 @@ let testExcelCompiler =
     writeExcelFile (file + ".xlsx") cmds
    )
 
-//testExcelInterpreter 1
-//testParser 10
-//testCompilerAST 11
-//testPAsm 1
-//testExcelFile 1
-testExcelCompiler 11
+let runSpecificTest() =
+  //testExcelInterpreter 1
+  //testParser 10
+  //testCompilerAST 11
+  //testPAsm 1
+  //testExcelFile 1
+  testExcelCompiler 10

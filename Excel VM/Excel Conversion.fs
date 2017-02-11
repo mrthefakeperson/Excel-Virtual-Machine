@@ -11,8 +11,8 @@ let Int a = Literal (string a)
 let defaultTo x e = If(Reference "A1" =. Literal "2", x, e)
 
 [<Literal>]
-let LARGE_SIZE = 200
-let SMALL_SIZE = 15
+let LARGE_SIZE = 300
+let SMALL_SIZE = 20
 let makeVerticalStack sz _name pushCondition pushValue =
   let column, row = separate _name
   let row = int row
@@ -133,16 +133,8 @@ let variableStack sz row col =
 
 let seed = Cell("A1", Reference("A1") +. Literal "1")
 
-open Compiler
+open Compiler_Definitions
 open System.Collections.Generic
-let cmdToStrPair (mapping: IDictionary<string, string>) i = function
-  |Push e -> "push", e | PushFwdShift x -> "push", string(i + x) | Pop -> "pop", ""
-  |Store e -> "store", mapping.[e] | Load e -> "load", string(alphaToNumber mapping.[e] - 5) | Popv e -> "popv", mapping.[e]
-  |GotoFwdShift x -> "goto", string(i + x) | GotoIfTrueFwdShift x -> "gotoiftrue", string(i + x)
-  |Call -> "call", "" | Return -> "return", ""
-  |GetHeap -> "getheap", "" | NewHeap -> "newheap", "" | WriteHeap -> "writeheap", ""
-  |InputLine -> "inputline", "" | OutputLine -> "outputline", ""
-  |Add -> "add", "" | Equals -> "equals", "" | Greater -> "greater", "" | LEq -> "leq", ""
 let packageProgram instructions vars =
   let variables = Seq.map (numberToAlpha >> (variableStack LARGE_SIZE 2)) vars
   let cells =

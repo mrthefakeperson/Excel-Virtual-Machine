@@ -25,6 +25,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\Debug\Excel_VM.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
+    <StartArguments>test</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -75,10 +76,12 @@
     <Compile Include="Lexer.fs" />
     <Compile Include="Parser.fs" />
     <Compile Include="Excel Language.fs" />
+    <Compile Include="Compiler Definitions.fs" />
     <Compile Include="Compiler.fs" />
     <Compile Include="Excel Conversion.fs" />
     <Compile Include="Write File.fs" />
-    <Compile Include="Program.fs" />
+    <Compile Include="Testing.fs" />
+    <Compile Include="Main.fs" />
     <Content Include="test cases - compiler AST\in1.txt" />
     <Content Include="test cases - compiler AST\in2.txt" />
     <Content Include="test cases - compiler AST\in3.txt" />

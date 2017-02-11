@@ -4,11 +4,12 @@ open Microsoft.Office.Interop.Excel
 open System.Reflection
 open System.IO
 open Excel_Language
-open Compiler
+open Compiler_Definitions
 open Excel_Conversion
 
-let writeExcelFile fileName cmds =
-  if File.Exists fileName then File.Delete fileName
+//the file containing all cells except the instructions
+let defaultFileName = sprintf "%s\default_file.xlsx" __SOURCE_DIRECTORY__
+let writeDefaultFile() =
   let back = ApplicationClass()
   let sheet = back.Workbooks.Add().Worksheets.[1] :?> _Worksheet
   back.Calculation <- XlCalculation.xlCalculationManual
@@ -16,11 +17,26 @@ let writeExcelFile fileName cmds =
   back.Iteration <- true
   back.MaxIterations <- 100
   back.MaxChange <- 0.
-  back.Visible <- true
   let set cellname txt =
     printfn "%A" (cellname, txt)
     sheet.Range(cellname).Value(Missing.Value) <- txt
-  makeProgram cmds
+  makeProgram (Array.init 25 (fun e -> Store (string e)))         // 25 variables
    |> Seq.iter (fun (Cell(s, _) as f) -> set s (f.ToString()))
+  sheet.SaveAs defaultFileName
+  back.Quit()
+
+let writeExcelFile fileName cmds =
+  if File.Exists fileName then File.Delete fileName
+  if not (File.Exists defaultFileName) then writeDefaultFile()
+  let back = ApplicationClass()
+  let sheet = back.Workbooks.Open(defaultFileName).Worksheets.[1] :?> _Worksheet
+  let set cellname txt =
+    printfn "%A" (cellname, txt)
+    sheet.Range(cellname).Value(Missing.Value) <- txt
+  let cells =
+    Array.filter (fun (Cell(c, _)) ->
+      fst (coordinates c) = 1
+     ) (makeProgram cmds)
+  Seq.iter (fun (Cell(s, _) as f) -> set s (f.ToString())) cells
   sheet.SaveAs fileName
   back.Quit()
