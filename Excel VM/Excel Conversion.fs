@@ -11,20 +11,21 @@ let Int a = Literal (string a)
 let defaultTo x e = If(Reference "A1" =. Literal "2", x, e)
 
 [<Literal>]
-let SZ = 60
-let makeVerticalStack _name pushCondition pushValue =
+let LARGE_SIZE = 200
+let SMALL_SIZE = 15
+let makeVerticalStack sz _name pushCondition pushValue =
   let column, row = separate _name
   let row = int row
   let _name = name (row+1) column
   seq {
     yield  //topstack value
       Cell(name row column,
-        Index(Range(name (row+2) column, name (row+SZ+1) column), Reference _name)
+        Index(Range(name (row+2) column, name (row+sz+1) column), Reference _name)
        )
     //stack size (pushCondition is the change in size)
     yield Cell(_name, (Reference _name +. pushCondition) |> defaultTo (Int 1))
     //stack cells (pushValue is the new value)
-    for e in row+1+1..row+1+SZ ->
+    for e in row+1+1..row+1+sz ->
       Cell(name e column,
         If(Int (e-row-1) =. Reference _name,
           pushValue (Reference (name e column)),
@@ -50,7 +51,7 @@ let matchTable defaultVal =   //match the current instruction
   (List.map (fun (s, a) -> Literal s =. currentInstruction, a)) >> (conditionTable defaultVal)
 
 let instructionStack =
-  makeVerticalStack ``instr*``
+  makeVerticalStack LARGE_SIZE ``instr*``
    ([ "call", Int 1
       "return", Int -1
      ]
@@ -63,7 +64,7 @@ let instructionStack =
      |> matchTable (self +. Int 2) )
 
 let valueStack =
-  makeVerticalStack ``value*``
+  makeVerticalStack LARGE_SIZE ``value*``
    ([ "push", Int 1
       "pop", Int -1
       "load", Int 1
@@ -83,15 +84,15 @@ let valueStack =
     [ "push", instr_index 1
       "load", Index(Range("F2", "XFD2"), instr_index 1)
       "newheap", Reference "C3" -. Int 2    //size of heap
-      "getheap", Index(Range("C4", "C54"), self +. Int 1)     //change C14 when changing stack constant
-      "add", Index(Range("B4", "B54"), valueTopstackPt +. Int 1) +. self
-      "equals", Index(Range("B4", "B54"), valueTopstackPt +. Int 1) =. self
-      "leq", Index(Range("B4", "B54"), valueTopstackPt +. Int 1) <=. self
+      "getheap", Index(Range("C4", "C" + string(4 + LARGE_SIZE)), self +. Int 1)
+      "add", Index(Range("B4", "B" + string(4 + LARGE_SIZE)), valueTopstackPt +. Int 1) +. self
+      "equals", Index(Range("B4", "B" + string(4 + LARGE_SIZE)), valueTopstackPt +. Int 1) =. self
+      "leq", Index(Range("B4", "B" + string(4 + LARGE_SIZE)), valueTopstackPt +. Int 1) <=. self
      ]
      |> matchTable self )
 
 let heap =
-  makeVerticalStack ``heap*``
+  makeVerticalStack LARGE_SIZE ``heap*``
    (matchTable (Int 0) ["newheap", Int 1])
    id
    |> Seq.mapi (fun i (Cell(s, e)) ->
@@ -99,24 +100,24 @@ let heap =
         else
           Cell(s,
             If((currentInstruction =. Literal "writeheap")
-                &&. (Index(Range("B4", "B54"), valueTopstackPt +. Int 1) =. Int (i-2)),    //remember to change this when changing stack size constant
-             Index(Range("B4", "B54"), valueTopstackPt +. Int 2),
+                &&. (Index(Range("B4", "B" + string(4 + LARGE_SIZE)), valueTopstackPt +. Int 1) =. Int (i-2)),
+             Index(Range("B4", "B" + string(4 + LARGE_SIZE)), valueTopstackPt +. Int 2),
              e)
              |> defaultTo (Int 1)
            )
        )
 
 let input =
-  makeVerticalStack ``input*``
+  makeVerticalStack SMALL_SIZE ``input*``
    (matchTable (Int 0) ["inputline", Int 1])
    id
 let output =
-  makeVerticalStack ``output*``
+  makeVerticalStack LARGE_SIZE ``output*``
    (matchTable (Int 0) ["outputline", Int 1])
    (fun self -> matchTable self ["outputline", currentValue])
 
-let variableStack row col =
-  makeVerticalStack (name row col)
+let variableStack sz row col =
+  makeVerticalStack sz (name row col)
    (conditionTable (Int 0) [
       If(currentInstruction =. Literal "store", instr_index 1 =. Literal col, Literal "false"),
        Int 1     //`store` pushes the value to the top of the stack, remembering previous values for recursion
@@ -143,7 +144,7 @@ let cmdToStrPair (mapping: IDictionary<string, string>) i = function
   |InputLine -> "inputline", "" | OutputLine -> "outputline", ""
   |Add -> "add", "" | Equals -> "equals", "" | Greater -> "greater", "" | LEq -> "leq", ""
 let packageProgram instructions vars =
-  let variables = Seq.map (numberToAlpha >> (variableStack 2)) vars
+  let variables = Seq.map (numberToAlpha >> (variableStack LARGE_SIZE 2)) vars
   let cells =
     Seq.concat [
       Seq.singleton seed

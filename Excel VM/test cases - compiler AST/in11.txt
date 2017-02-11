@@ -1,0 +1,3 @@
+﻿for e in 5..7 do
+  for ee in e..8 do
+    printfn "%A" ee

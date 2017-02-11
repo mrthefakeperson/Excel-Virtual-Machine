@@ -28,6 +28,10 @@ type AST =
         |Assign(a, i, e) -> indent + sprintf "%s[%s] <- %s" (str "" a) (str "" i) (str "" e)
       str "" x
 
+let nxt' x () =
+  incr x
+  string !x
+let nxt = nxt' (ref 0)
 let (|X|) (t:Token) = X(t.Name, t.Dependants)
 let (|Var|Cnst|Other|) = function               //todo: non-numeric constants (eg. chars)
   |T ("true" | "false" as s) -> Cnst s
@@ -65,26 +69,28 @@ let rec ASTCompile' (capture, captured as cpt) = function
     If(ASTCompile' cpt cond, ASTCompile' cpt aff, ASTCompile' cpt neg)
   |X("do", [b]) -> Apply(Value "ignore", [ASTCompile' cpt b])
   |X("while", [cond; b]) ->
+    let loop = "$loop" + nxt()
     Sequence [
-      Define("$loop", ["()"],
+      Define(loop, ["()"],
         If(ASTCompile' cpt cond,
-          Sequence [ASTCompile' cpt b; Apply(Value "$loop", [Const "()"])],
+          Sequence [ASTCompile' cpt b; Apply(Value loop, [Const "()"])],
           Const "()"     //Apply(Value "ignore", [Const "()"])
          ) )
-      Apply(Value "$loop", [Const "()"])
+      Apply(Value loop, [Const "()"])
      ]
   |X("for", [name; iterable; body]) ->
+    let loop = "$loop" + nxt()
     //todo: flatten name pattern, change call to loop function accordingly
     let name = match name with X(name, []) -> name | _ -> failwith "patterns not supported yet"
     match iterable with
     |X("..", [a; step; b]) ->
       Sequence [
-        Define("$loop", [name],
+        Define(loop, [name],
           If(Apply(Apply(Value "<=", [Value name]), [ASTCompile' cpt b]),          //todo: negative step values
-            Sequence [ASTCompile' cpt body; Apply(Value "$loop", [Apply(Apply(Value "+", [Value name]), [ASTCompile' cpt step])])],
+            Sequence [ASTCompile' cpt body; Apply(Value loop, [Apply(Apply(Value "+", [Value name]), [ASTCompile' cpt step])])],
             Const "()"
            ) )
-        Apply(Value "$loop", [ASTCompile' cpt a])
+        Apply(Value loop, [ASTCompile' cpt a])
        ]
     |_ -> failwith "iterable objects not supported yet"
   |X("sequence", list) -> //Sequence (List.map (ASTCompile' capture) list)

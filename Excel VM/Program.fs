@@ -150,7 +150,7 @@ let testExcelCompiler =
 
 //testExcelInterpreter 1
 //testParser 10
-//testCompilerAST 10
+//testCompilerAST 11
 //testPAsm 1
 //testExcelFile 1
-testExcelCompiler 10
+testExcelCompiler 11
