@@ -1,0 +1,4 @@
+sequence[1,1](if[1,1](sequence[1,4](apply[1,4](apply[1,4](dot[1,4](a[1,4](),b[1,6]()),c[1,8]()),()[1,10](sequence[1,11](apply[1,11](d[1,11](),dot[1,13](e[1,13](),f[1,15]())))))),sequence[1,23](dot[1,23](()[1,23](sequence[1,24](apply[1,24](b[1,24](),a[1,26]()))),c[1,29]())),sequence[1,36](dot[1,36](e[1,36](),()[1,38](sequence[1,39](a[1,39]()))))))
+if a.b c (d e.f) then (b a).c else e.(a)
+
+if ((a.b) (c)) ((d) (e.f)) then (b) (a).c else e.a

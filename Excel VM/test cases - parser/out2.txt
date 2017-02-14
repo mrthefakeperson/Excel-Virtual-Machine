@@ -1,0 +1,6 @@
+sequence[2,0](if[1,1](sequence[1,4](a[1,4]()),sequence[1,11](b[1,11]()),()[1,1]()),apply[2,0](apply[2,0](+[3,0](),apply[2,0](apply[2,0](+[2,6](),()[2,0](sequence[2,1](apply[2,1](a[2,1](),b[2,3]())))),c[2,8]())),d[3,2]()))
+if a then b
+(a b) + c
++ d
+
+if a then b else (); ((+) (((+) ((a) (b))) (c))) (d)

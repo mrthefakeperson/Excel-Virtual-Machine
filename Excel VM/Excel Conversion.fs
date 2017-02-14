@@ -1,18 +1,20 @@
-﻿//fix heap indexing before anything else
-//more arithmetic
+﻿//more arithmetic
 //test arithmetic
 
 module Excel_Conversion
+open Compiler_Definitions
 open Excel_Language
 open System
+
+[<Literal>]
+let LARGE_SIZE = 100
+[<Literal>]
+let SMALL_SIZE = 20
 
 let name row col = sprintf "%s%i" col row
 let Int a = Literal (string a)
 let defaultTo x e = If(Reference "A1" =. Literal "2", x, e)
 
-[<Literal>]
-let LARGE_SIZE = 300
-let SMALL_SIZE = 20
 let makeVerticalStack sz _name pushCondition pushValue =
   let column, row = separate _name
   let row = int row
@@ -75,20 +77,29 @@ let valueStack =
       "inputline", Int 1
       "outputline", Int -1
       "gotoiftrue", Int -1
-      "add", Int -1
-      "equals", Int -1
-      "leq", Int -1
+//      "add", Int -1
+//      "equals", Int -1
+//      "leq", Int -1
      ]
+     @ List.map (function
+         |Combinator_2 c -> c.Name, Int -1
+         |_ -> failwith "non-combinator found in the combinator list"
+        ) allCombinators
      |> matchTable (Int 0) )
    (fun self ->
     [ "push", instr_index 1
       "load", Index(Range("F2", "XFD2"), instr_index 1)
       "newheap", Reference "C3" -. Int 2    //size of heap
       "getheap", Index(Range("C4", "C" + string(4 + LARGE_SIZE)), self +. Int 1)
-      "add", Index(Range("B4", "B" + string(4 + LARGE_SIZE)), valueTopstackPt +. Int 1) +. self
-      "equals", Index(Range("B4", "B" + string(4 + LARGE_SIZE)), valueTopstackPt +. Int 1) =. self
-      "leq", Index(Range("B4", "B" + string(4 + LARGE_SIZE)), valueTopstackPt +. Int 1) <=. self
+//      "add", Index(Range("B4", "B" + string(4 + LARGE_SIZE)), valueTopstackPt +. Int 1) +. self
+//      "equals", Index(Range("B4", "B" + string(4 + LARGE_SIZE)), valueTopstackPt +. Int 1) =. self
+//      "leq", Index(Range("B4", "B" + string(4 + LARGE_SIZE)), valueTopstackPt +. Int 1) <=. self
      ]
+     @ List.map (function
+         |Combinator_2 c ->
+           c.Name, c.CreateFormula (Index(Range("B4", "B" + string(4 + LARGE_SIZE)), valueTopstackPt +. Int 1)) self
+         |_ -> failwith "non-combinator found in the combinator list"
+        ) allCombinators
      |> matchTable self )
 
 let heap =

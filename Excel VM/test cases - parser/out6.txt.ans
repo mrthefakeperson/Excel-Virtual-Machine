@@ -1,0 +1,5 @@
+sequence[1,1](let[1,1](apply[1,5](a[1,5](),b[1,7]()),sequence[1,1](fun[1,1](apply[1,15](c[1,15](),d[1,17]()),sequence[2,2](apply[2,2](apply[2,2](+[2,4](),f[2,2]()),g[2,6]()))))))
+let a b = fun c d ->
+  f + g
+
+let (a) (b) = (fun (c) (d) -> (((+) (f)) (g)))

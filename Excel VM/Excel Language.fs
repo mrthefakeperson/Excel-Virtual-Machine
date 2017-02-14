@@ -115,7 +115,7 @@ let error x message =
   //printfn "%s: %A" message x
   //ignore (stdin.ReadLine())
   ERROR
-let combOp (x:Combinator)=
+let combOp (x:Combinator) =
   let _N op a b =
     match a,b with
     |N a, N b -> S (string(op a b))

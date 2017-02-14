@@ -28,6 +28,13 @@ type AST =
         |Assign(a, i, e) -> indent + sprintf "%s[%s] <- %s" (str "" a) (str "" i) (str "" e)
       str "" x
 
+[<AbstractClass>]     //combinator class
+type comb2(name) =
+  member x.ToStrPair() = name, ""
+  abstract member Interpret: string -> string -> string
+  abstract member CreateFormula: Formula -> Formula -> Formula
+  member x.Name = name
+
 //heap is indexed from 0
 //everything else (?) from 1
 type PseudoAsm =
@@ -46,11 +53,37 @@ type PseudoAsm =
   |WriteHeap   //let v = topstack; pop stack; let i = topstack; pop stack; heap at i <- v
   |InputLine
   |OutputLine
+  |Combinator_2 of comb2
   //arithmetic (consider making this a type)
-  |Add
-  |Equals
-  |Greater
-  |LEq
+//  |Add
+//  |Equals
+//  |Greater
+//  |LEq
+type C2_Add(name) =
+  inherit comb2(name)
+  override x.Interpret a b = string (int a + int b)
+  override x.CreateFormula a b = a +. b
+let Add = Combinator_2 (C2_Add("add"))
+type C2_Equals(name) =
+  inherit comb2(name)
+  override x.Interpret a b = string (a = b)
+  override x.CreateFormula a b = a =. b
+let Equals = Combinator_2 (C2_Equals("equals"))
+type C2_LEq(name) =
+  inherit comb2(name)
+  override x.Interpret a b =
+    if System.Int32.TryParse(a, ref 0) && System.Int32.TryParse(b, ref 0)
+     then string(int a <= int b)
+     else string(a <= b)
+  override x.CreateFormula a b = a <=. b
+let LEq = Combinator_2 (C2_LEq("leq"))
+type C2_Greater(name) =
+  inherit comb2(name)
+  override x.Interpret a b = failwith "not done yet"
+  override x.CreateFormula a b = failwith "not done yet"
+let Greater = Combinator_2 (C2_Greater("greater"))
+let allCombinators = [Add; Equals; LEq]
+
 let cmdToStrPair (mapping: IDictionary<string, string>) i = function
   |Push e -> "push", e | PushFwdShift x -> "push", string(i + x) | Pop -> "pop", ""
   |Store e -> "store", mapping.[e] | Load e -> "load", string(alphaToNumber mapping.[e] - 5) | Popv e -> "popv", mapping.[e]
@@ -58,7 +91,8 @@ let cmdToStrPair (mapping: IDictionary<string, string>) i = function
   |Call -> "call", "" | Return -> "return", ""
   |GetHeap -> "getheap", "" | NewHeap -> "newheap", "" | WriteHeap -> "writeheap", ""
   |InputLine -> "inputline", "" | OutputLine -> "outputline", ""
-  |Add -> "add", "" | Equals -> "equals", "" | Greater -> "greater", "" | LEq -> "leq", ""
+  |Combinator_2 c -> c.ToStrPair()
+//  |Add -> "add", "" | Equals -> "equals", "" | Greater -> "greater", "" | LEq -> "leq", ""
 let interpretPAsm cmds =
   let pushstack stack v = stack := v :: !stack
   let popstack stack = stack := match !stack with _ :: tl -> tl | [] -> []
@@ -96,6 +130,11 @@ let interpretPAsm cmds =
     |WriteHeap -> let v = top value in pop value; let i = top value in pop value; heap.[int i] <- v
     |InputLine -> push value (stdin.ReadLine())
     |OutputLine -> push output (top value); pop value
+    |Combinator_2 c ->
+      let a = top value in pop value
+      let b = top value in pop value
+      push value (c.Interpret a b)
+(*
     |Add -> let a = top value in pop value; let b = top value in pop value; push value (string(int a + int b))
     |Equals -> let a = top value in pop value; let b = top value in pop value; push value (string(a = b))
     |Greater -> failwith "do later"//let a = top value in pop value; let b = top value in pop value; push value (string(a > b))
@@ -104,7 +143,7 @@ let interpretPAsm cmds =
       if System.Int32.TryParse(a, ref 0) && System.Int32.TryParse(b, ref 0)
        then push value (string(int a <= int b))
        else push value (string(a <= b))
-
+*)
   let debug = false
   push instr "0"
   while int(top instr) < Array.length cmds do

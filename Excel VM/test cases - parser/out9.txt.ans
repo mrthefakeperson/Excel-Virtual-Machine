@@ -1,0 +1,4 @@
+sequence[1,1](apply[1,1](apply[1,1](printfn[1,1](),"%A"[1,9]()),74[1,14]()))
+printfn "%A" 74
+
+((printfn) ("%A")) (74)
