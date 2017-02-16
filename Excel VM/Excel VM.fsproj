@@ -93,6 +93,7 @@
     <Content Include="test cases - compiler AST\in9.txt" />
     <Content Include="test cases - compiler AST\in10.txt" />
     <Content Include="test cases - compiler AST\in11.txt" />
+    <Content Include="test cases - compiler AST\in12.txt" />
     <Content Include="test cases - Excel pseudo-asm\in1.txt" />
     <Content Include="test cases - Excel pseudo-asm\in2.txt" />
     <Content Include="test cases - Excel pseudo-asm\in3.txt" />
@@ -111,6 +112,7 @@
     <Content Include="test cases - parser\in8.txt" />
     <Content Include="test cases - parser\in9.txt" />
     <Content Include="test cases - parser\in10.txt" />
+    <Content Include="test cases - parser\in11.txt" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

@@ -105,9 +105,9 @@ let testCompilerAST a =
     let stack, heap = interpretPAsm cmds
     printfn "stack %A" stack
     printfn "heap [%s]" (String.concat "; " (Seq.map (sprintf "%A") heap))
-    makeProgram cmds
-     |> interpret 800
-     |> printCells outFile
+    //makeProgram cmds
+    // |> interpret 800
+    // |> printCells outFile
    )
    
 let testPAsm a =
@@ -172,10 +172,10 @@ let testExcelCompiler =
     writeExcelFile (file + ".xlsx") cmds
    )
 
-let runSpecificTest() =
+let runSpecificTest() =       // `generate` to create outputs, `verify` to test, `ignore` to print
   //testExcelInterpreter verify 1
-  //testParser verify 1
-  //testCompilerAST generate 1
-  testPAsm verify 1
+  //testParser verify 11
+  //testCompilerAST ignore 12
+  //testPAsm ignore 8
   //testExcelFile 1
-  //testExcelCompiler 1
+  testExcelCompiler 12

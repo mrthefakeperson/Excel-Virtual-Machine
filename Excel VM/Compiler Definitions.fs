@@ -34,6 +34,7 @@ type comb2(name) =
   abstract member Interpret: string -> string -> string
   abstract member CreateFormula: Formula -> Formula -> Formula
   member x.Name = name
+  override x.ToString() = name
 
 //heap is indexed from 0
 //everything else (?) from 1
@@ -54,11 +55,6 @@ type PseudoAsm =
   |InputLine
   |OutputLine
   |Combinator_2 of comb2
-  //arithmetic (consider making this a type)
-//  |Add
-//  |Equals
-//  |Greater
-//  |LEq
 type C2_Add(name) =
   inherit comb2(name)
   override x.Interpret a b = string (int a + int b)
@@ -82,7 +78,12 @@ type C2_Greater(name) =
   override x.Interpret a b = failwith "not done yet"
   override x.CreateFormula a b = failwith "not done yet"
 let Greater = Combinator_2 (C2_Greater("greater"))
-let allCombinators = [Add; Equals; LEq]
+type C2_Mod(name) =
+  inherit comb2(name)
+  override x.Interpret a b = string(int a % int b)
+  override x.CreateFormula a b = a %. b
+let Mod = Combinator_2 (C2_Mod("mod"))
+let allCombinators = [Add; Equals; LEq; Mod]
 
 let cmdToStrPair (mapping: IDictionary<string, string>) i = function
   |Push e -> "push", e | PushFwdShift x -> "push", string(i + x) | Pop -> "pop", ""
@@ -134,26 +135,25 @@ let interpretPAsm cmds =
       let a = top value in pop value
       let b = top value in pop value
       push value (c.Interpret a b)
-(*
-    |Add -> let a = top value in pop value; let b = top value in pop value; push value (string(int a + int b))
-    |Equals -> let a = top value in pop value; let b = top value in pop value; push value (string(a = b))
-    |Greater -> failwith "do later"//let a = top value in pop value; let b = top value in pop value; push value (string(a > b))
-    |LEq ->
-      let a = top value in pop value; let b = top value in pop value
-      if System.Int32.TryParse(a, ref 0) && System.Int32.TryParse(b, ref 0)
-       then push value (string(int a <= int b))
-       else push value (string(a <= b))
-*)
   let debug = false
   push instr "0"
   while int(top instr) < Array.length cmds do
     let i = int(top instr)
     if debug then printfn "%A" stacks.["e"]
     if debug then printfn "%A" cmds.[i]
-    interpretCmd i cmds.[i]
+    try
+      interpretCmd i cmds.[i]
+    with
+    |ex ->
+      printfn "%A" ex
+      printfn "stack %A" !stacks.[value]
+      printfn "heap [%s]" (String.concat "; " (Seq.map (sprintf "%A") heap))
+      printfn "%A" cmds.[i]
+      failwith "failed"
     if debug then printfn "stack %A" !stacks.[value]
     if debug then printfn "heap [%s]" (String.concat "; " (Seq.map (sprintf "%A") heap))
     let pt = int(top instr)
     pop instr; push instr (string(pt+1))
     if debug then ignore (stdin.ReadLine())
+  List.iter (printfn "%A") (List.rev !stacks.[output])
   !stacks.[value], heap

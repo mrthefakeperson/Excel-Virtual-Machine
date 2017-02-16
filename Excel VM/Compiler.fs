@@ -8,7 +8,14 @@ let nxt' x () =
   string !x
 let nxt = nxt' (ref 0)
 let (|X|) (t:Token) = X(t.Name, t.Dependants)
-let (|Var|Cnst|Other|) = function               //todo: non-numeric constants (eg. chars)
+let (|Inner|_|) c = function
+  |T "\"\"" -> Some ""
+  |T s when s.Length >= 2 && s.[0] = c && s.[s.Length-1] = c -> Some s.[1..s.Length-2]
+  |_ -> None
+let (|Var|Cnst|Other|) = function               //todo: non-numeric constants
+  |Inner '"' s -> Cnst s        //cases like "\" should not have made it through the lexer
+  |Inner ''' s -> Cnst s        //cases like 'dd' are the lexer's job
+  |T "()" -> Cnst "()"
   |T ("true" | "false" as s) -> Cnst s
   |T s -> if s <> "" && '0' <= s.[0] && s.[0] <= '9' then Cnst s else Var s
   |_ -> Other
@@ -84,38 +91,32 @@ let rec ASTCompile' (capture, captured as cpt) = function
 let ASTCompile e = ASTCompile' ([], Map.empty) e
   
 let x = "F"    //just a place to store values
-let rec operationsPrefix = [
-  Add
+let createComb2Section cmd = [
+  cmd
   Return
-  Store x;   //(+): 3   (one instruction goes before all of this)
-    NewHeap; Store x; Load x; PushFwdShift -6; WriteHeap; Load x; Popv x;
-    NewHeap; Load x; WriteHeap; Popv x; NewHeap; Push "endArr"; WriteHeap
-  Return
-
-  OutputLine    //print: 19
-  Push "()"
-  Return
-
-  Equals
-  Return
-  Store x;        //(=): 24
-    NewHeap; Store x; Load x; PushFwdShift -6; WriteHeap; Load x; Popv x;
-    NewHeap; Load x; WriteHeap; Popv x; NewHeap; Push "endArr"; WriteHeap
-  Return
-
-  LEq
-  Return
-  Store x;        //(<=): 42
+  Store x;   //cmd: 2 + number of instructions before
     NewHeap; Store x; Load x; PushFwdShift -6; WriteHeap; Load x; Popv x;
     NewHeap; Load x; WriteHeap; Popv x; NewHeap; Push "endArr"; WriteHeap
   Return
  ]
+let allComb2Sections = List.collect createComb2Section allCombinators
+let getSectionAddress i = 18 * i + 3
+let getSectionAddressFromCmd cmd = List.findIndex ((=) cmd) allCombinators |> getSectionAddress
+let getSectionAddressFromInfix =
+  (function "+" -> Add | "=" -> Equals | "<=" -> LEq | "%" -> Mod | _ -> failwith "???")
+   >> getSectionAddressFromCmd
+let rec operationsPrefix =
+  allComb2Sections
+   @ [OutputLine; Push "()"; Return]
+let _PrintAddress = List.length allComb2Sections + 1
 let (|Inline|_|) = function
-  |Value "+" -> Some [NewHeap; Store x; Load x; Push "3"; WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
-  |Value "=" -> Some [NewHeap; Store x; Load x; Push "24"; WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
-  |Value "<=" -> Some [NewHeap; Store x; Load x; Push "42"; WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
+  |Value ("+" | "=" | "<=" | "%" as nfx) ->
+    Some [
+      NewHeap; Store x; Load x; Push (string(getSectionAddressFromInfix nfx)); WriteHeap  // store address
+      NewHeap; Push "endArr"; WriteHeap; Load x; Popv x      // end the array
+     ]
   |Value "ignore" -> Some [Push "not implemented"]
-  |Apply(Value "printfn", [Value "\"%A\""]) -> Some [NewHeap; Store x; Load x; Push "19"; WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
+  |Apply(Value "printfn", [Const "%A"]) -> Some [NewHeap; Store x; Load x; Push (string _PrintAddress); WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
   |_ -> None
 let rec compile' = function
   |Inline ll -> ll

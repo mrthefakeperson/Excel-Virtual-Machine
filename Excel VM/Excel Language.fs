@@ -11,17 +11,18 @@ type Combinator=
   |Minus    = 1
   |Mul      = 2
   |Div      = 3
-  |Less             = 4
-  |LessOrEqual      = 5
-  |Equal            = 6
-  |Unequal          = 7
-  |Greater          = 8
-  |GreaterOrEqual   = 9
-  |And      = 10
-  |Or       = 11
+  |Mod      = 4
+  |Less             = 5
+  |LessOrEqual      = 6
+  |Equal            = 7
+  |Unequal          = 8
+  |Greater          = 9
+  |GreaterOrEqual   = 10
+  |And      = 11
+  |Or       = 12
 let combString (x:Combinator)=
-  let a=[|"+"; "-"; "*"; "/"; "<"; "<="; "="; "<>"; ">"; ">="; "&&"; "||";|]
-  a.[int x]
+  [|"+"; "-"; "*"; "/"; "MOD"; "<"; "<="; "="; "<>"; ">"; ">="; "AND"; "OR";|]
+   .[int x]
 type Formula=
   |Literal of string
   |Reference of cellName:string
@@ -41,7 +42,7 @@ type Formula=
       |Index(a, b) -> a.hasReference() || b.hasReference()
       |Combine(a,_,b) -> a.hasReference() || b.hasReference()
       |Concatenate a -> Array.exists (fun (e:Formula) -> e.hasReference()) a
-and Cell=
+and Cell =
   Cell of name:string*Formula
    with
     override x.ToString()=
@@ -56,13 +57,14 @@ and Cell=
           |Choose(n,list) ->
             sprintf "CHOOSE(%s,%s)" (pr n) (String.concat "," (Array.map pr list))
           |Index(list, k) -> sprintf "INDEX(%s,%s)" (pr list) (pr k)
-          |Combine(a, Combinator.And, b) -> sprintf "AND(%s,%s)" (pr a) (pr b)
-          |Combine(a,u,b) -> sprintf "(%s)%s(%s)" (pr a) (combString u) (pr b)
+          |Combine(a, (Combinator.Mod | Combinator.And | Combinator.Or as u), b) ->
+            sprintf "%s(%s,%s)" (combString u) (pr a) (pr b)
+          |Combine(a, u, b) -> sprintf "(%s)%s(%s)" (pr a) (combString u) (pr b)
           |Concatenate list -> sprintf "CONCATENATE(%s)" (String.concat "," (Array.map pr list))
         sprintf "=%s" (pr formula)
 let cmb c a b = Combine(a, c, b)
-let (+.), (-.), ( *. ), (/.), (<=.), (=.), (&&.), (||.) =
-  cmb Combinator.Plus, cmb Combinator.Minus, cmb Combinator.Mul, cmb Combinator.Div,
+let (+.), (-.), ( *. ), (/.), (%.), (<=.), (=.), (&&.), (||.) =
+  cmb Combinator.Plus, cmb Combinator.Minus, cmb Combinator.Mul, cmb Combinator.Div, cmb Combinator.Mod,
   cmb Combinator.LessOrEqual, cmb Combinator.Equal,
   cmb Combinator.And, cmb Combinator.Or
 

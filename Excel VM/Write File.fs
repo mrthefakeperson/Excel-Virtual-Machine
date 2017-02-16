@@ -18,12 +18,13 @@ let writeDefaultFile() =
   back.MaxIterations <- 100
   back.MaxChange <- 0.
   let set cellname txt =
-    printfn "%A" (cellname, txt)
+    //printfn "%A" (cellname, txt)
     sheet.Range(cellname).Value(Missing.Value) <- txt
   makeProgram (Array.init 25 (fun e -> Store (string e)))         // 25 variables
    |> Seq.iter (fun (Cell(s, _) as f) -> set s (f.ToString()))
   sheet.SaveAs defaultFileName
   back.Quit()
+  printfn "done"
 
 let writeExcelFile fileName cmds =
   if File.Exists fileName then File.Delete fileName
@@ -31,7 +32,7 @@ let writeExcelFile fileName cmds =
   let back = ApplicationClass()
   let sheet = back.Workbooks.Open(defaultFileName).Worksheets.[1] :?> _Worksheet
   let set cellname txt =
-    printfn "%A" (cellname, txt)
+    //printfn "%A" (cellname, txt)
     sheet.Range(cellname).Value(Missing.Value) <- txt
   let cells =
     Array.filter (fun (Cell(c, _)) ->
@@ -40,3 +41,4 @@ let writeExcelFile fileName cmds =
   Seq.iter (fun (Cell(s, _) as f) -> set s (f.ToString())) cells
   sheet.SaveAs fileName
   back.Quit()
+  printfn "done"
