@@ -4,7 +4,7 @@
 let infixOrder = [|
   ["*"; "/"; "%"]
   ["+"; "-"]
-  ["="]
+  ["="; "<>"; ">"; ">="; "<"; "<="]
   ["&&"]
   ["||"]
  |]
@@ -43,6 +43,7 @@ type Token(name:string, row_col, functionApplication:bool, dependants:Token list
     |"while", [a; b] -> sprintf "while %s do %s" (a.ToStringExpr()) (b.ToStringExpr())
     |"for", [a; b; c] -> sprintf "for %s in %s do (%s)" (a.ToStringExpr()) (b.ToStringExpr()) (c.ToStringExpr())
     |"let", [a; b] -> sprintf "let %s = (%s)" (a.ToStringExpr()) (b.ToStringExpr())
+    |"let rec", [a; b] -> sprintf "let rec %s = (%s)" (a.ToStringExpr()) (b.ToStringExpr())
     |"fun", [a; b] -> sprintf "fun %s -> (%s)" (a.ToStringExpr()) (b.ToStringExpr())
     |"pattern", [a; b] -> sprintf "| %s -> %s" (a.ToStringExpr()) (b.ToStringExpr())
     |_ -> name + (String.concat " " (List.map (fun (e:Token) -> e.ToStringExpr()) dependants))

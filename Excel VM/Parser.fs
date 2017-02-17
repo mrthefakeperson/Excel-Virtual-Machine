@@ -20,6 +20,13 @@ let preprocess =
        ) ((-1, 0), [])
    >> snd >> List.rev
 
+let (|ConsqLR|_|) = function
+  |(T _ as a)::_, (T _ as b)::_ when a.IndentedLess b -> Some ConsqLR
+  |_ -> None
+let (|ConsqS|_|) = function
+  |(T _ as a)::(T _ as b)::_ when a.IndentedLess b -> Some ConsqS
+  |_ -> None
+
 type State =
   |Pattern
   |Normal
@@ -42,7 +49,6 @@ let rec parse state (stop:Token list->bool) (fail:Token list->bool) left right =
     |Match state stop fail x
     |Function state stop fail x
     |Dot state stop fail x
-    |FixPriorityOfDot state stop fail x
     |Infix state stop fail x
     |Apply state stop fail x
     |Transfer state stop fail x             -> x
@@ -79,10 +85,12 @@ and (|If|_|) state stop fail = function
       parse state (function T "then"::_ -> true | _ -> false)
        (fun e -> stop e || fail e) [] right
     let aff, restr =
-      parse state (function T "else"::_ -> true | k when stop k -> true | t'::_ -> not (t.IndentedLess t'))
+      parse state (function T ("elif" | "else")::_ -> true | k when stop k -> true | t'::_ -> not (t.IndentedLess t'))
        fail [] restr
     let neg, restr =
       match restr with
+      |T "elif"::restr | (T "else"::T "if"::restr & ConsqS) ->
+        parse state stop fail [] (t::restr)
       |T "else"::restr ->
         parse state (function k when stop k -> true | t'::_ -> not (t.IndentedLess t') | _ -> false)
          fail [] restr
@@ -129,14 +137,15 @@ and (|For|_|) state stop fail = function
     Some (parse state stop fail restl (parsed::restr))
   |_ -> None
 and (|Let|_|) state stop fail = function
-  |T "let" as t::restl, right ->
+  |((T "let" as t::restl, T ("rec" as s)::right) & ConsqLR)
+  |(T ("let" as s) as t::restl, right) ->
     let name, T "="::restr =
       parse Pattern (function T "="::_ -> true | _ -> false)
        (fun e -> stop e || fail e) [] right
     let body, restr =
       parse state (function e when stop e -> true | t'::_ -> not (t.IndentedLess t') | _ -> false)
        fail [] restr
-    let parsed = Token("let", t.Indentation, [name; body])
+    let parsed = Token((if s = "let" then s else "let rec"), t.Indentation, [name; body])
     Some (parse state stop fail restl (parsed::restr))
   |_ -> None
 and (|Fun|_|) state stop fail = function
@@ -189,8 +198,7 @@ and (|Dot|_|) state stop fail = function
   |T "."::(A as a)::restl, (A as b)::restr ->  //not perfect: catches bracketed expressions as weird dotted accesses
     let parsed = Token("dot", a.Indentation, true, [a; b])
     Some (parse state stop fail restl (parsed::restr))
-  |_ -> None
-and (|FixPriorityOfDot|_|) state stop fail = function
+  //fix priority
   |left, a::(T "." as t)::restr -> Some (parse state stop fail (t::a::left) restr)
   |_ -> None
 and (|Infix|_|) state stop fail = function
