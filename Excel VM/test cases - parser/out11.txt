@@ -1,8 +1,8 @@
-sequence[1,1](for[1,1](e[1,5](),..[0,0](sequence[1,10](1[1,10]()),1[0,0](),sequence[1,13](10[1,13]())),sequence[2,2](if[2,2](sequence[2,5](apply[2,5](apply[2,5](=[2,11](),apply[2,5](apply[2,5](%[2,7](),e[2,5]()),3[2,9]())),0[2,13]())),sequence[2,20](apply[2,20](apply[2,20](printfn[2,20](),"%A"[2,28]()),"fizz"[2,33]())),sequence[4,4](if[4,4](sequence[4,7](apply[4,7](apply[4,7](=[4,13](),apply[4,7](apply[4,7](%[4,9](),e[4,7]()),5[4,11]())),0[4,15]())),sequence[4,22](apply[4,22](apply[4,22](printfn[4,22](),"%A"[4,30]()),"buzz"[4,35]())),sequence[5,9](apply[5,9](apply[5,9](printfn[5,9](),"%A"[5,17]()),e[5,22]()))))))))
 for e in 1..10 do
   if e % 3 = 0 then printfn "%A" "fizz"
   else
     if e % 5 = 0 then printfn "%A" "buzz"
-    else printfn "%A" e
-
-for e in ..1 1 10 do (if ((=) (((%) (e)) (3))) (0) then ((printfn) ("%A")) ("fizz") else if ((=) (((%) (e)) (5))) (0) then ((printfn) ("%A")) ("buzz") else ((printfn) ("%A")) (e))
+    else
+      if e % 15 = 0 then printfn "%A" "fizzbuzz"
+      else printfn "%A" e
+for e in ..1 1 10 do (if ((=) (((%) (e)) (3))) (0) then ((printfn) ("%A")) ("fizz") else if ((=) (((%) (e)) (5))) (0) then ((printfn) ("%A")) ("buzz") else if ((=) (((%) (e)) (15))) (0) then ((printfn) ("%A")) ("fizzbuzz") else ((printfn) ("%A")) (e))

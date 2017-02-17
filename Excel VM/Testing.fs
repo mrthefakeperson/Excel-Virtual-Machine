@@ -12,8 +12,11 @@ open System.Diagnostics
 open System.IO
 
 let logPrintf file =
+  let pr = new StreamWriter(file:string)
   Printf.kprintf (fun e ->
-    File.AppendAllText(file, e)
+    pr.Write e
+    pr.Flush()
+    pr.Close()
     printf "%s" e
    )
 
@@ -79,11 +82,11 @@ let testParser a =
       File.ReadAllText file
        |> groupByRuleset
        |> preprocess
-       |> parse (function [] -> true | _ -> false) (fun _ -> false) []
+       |> parse Normal (function [] -> true | _ -> false) (fun _ -> false) []
        |> fst
+    let parsed = parsed.Clean()
     logPrintf outFile "%A\n" parsed
-    parsed.Clean()
-     .ToStringExpr()
+    parsed.ToStringExpr()
      |> logPrintf outFile "%s\n%O\n" (File.ReadAllText file)
    )
 
@@ -94,7 +97,7 @@ let testCompilerAST a =
       File.ReadAllText file
        |> groupByRuleset
        |> preprocess
-       |> parse (function [] -> true | _ -> false) (fun _ -> false) []
+       |> parse Normal (function [] -> true | _ -> false) (fun _ -> false) []
        |> fst
     let cmds =
       parsed.Clean()
@@ -161,7 +164,7 @@ let testExcelCompiler =
       File.ReadAllText file
        |> groupByRuleset
        |> preprocess
-       |> parse (function [] -> true | _ -> false) (fun _ -> false) []
+       |> parse Normal (function [] -> true | _ -> false) (fun _ -> false) []
        |> fst
     let cmds =
       parsed.Clean()
@@ -174,7 +177,7 @@ let testExcelCompiler =
 
 let runSpecificTest() =       // `generate` to create outputs, `verify` to test, `ignore` to print
   //testExcelInterpreter verify 1
-  //testParser verify 11
+  //testParser verify 1
   //testCompilerAST ignore 12
   //testPAsm ignore 8
   //testExcelFile 1

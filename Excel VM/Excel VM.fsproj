@@ -113,6 +113,7 @@
     <Content Include="test cases - parser\in9.txt" />
     <Content Include="test cases - parser\in10.txt" />
     <Content Include="test cases - parser\in11.txt" />
+    <Content Include="test cases - parser\in12.txt" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
