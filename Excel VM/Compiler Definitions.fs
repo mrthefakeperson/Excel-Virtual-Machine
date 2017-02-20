@@ -29,11 +29,12 @@ type AST =
       str "" x
 
 [<AbstractClass>]     //combinator class
-type comb2(name) =
+type comb2(name, symbol) =
   member x.ToStrPair() = name, ""
   abstract member Interpret: string -> string -> string
   abstract member CreateFormula: Formula -> Formula -> Formula
   member x.Name = name
+  member x.Symbol = symbol
   override x.ToString() = name
 
 //heap is indexed from 0
@@ -55,35 +56,37 @@ type PseudoAsm =
   |InputLine
   |OutputLine
   |Combinator_2 of comb2
-type C2_Add(name) =
-  inherit comb2(name)
+type C2_Add(name, symbol) =
+  inherit comb2(name, symbol)
   override x.Interpret a b = string (int a + int b)
   override x.CreateFormula a b = a +. b
-let Add = Combinator_2 (C2_Add("add"))
-type C2_Equals(name) =
-  inherit comb2(name)
+type C2_Equals(name, symbol) =
+  inherit comb2(name, symbol)
   override x.Interpret a b = string (a = b)
   override x.CreateFormula a b = a =. b
-let Equals = Combinator_2 (C2_Equals("equals"))
-type C2_LEq(name) =
-  inherit comb2(name)
+type C2_LEq(name, symbol) =
+  inherit comb2(name, symbol)
   override x.Interpret a b =
     if System.Int32.TryParse(a, ref 0) && System.Int32.TryParse(b, ref 0)
      then string(int a <= int b)
      else string(a <= b)
   override x.CreateFormula a b = a <=. b
-let LEq = Combinator_2 (C2_LEq("leq"))
-type C2_Greater(name) =
-  inherit comb2(name)
-  override x.Interpret a b = failwith "not done yet"
-  override x.CreateFormula a b = failwith "not done yet"
-let Greater = Combinator_2 (C2_Greater("greater"))
-type C2_Mod(name) =
-  inherit comb2(name)
+type C2_Greater(name, symbol) =
+  inherit comb2(name, symbol)
+  override x.Interpret a b =
+    if System.Int32.TryParse(a, ref 0) && System.Int32.TryParse(b, ref 0)
+     then string(int a > int b)
+     else string(a > b)
+  override x.CreateFormula a b = a >. b
+type C2_Mod(name, symbol) =
+  inherit comb2(name, symbol)
   override x.Interpret a b = string(int a % int b)
   override x.CreateFormula a b = a %. b
-let Mod = Combinator_2 (C2_Mod("mod"))
-let allCombinators = [Add; Equals; LEq; Mod]
+let allCombinators =
+  List.map Combinator_2 [
+    C2_Add("add", "+"); C2_Equals("equals", "="); C2_LEq("leq", "<="); C2_Greater("greater", ">"); C2_Mod("mod", "%")
+   ]
+let [Add; Equals; LEq; Greater; Mod] = allCombinators
 
 let cmdToStrPair (mapping: IDictionary<string, string>) i = function
   |Push e -> "push", e | PushFwdShift x -> "push", string(i + x) | Pop -> "pop", ""
@@ -93,7 +96,6 @@ let cmdToStrPair (mapping: IDictionary<string, string>) i = function
   |GetHeap -> "getheap", "" | NewHeap -> "newheap", "" | WriteHeap -> "writeheap", ""
   |InputLine -> "inputline", "" | OutputLine -> "outputline", ""
   |Combinator_2 c -> c.ToStrPair()
-//  |Add -> "add", "" | Equals -> "equals", "" | Greater -> "greater", "" | LEq -> "leq", ""
 let interpretPAsm cmds =
   let pushstack stack v = stack := v :: !stack
   let popstack stack = stack := match !stack with _ :: tl -> tl | [] -> []

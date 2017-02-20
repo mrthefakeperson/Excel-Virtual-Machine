@@ -1,0 +1,8 @@
+﻿let rec gcd a b =
+  if a > b then gcd b a
+  elif a = 0 then b
+  else gcd (b % a) a
+
+printfn "%A" (gcd 15 25)
+printfn "%A" (gcd 14 7)
+printfn "%A" (gcd 1001 2)

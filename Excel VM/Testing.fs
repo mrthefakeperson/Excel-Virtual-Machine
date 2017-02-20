@@ -148,7 +148,6 @@ let testExcelFile =
           |"call", _ -> Call | "return", _ -> Return
           |"getheap", _ -> GetHeap | "newheap", _ -> NewHeap | "writeheap", _ -> WriteHeap
           |"inputline", _ -> InputLine | "outputline", _ -> OutputLine
-//          |"add", _ -> Add | "equals", _ -> Equals
           |name, "" when
             List.exists (function Combinator_2 c -> c.Name = name | _ -> false) allCombinators ->
             List.find (function Combinator_2 c -> c.Name = name | _ -> false) allCombinators
@@ -177,8 +176,8 @@ let testExcelCompiler =
 
 let runSpecificTest() =       // `generate` to create outputs, `verify` to test, `ignore` to print
   //testExcelInterpreter verify 1
-  testParser generate 12
-  //testCompilerAST ignore 12
+  //testParser generate 12
+  //testCompilerAST ignore 13
   //testPAsm ignore 8
   //testExcelFile 1
-  //testExcelCompiler 12
+  testExcelCompiler 13

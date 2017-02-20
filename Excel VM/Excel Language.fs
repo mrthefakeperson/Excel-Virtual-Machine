@@ -63,9 +63,9 @@ and Cell =
           |Concatenate list -> sprintf "CONCATENATE(%s)" (String.concat "," (Array.map pr list))
         sprintf "=%s" (pr formula)
 let cmb c a b = Combine(a, c, b)
-let (+.), (-.), ( *. ), (/.), (%.), (<=.), (=.), (&&.), (||.) =
+let (+.), (-.), ( *. ), (/.), (%.), (<=.), (=.), (>.), (&&.), (||.) =
   cmb Combinator.Plus, cmb Combinator.Minus, cmb Combinator.Mul, cmb Combinator.Div, cmb Combinator.Mod,
-  cmb Combinator.LessOrEqual, cmb Combinator.Equal,
+  cmb Combinator.LessOrEqual, cmb Combinator.Equal, cmb Combinator.Greater,
   cmb Combinator.And, cmb Combinator.Or
 
 let alphaList =

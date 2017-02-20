@@ -45,6 +45,14 @@ let rec ASTCompile' (capture, captured as cpt) = function
     |T s ->
       match capture with
       |[] -> Declare(s, ASTCompile' cpt b)
+      |ll -> Define(s, capture, ASTCompile' (capture, Map.add s (List.map Value capture) captured) b)    //this is not right, it's a recursive definition
+    |_ -> failwith "patterns in function arguments not supported yet"
+  |X("let rec", [a; b]) ->
+    match a with
+    |X("apply", [aa; ab]) -> ASTCompile' cpt (Token("let rec", [aa; Token("fun", [ab; b])]))
+    |T s ->
+      match capture with
+      |[] -> Declare(s, ASTCompile' cpt b)
       |ll -> Define(s, capture, ASTCompile' (capture, Map.add s (List.map Value capture) captured) b)
     |_ -> failwith "patterns in function arguments not supported yet"
   |X("if", [cond; aff; neg]) ->
@@ -56,7 +64,7 @@ let rec ASTCompile' (capture, captured as cpt) = function
       Define(loop, ["()"],
         If(ASTCompile' cpt cond,
           Sequence [ASTCompile' cpt b; Apply(Value loop, [Const "()"])],
-          Const "()"     //Apply(Value "ignore", [Const "()"])
+          Const "()"
          ) )
       Apply(Value loop, [Const "()"])
      ]
@@ -102,15 +110,15 @@ let createComb2Section cmd = [
 let allComb2Sections = List.collect createComb2Section allCombinators
 let getSectionAddress i = 18 * i + 3
 let getSectionAddressFromCmd cmd = List.findIndex ((=) cmd) allCombinators |> getSectionAddress
-let getSectionAddressFromInfix =
-  (function "+" -> Add | "=" -> Equals | "<=" -> LEq | "%" -> Mod | _ -> failwith "???")
-   >> getSectionAddressFromCmd
+let getSectionAddressFromInfix nfx =
+  List.find (function Combinator_2 e -> e.Symbol = nfx | _ -> false) allCombinators
+   |> getSectionAddressFromCmd
 let rec operationsPrefix =
   allComb2Sections
    @ [OutputLine; Push "()"; Return]
 let _PrintAddress = List.length allComb2Sections + 1
 let (|Inline|_|) = function
-  |Value ("+" | "=" | "<=" | "%" as nfx) ->
+  |Value nfx when List.exists (function Combinator_2 e -> e.Symbol = nfx | _ -> false) allCombinators ->
     Some [
       NewHeap; Store x; Load x; Push (string(getSectionAddressFromInfix nfx)); WriteHeap  // store address
       NewHeap; Push "endArr"; WriteHeap; Load x; Popv x      // end the array
