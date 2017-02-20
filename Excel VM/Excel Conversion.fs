@@ -19,10 +19,12 @@ let makeVerticalStack sz _name pushCondition pushValue =
   let column, row = separate _name
   let row = int row
   let _name = name (row+1) column
+  let blankIsZero f = If(f =. Literal "", Int 0, f)
   seq {
     yield  //topstack value
       Cell(name row column,
-        Index(Range(name (row+2) column, name (row+sz+1) column), Reference _name)
+        blankIsZero(Index(Range(name (row+2) column, name (row+sz+1) column), Reference _name))
+  //       |> defaultTo (Int 0)
        )
     //stack size (pushCondition is the change in size)
     yield Cell(_name, (Reference _name +. pushCondition) |> defaultTo (Int 1))
@@ -33,7 +35,7 @@ let makeVerticalStack sz _name pushCondition pushValue =
           pushValue (Reference (name e column)),
           Reference (name e column)
          )
-         |> defaultTo (Int 1) )
+         |> defaultTo (Literal "") )
    }
 
 //where each topstack is located
@@ -41,7 +43,7 @@ let ``instr*`` = "A2"
 let ``value*``, ``heap*`` = "B2", "C2"
 let ``input*``, ``output*`` = "D2", "E2"
 
-let instr_index i = Index(Range("B1", "XFD1"), Reference ``instr*`` +. Int i)     //16383 spaces in total, to XFD1
+let instr_index i = Index(Range("B1", "XFD1"), Reference ``instr*`` +. Int 1 +. Int i)     //16383 spaces in total, to XFD1
 let currentInstruction = instr_index 0
 let currentValue, valueTopstackPt = Reference ``value*``, Reference "B3"
 
@@ -59,9 +61,9 @@ let instructionStack =
      ]
      |> matchTable (Int 0) )
    (fun self ->
-    [ "call", currentValue *. Int 2 +. Int 1           // ? | call | ?
-      "goto", instr_index 1 *. Int 2 +. Int 1          // ? | goto | arg1 | ?
-      "gotoiftrue", If(currentValue, instr_index 1 *. Int 2 +. Int 1, self +. Int 2)
+    [ "call", currentValue *. Int 2           // ? | call | ?
+      "goto", instr_index 1 *. Int 2          // ? | goto | arg1 | ?
+      "gotoiftrue", If(currentValue, instr_index 1 *. Int 2, self +. Int 2)
      ]
      |> matchTable (self +. Int 2) )
 
