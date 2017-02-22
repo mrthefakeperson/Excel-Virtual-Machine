@@ -28,7 +28,7 @@ let rec test action folderName runFile n =
     printfn "%s:" name
     runFile name outName
     action outName
-    ignore (stdin.ReadLine())
+    //ignore (stdin.ReadLine())
     test action folderName runFile (n + 1)
 let verify name =
   if File.ReadAllLines name <> File.ReadAllLines (name + ".ans")
@@ -81,13 +81,11 @@ let testParser a =
     let parsed =
       File.ReadAllText file
        |> groupByRuleset
-       |> preprocess
-       |> parse Normal (function [] -> true | _ -> false) (fun _ -> false) []
-       |> fst
+       |> FSharp.parseSyntax
     let parsed = parsed.Clean()
-    logPrintf outFile "%A\n" parsed
+    printfn "%A" (File.ReadAllText file)
     parsed.ToStringExpr()
-     |> logPrintf outFile "%s\n%O\n" (File.ReadAllText file)
+     |> logPrintf outFile "%O\n"
    )
 
 let testCompilerAST a =
@@ -96,9 +94,7 @@ let testCompilerAST a =
     let parsed =
       File.ReadAllText file
        |> groupByRuleset
-       |> preprocess
-       |> parse Normal (function [] -> true | _ -> false) (fun _ -> false) []
-       |> fst
+       |> FSharp.parseSyntax
     let cmds =
       parsed.Clean()
        |> ASTCompile |> debug
@@ -106,8 +102,8 @@ let testCompilerAST a =
        |> Array.ofList
     Array.iter (printf "%A   ") cmds
     let stack, heap = interpretPAsm cmds
-    printfn "stack %A" stack
-    printfn "heap [%s]" (String.concat "; " (Seq.map (sprintf "%A") heap))
+    logPrintf outFile "stack %A\n" stack
+    logPrintf outFile "heap [%s]\n" (String.concat "; " (Seq.map (sprintf "%A") heap))
     //makeProgram cmds
     // |> interpret 800
     // |> printCells outFile
@@ -125,7 +121,6 @@ let testPAsm a =
           |"call", _ -> Call | "return", _ -> Return
           |"getheap", _ -> GetHeap | "newheap", _ -> NewHeap | "writeheap", _ -> WriteHeap
           |"inputline", _ -> InputLine | "outputline", _ -> OutputLine
-//          |"add", _ -> Add | "equals", _ -> Equals
           |name, "" when
             List.exists (function Combinator_2 c -> c.Name = name | _ -> false) allCombinators ->
             List.find (function Combinator_2 c -> c.Name = name | _ -> false) allCombinators
@@ -162,9 +157,7 @@ let testExcelCompiler =
     let parsed =
       File.ReadAllText file
        |> groupByRuleset
-       |> preprocess
-       |> parse Normal (function [] -> true | _ -> false) (fun _ -> false) []
-       |> fst
+       |> FSharp.parseSyntax
     let cmds =
       parsed.Clean()
        |> ASTCompile |> debug
@@ -176,8 +169,10 @@ let testExcelCompiler =
 
 let runSpecificTest() =       // `generate` to create outputs, `verify` to test, `ignore` to print
   //testExcelInterpreter verify 1
-  //testParser generate 12
-  //testCompilerAST ignore 13
-  //testPAsm ignore 8
+  testParser verify 1
+  //testCompilerAST ignore 1
+  //testPAsm verify 1
   //testExcelFile 1
-  testExcelCompiler 13
+  //testExcelCompiler 13
+  printfn "done"
+  ignore (stdin.ReadLine())

@@ -1,3 +1,1 @@
-printfn "%A" 74
-
 ((printfn) ("%A")) (74)

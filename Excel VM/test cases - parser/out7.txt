@@ -1,7 +1,1 @@
-for a b in c+(d e) do
-  let x = y
-  y
-do
-  t + k h
-
 for (a) (b) in ((+) (c)) ((d) (e)) do (let x = (y); y); ((+) (t)) ((k) (h))
