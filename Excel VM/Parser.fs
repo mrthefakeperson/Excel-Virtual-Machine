@@ -51,6 +51,7 @@ module FSharp =
       |Function state stop fail x
       |Dot state stop fail x
       |Infix state stop fail x
+      |Tuple state stop fail x           //more testing needed
       |Apply state stop fail x
       |Transfer state stop fail x             -> x
       |_, [] -> Token("()", (0,0)), []
@@ -61,6 +62,7 @@ module FSharp =
       |_ when fail right -> failwithf "unexpected end of context %A" right
       |PatternBrackets state stop fail x
       |PatternComb state stop fail x
+      |Tuple state stop fail x
       |Apply state stop fail x
       |Transfer state stop fail x         -> x
       |_, [] -> Token("()", (0,0)), []
@@ -217,6 +219,14 @@ module FSharp =
         Some (parse state stop fail restl (parsed::r @ restr))
       |_ -> failwith "infix failed"
     |_ -> None
+  and (|Tuple|_|) state stop fail = function      //testing needed
+    |t::restl, T ","::restr ->
+      let parsed, restr =
+        match parse state stop fail [] restr with
+        |X(",", es), restr -> Token(",", t::es), restr
+        |parsed, restr -> Token(",", [t; parsed]), restr
+      Some (parse state stop fail (parsed::restl) restr)
+    |_ -> None
   and (|Apply|_|) state stop fail = function
     |(A as a)::restl, (A as b)::restr when a.IndentedLess b ->
       let restr = Token("apply", a.Indentation, true, [a; b])::restr
@@ -251,7 +261,6 @@ module FSharp =
      >> parse Normal (function [] -> true | _ -> false) (fun _ -> false) []
      >> fst
 
-
 module Python2 =
   let preprocess: string list->Token list list =
     FSharp.preprocess
@@ -262,7 +271,6 @@ module Python2 =
          ) []
      >> List.map List.rev
      >> List.rev
-  let (|X|) (t:Token) = X(t.Name, t.Dependants)
   let indent (e:Token) = snd e.Indentation
   let rec parseLineByLine left right =
     match (left:Token list), (right:Token list) with
@@ -289,7 +297,13 @@ module Python2 =
         |[], [] -> failwith "oh no a blank line"
       Token("sequence", (0, col), left), right
     |_ when fail right -> failwithf "unexpected end of context (in line) %O" right
-    |Bracket stop fail x -> x
+    |Bracket stop fail x
+    |ExprWithColon stop fail x
+    |Apply stop fail x
+    |Tuple stop fail x
+    |Transfer stop fail x
+                             -> x
+    |_, [] -> Token("()", (0,0)), []
   and (|Bracket|_|) stop fail = function
     |T "("::restl, right ->
       let parsed, T ")"::restr =
@@ -326,5 +340,20 @@ module Python2 =
           |_ -> [body]
       Some (parseLine stop fail (Token(s, (0, indent t), beforeColon @ afterColon)::restl) [])
     |_ -> None
-  //todo: operators, dot expressions, function calls
-      
+  //todo: operators, dot expressions, function calls, commands (eg. print)
+  and (|Apply|_|) stop fail = function
+    |a::restl, (T "("::_ as right) ->
+      let argsTuple, restr = parseLine stop fail [] right
+      Some (parseLine stop fail (Token("apply", (0, indent a), [a; argsTuple])::restl) restr)
+    |_ -> None
+  and (|Tuple|_|) stop fail = function
+    |t::restl, T ","::restr ->
+      let parsed, restr =
+        match parseLine stop fail [] restr with
+        |X(",", es), restr -> Token(",", (0, indent t), t::es), restr
+        |parsed, restr -> Token(",", (0, indent t), [t; parsed]), restr
+      Some (parseLine stop fail (parsed::restl) restr)
+    |_ -> None
+  and (|Transfer|_|) stop fail = function
+    |left, x::restr -> Some (parseLine stop fail (x::left) restr)
+    |_ -> None

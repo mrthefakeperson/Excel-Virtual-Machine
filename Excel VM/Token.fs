@@ -46,6 +46,7 @@ type Token(name:string, row_col, functionApplication:bool, dependants:Token list
     |"let rec", [a; b] -> sprintf "let rec %s = (%s)" (a.ToStringExpr()) (b.ToStringExpr())
     |"fun", [a; b] -> sprintf "fun %s -> (%s)" (a.ToStringExpr()) (b.ToStringExpr())
     |"pattern", [a; b] -> sprintf "| %s -> %s" (a.ToStringExpr()) (b.ToStringExpr())
+    |",", members -> List.map (fun (e:Token) -> e.ToStringExpr()) members |> String.concat ", "
     |_ -> name + (String.concat " " (List.map (fun (e:Token) -> e.ToStringExpr()) dependants))
   member x.Clean() =
     match name, dependants with
@@ -56,3 +57,4 @@ let (|T|_|) (x:Token) =
    then Some x.Name
    else None
 let (|A|_|) (x:Token) = if x.CanApply then Some A else None
+let (|X|) (t:Token) = X(t.Name, t.Dependants)

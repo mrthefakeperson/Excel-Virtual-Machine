@@ -1,0 +1,3 @@
+﻿let a, b = 3, 2
+printfn "%A" a
+printfn "%A" b

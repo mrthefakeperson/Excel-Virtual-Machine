@@ -7,7 +7,6 @@ let nxt' x () =
   incr x
   string !x
 let nxt = nxt' (ref 0)
-let (|X|) (t:Token) = X(t.Name, t.Dependants)
 let (|Inner|_|) c = function
   |T "\"\"" -> Some ""
   |T s when s.Length >= 2 && s.[0] = c && s.[s.Length-1] = c -> Some s.[1..s.Length-2]

@@ -169,7 +169,7 @@ let testExcelCompiler =
 
 let runSpecificTest() =       // `generate` to create outputs, `verify` to test, `ignore` to print
   //testExcelInterpreter verify 1
-  testParser verify 1
+  testParser ignore 14
   //testCompilerAST ignore 1
   //testPAsm verify 1
   //testExcelFile 1
