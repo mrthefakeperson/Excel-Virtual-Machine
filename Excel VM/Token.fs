@@ -48,7 +48,7 @@ type Token(name:string, row_col, functionApplication:bool, dependants:Token list
     |"fun", [a; b] -> sprintf "fun %s -> (%s)" (a.ToStringExpr()) (b.ToStringExpr())
     |"pattern", [a; b] -> sprintf "| %s -> %s" (a.ToStringExpr()) (b.ToStringExpr())
     |",", members -> List.map (fun (e:Token) -> e.ToStringExpr()) members |> String.concat ", "
-    |_ -> name + (String.concat " " (List.map (fun (e:Token) -> e.ToStringExpr()) dependants))
+    |_ -> name + "(" + (String.concat " " (List.map (fun (e:Token) -> e.ToStringExpr()) dependants)) + ")"
   member x.Clean() =
     match name, dependants with
     |("sequence" | "()"), [a] -> a.Clean()

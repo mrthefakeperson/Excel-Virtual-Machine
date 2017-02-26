@@ -1,5 +1,6 @@
-﻿Py2
-if a:
-  b
-else:
-  c
+﻿C
+int main() {
+  if(a) {b;} else {c;d;}
+  int e;
+  while(f) p;
+}

@@ -1,1 +1,1 @@
-if a then b else c
+declare function(int()  {}(if a() then b(); ;() else c(); d(); ;(); declare(int() e()); while f() do p()))

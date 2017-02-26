@@ -419,7 +419,9 @@ module C =
     |Global
     |FunctionArgs
     |Local
+    |LocalImd    //keywords must appear at the beginning of a statement; LocalImd doesn't include them
   let rec parse state stop fail left right =
+    printfn "%A: %A" state (left, right)
     match state with
     |Global ->
       match left, right with
@@ -429,8 +431,9 @@ module C =
       //|Struct
       |Apply state stop fail x
       |Brackets state stop fail x
-      |Assignment state stop fail x
-      |Operator state stop fail x
+      |Braces state stop fail x
+//      |Assignment state stop fail x
+//      |Operator state stop fail x
       |Transfer state stop fail x     -> x
       |_ -> failwithf "unknown: %A" (left, right)
     |FunctionArgs ->
@@ -445,15 +448,29 @@ module C =
       match left, right with
       |_ when stop right -> Token("sequence", List.rev left), right
       |_ when fail right -> failwithf "tokens are incomplete: %A" (left, right)
-      |T ";"::restl, right -> parse state stop fail restl right         //handles a(b); after a(b) has been parsed
-      |DatatypeLocal state stop fail x
-      |Apply state stop fail x
+      |T ";"::restl, right -> parse Local stop fail restl right         //handles a(b); after a(b) has been parsed
+      |Brackets state stop fail x
+      |Braces state stop fail x
       |If state stop fail x
       |While state stop fail x
-      |For state stop fail x
+//      |For state stop fail x
+//      |Assignment state stop fail x
+//      |Operator state stop fail x
+      |Apply state stop fail x
+      |DatatypeLocal state stop fail x         //do this better: preprocess all datatypes into one string
+      |Transfer state stop fail x     -> x
+      |_ -> failwithf "unknown: %A" (left, right)
+    |LocalImd ->
+      match left, right with
+      |_ when stop right -> Token("sequence", List.rev left), right
+      |_ when fail right -> failwithf "tokens are incomplete: %A" (left, right)
+      |T ";"::restl, right -> parse Local stop fail restl right
+      |DatatypeLocal state stop fail x
       |Brackets state stop fail x
-      |Assignment state stop fail x
-      |Operator state stop fail x
+      //|Braces state stop fail x    ({statement;}) with one pair of braces gets parsed, don't know the purpose of this
+//      |Assignment state stop fail x
+//      |Operator state stop fail x
+      |Apply state stop fail x
       |Transfer state stop fail x     -> x
       |_ -> failwithf "unknown: %A" (left, right)
   and (|Transfer|_|) state stop fail = function
@@ -466,11 +483,11 @@ module C =
       let parsed, restr =
         match parsed with
         |T _ | X("assign", [_; _]) | X(",", _) -> Token("declare", [Token datatypeName; parsed]), restr.Tail
-        |X("apply", [declaredName; args]) ->
-          let functionBody, restr =
-            parse Global (function T "}"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr.Tail
+        |X("sequence", [X("apply", [declaredName; args])]) ->
+          let X("sequence", []), functionBody::restr =
+            parse Local (function X("{}", _)::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
           Token("declare function", [Token datatypeName; args; functionBody]), restr
-        |_ -> failwith "expression following data type declaration is invalid"
+        |o -> failwithf "expression following data type declaration is invalid %O" o
       Some (parse Global stop fail left (parsed::restr))
     |_ -> None
   and (|DatatypeFunction|_|) state stop fail = function
@@ -490,40 +507,70 @@ module C =
   and (|DatatypeLocal|_|) state stop fail = function
     |left, DatatypeName(datatypeName, restr) ->
       let parsed, restr =
-        parse Local (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
-      let parsed, restr = Token("declare", [Token datatypeName; parsed]), restr.Tail
-      Some (parse Local stop fail left (parsed::restr))
+        parse LocalImd (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
+      let parsed = Token("declare", [Token datatypeName; parsed])
+      Some (parse LocalImd stop fail left (parsed::restr))
     |_ -> None
   and (|Apply|_|) state stop fail = function
     |a::restl, T "("::restr ->
-      let X("sequence", [args]), T ")"::restr =
-        parse FunctionArgs (function T ")"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
+      let args, restr =
+        match parse FunctionArgs (function T ")"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr with
+        |X("sequence", [args]), T ")"::restr -> args, restr
+        |X("sequence", []), T ")"::restr -> Token(",", []), restr
+        |_ -> failwith "arguments were not formatted correctly"
       let parsed = Token("apply", [a; args])
-      Some (parse state stop fail restl (parsed::restr))
-    |_ -> None
-  and (|If|_|) state stop fail = function
-
-
-
-  and (|While|_|) state stop fail = function
-    |T "while"::restl, T "("::restr ->
-      let cond, T ")"::restr =
-        parse state (function T ")"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
-      let body, restr =
-        match restr with
-        |T "{"::restr ->
-          let parsed, T "}"::restr =
-            parse state (function T "}"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
-          parsed, restr
-        |_ ->
-          let parsed, T ";"::restr =
-            parse state (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
-          parsed, restr
-      let parsed = Token("while", [cond; body])
-      Some (parse state stop fail restl (parsed::restr))
+      Some (parse LocalImd stop fail restl (parsed::restr))
     |_ -> None
   and (|Brackets|_|) state stop fail = function
+    |T "("::restl, right ->
+      let parsed, T ")"::restr =
+        parse LocalImd (function T ")"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] right
+      let parsed = Token("()", [parsed])
+      Some (parse LocalImd stop fail restl (parsed::restr))
+    |_ -> None
+  and (|Braces|_|) state stop fail = function
+    |T "{"::restl, right ->
+      let parsed, T "}"::restr =
+        parse Local (function T "}"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] right
+      let parsed = Token("{}", [parsed])
+      Some (parse Local stop fail restl (parsed::restr))
+    |_ -> None
+  and getStatementBody stop fail right =
+    match right with
+    |T "{"::_ ->
+      let X("sequence", []), X("{}", [body])::restr =
+        parse Local (function X("{}", [_])::_ -> true | _ -> false)
+         (fun e -> stop e || fail e) [] right
+      body, restr
+    |_ ->
+      let body, T ";"::restr =
+        parse Local (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] right
+      body, restr
+  and (|If|_|) state stop fail = function
+    |T "if"::restl, (T "("::_ as right) ->
+      let X("sequence", []), X("()", [cond])::restr =
+        parse LocalImd (function X("()", _)::_ -> true | _ -> false) (fun e -> stop e || fail e) [] right
+      let aff, restr = getStatementBody stop fail restr
+      let neg, restr =
+        match restr with
+        |T "else"::restr -> getStatementBody stop fail restr
+        |_ -> Token("sequence", []), restr
+      let parsed = Token("if", [cond; aff; neg])
+      Some (parse Local stop fail restl (parsed::restr))
+    |_ -> None
+  and (|While|_|) state stop fail = function
+    |T "while"::restl, (T "("::_ as right) ->
+      let X("sequence", []), X("()", [cond])::restr =
+        parse LocalImd (function X("()", _)::_ -> true | _ -> false) (fun e -> stop e || fail e) [] right
+      let body, restr = getStatementBody stop fail restr
+      let parsed = Token("while", [cond; body])
+      Some (parse Local stop fail restl (parsed::restr))
+    |_ -> None
 
 
 
-  let parseSyntax _ = Token("", [])
+  let parseSyntax =
+    List.filter (ruleset " " >> not)
+     >> List.map (fun e -> Token e)
+     >> parse Global (function [] -> true | _ -> false) (fun _ -> false) []
+     >> fst
