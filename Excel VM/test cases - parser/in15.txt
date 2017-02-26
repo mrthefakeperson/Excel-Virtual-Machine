@@ -1,0 +1,5 @@
+﻿Py2
+if a:
+  b
+else:
+  c

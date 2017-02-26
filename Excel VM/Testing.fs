@@ -32,7 +32,9 @@ let rec test action folderName runFile n =
     test action folderName runFile (n + 1)
 let verify name =
   if File.ReadAllLines name <> File.ReadAllLines (name + ".ans")
-   then printfn "\n\nincorrect file: %s\n" name
+   then
+    printfn "\n\nincorrect file: %s\n" name
+    stdin.ReadLine() |> ignore
    else printfn "\n\ngood\n"
 let generate name =
   if File.Exists (name + ".ans") then File.Delete (name + ".ans")
@@ -79,11 +81,19 @@ let testExcelInterpreter a =
 let testParser a =
   test a "test cases - parser" (fun file outFile ->
     let parsed =
-      File.ReadAllText file
+      let txt = File.ReadAllLines file
+      let parseSyntax, txt =
+        match txt.[0] with
+        |"F#" -> FSharp.parseSyntax, String.concat "\n" txt.[1..]
+        |"Py2" -> Python2.parseSyntax, String.concat "\n" txt.[1..]
+        |"C" -> C.parseSyntax, String.concat "\n" txt.[1..]
+        |_ -> FSharp.parseSyntax, String.concat "\n" txt
+      txt
        |> groupByRuleset
-       |> FSharp.parseSyntax
+       |> parseSyntax
     let parsed = parsed.Clean()
     printfn "%A" (File.ReadAllText file)
+    printfn "%A" parsed
     parsed.ToStringExpr()
      |> logPrintf outFile "%O\n"
    )
@@ -169,7 +179,7 @@ let testExcelCompiler =
 
 let runSpecificTest() =       // `generate` to create outputs, `verify` to test, `ignore` to print
   //testExcelInterpreter verify 1
-  testParser ignore 14
+  testParser verify 1
   //testCompilerAST ignore 1
   //testPAsm verify 1
   //testExcelFile 1

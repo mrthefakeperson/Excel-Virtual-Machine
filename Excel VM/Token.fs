@@ -17,6 +17,7 @@ type Token(name:string, row_col, functionApplication:bool, dependants:Token list
   new(name, (row, col)) = Token(name, (row, col), true, [])
   new(name, (row, col), dependants) = Token(name, (row, col), false, dependants)
   new(name, dependants) = Token(name, (0, 0), false, dependants)
+  new(name) = Token(name, (0, 0), false, [])
   member x.Name with get() = name
   member x.Dependants with get() = dependants
   member x.CanApply with get() = functionApplication

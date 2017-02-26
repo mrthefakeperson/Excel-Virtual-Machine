@@ -9,7 +9,7 @@ module FSharp =
       else if ruleset " " e then  (r,c+e.Length),acc
       else if e = "." then        (r,c+e.Length),Token(e, (r,c), false, [])::acc
       else                        (r,c+e.Length),Token(e, (r,c))::acc
-     ) ((1,1),[])
+     ) ((1,0),[])
      >> snd >> List.rev
      >> List.fold (fun (earliestInRow, acc) e ->
           if e.Name = "fun" && fst e.Indentation = fst earliestInRow then
@@ -224,8 +224,8 @@ module FSharp =
       let parsed, restr =
         match parse state stop fail [] restr with
         |X(",", es), restr -> Token(",", t::es), restr
-        |parsed, restr -> Token(",", [t; parsed]), restr
-      Some (parse state stop fail (parsed::restl) restr)
+        |parsed, restr -> Token(",", t.Indentation, [t; parsed]), restr
+      Some (parse state stop fail restl (parsed::restr))
     |_ -> None
   and (|Apply|_|) state stop fail = function
     |(A as a)::restl, (A as b)::restr when a.IndentedLess b ->
@@ -264,6 +264,7 @@ module FSharp =
 module Python2 =
   let preprocess: string list->Token list list =
     FSharp.preprocess
+     >> fun e -> printfn "%A" e; e
      >> List.fold (fun acc e ->
           match acc with
           |(hd:Token::tl1)::tl2 when fst e.Indentation = fst hd.Indentation -> (e::hd::tl1)::tl2
@@ -271,22 +272,53 @@ module Python2 =
          ) []
      >> List.map List.rev
      >> List.rev
+
   let indent (e:Token) = snd e.Indentation
   let rec parseLineByLine left right =
+    printfn "%A" (left, right)
     match (left:Token list), (right:Token list) with
+    |IfL x -> printfn "aaaa: %O -> %O" (left, right) x; x
+    (*
     |ExprWithBlock & (X(s, dep) as a::_, b::_) when indent a < indent b ->
       let parsed, restr = parseLineByLine [] right
       Token(s, (0, indent a), dep @ [parsed]), restr
     |ExprWithBlock -> failwith "block needs an expression"
+    *)
     |a::restl, b::restr when indent a = indent b ->
       parseLineByLine (b::a::restl) restr
     |a::restl, b::restr when indent a > indent b ->
-      Token("sequence", (0, indent a), left), right
-    |_ -> failwith "indented block doesn't belong there"
+      Token("sequence", (0, indent a), List.rev left), right
+    |_, [] -> Token("sequence", List.rev left), []
+    |TransferL x -> x
+    |x -> failwithf "indented block doesn't belong there: %A" x
+  and (|IfL|_|) = function
+    |X("if", [cond]) as a::restl, b::restr when indent a < indent b ->
+      let aff, restr = parseLineByLine [] (b::restr)
+      let parsed = Token("if", (0, indent a), [cond; aff])
+      Some (parseLineByLine (parsed::restl) restr)
+    |X("if", [cond; aff]) as a::restl, right ->
+      let neg, restr =
+        match right with
+        |X("else", [xprs]) as c::restr when indent a = indent c -> xprs, restr
+        |T "else" as c::restr when indent a = indent c -> parseLineByLine [] restr
+        |X("elif", dep) as c::restr when indent a = indent c ->
+          parseLineByLine [] (Token("if", (0, indent c), dep)::restr)
+        |c::_ when indent a >= indent c -> Token("()", []), right
+        |[] -> Token("()", []), right
+        |_ -> failwith "indented block doesn't belong there"
+      let parsed = Token("if", (0, indent a), [cond; aff; neg])
+      Some (parseLineByLine restl (parsed::restr))
+    |_ -> None
+//  and (|While|_|) = function
+//    |X("while", [cond])
   and (|ExprWithBlock|_|) = function   //consider making a generalization for all the colon keywords (put them all in a list)
     |(X("if", ([_] as dep)) | X("for", ([_; _] as dep)) | X("while", ([_] as dep)) as t)
       ::_, _ ->
       Some ExprWithBlock
+    |(X(name, dep)::_, _) as k -> printfn "%A %A %A" name dep k; None
+    |_ -> None
+  and (|TransferL|_|) = function
+    |left, x::restr -> Some (parseLineByLine (x::left) restr)
     |_ -> None
   let rec parseLine stop fail left right =
     match (left:Token list), (right:Token list) with
@@ -295,7 +327,7 @@ module Python2 =
         match left, right with
         |a::_, _ | _, a::_ -> indent a
         |[], [] -> failwith "oh no a blank line"
-      Token("sequence", (0, col), left), right
+      Token("sequence", (0, col), List.rev left), right
     |_ when fail right -> failwithf "unexpected end of context (in line) %O" right
     |Bracket stop fail x
     |ExprWithColon stop fail x
@@ -304,6 +336,7 @@ module Python2 =
     |Transfer stop fail x
                              -> x
     |_, [] -> Token("()", (0,0)), []
+    |x -> failwithf "unknown: %O" x
   and (|Bracket|_|) stop fail = function
     |T "("::restl, right ->
       let parsed, T ")"::restr =
@@ -312,7 +345,7 @@ module Python2 =
       Some (parseLine stop fail (parsed::restl) restr)
     |_ -> None
   and (|ExprWithColon|_|) stop fail = function   //consider making a generalization for all the colon keywords
-    |T("if" | "while" | "for" as s) as t::restl, right ->
+    |T("if" | "elif" | "else" | "while" | "for" as s) as t::restl, right ->    //else
       let beforeColon, restr =
         match s with
         |"for" ->
@@ -323,6 +356,9 @@ module Python2 =
             parseLine (function T ":"::_ -> true | _ -> false) (fun e -> stop e || fail e)
              [] right
           [namePattern; iterable], restr
+        |"else" ->
+          let T ":"::restr = right
+          [], restr
         |_ ->
           let cond, T ":"::restr =
             parseLine (function T ":"::_ -> true | _ -> false) (fun e -> stop e || fail e)
@@ -335,16 +371,15 @@ module Python2 =
           let body, restr =     // restr = []
             parseLine (function [] -> true | _ -> false) (fun e -> stop e || fail e)
              [] restr
-          match s with
-          |"if" -> [body; Token("pass", [])]
-          |_ -> [body]
+          [body]
       Some (parseLine stop fail (Token(s, (0, indent t), beforeColon @ afterColon)::restl) [])
     |_ -> None
   //todo: operators, dot expressions, function calls, commands (eg. print)
   and (|Apply|_|) stop fail = function
     |a::restl, (T "("::_ as right) ->
       let argsTuple, restr = parseLine stop fail [] right
-      Some (parseLine stop fail (Token("apply", (0, indent a), [a; argsTuple])::restl) restr)
+      let parsed = Token("apply", (0, indent a), [a; argsTuple])
+      Some (parseLine stop fail restl (parsed::restr))
     |_ -> None
   and (|Tuple|_|) stop fail = function
     |t::restl, T ","::restr ->
@@ -352,8 +387,143 @@ module Python2 =
         match parseLine stop fail [] restr with
         |X(",", es), restr -> Token(",", (0, indent t), t::es), restr
         |parsed, restr -> Token(",", (0, indent t), [t; parsed]), restr
-      Some (parseLine stop fail (parsed::restl) restr)
+      Some (parseLine stop fail restl (parsed::restr))
     |_ -> None
   and (|Transfer|_|) stop fail = function
     |left, x::restr -> Some (parseLine stop fail (x::left) restr)
     |_ -> None
+
+  let parseSyntax =
+    preprocess
+     >> List.map (parseLine (function [] -> true | _ -> false) (fun _ -> false) [])
+     >> List.map (fun e -> (fst e).Clean())
+     >> parseLineByLine []
+     >> fst
+
+
+module C =
+  //todo: preprocessor commands
+  let listOfDatatypeNames = ref ["int"; "long long"; "long"]
+  let (|DatatypeName|_|) (ll:Token list) =
+    let matchString (s:string) =
+      let matching = s.Split ' ' |> Array.toList
+      let rec findMatch = function
+        |[], x -> Some (s, x)
+        |a::resta, T b::restb when a = b -> findMatch (resta, restb)
+        |_ -> None
+      findMatch (matching, ll)
+    List.map matchString !listOfDatatypeNames
+     |> List.tryFind (function Some _ -> true | None -> false)
+     |> function Some yld -> yld | None -> None
+  type State =
+    |Global
+    |FunctionArgs
+    |Local
+  let rec parse state stop fail left right =
+    match state with
+    |Global ->
+      match left, right with
+      |_ when stop right -> Token("sequence", List.rev left), right
+      |_ when fail right -> failwithf "tokens are incomplete: %A" (left, right)
+      |DatatypeGlobal state stop fail x
+      //|Struct
+      |Apply state stop fail x
+      |Brackets state stop fail x
+      |Assignment state stop fail x
+      |Operator state stop fail x
+      |Transfer state stop fail x     -> x
+      |_ -> failwithf "unknown: %A" (left, right)
+    |FunctionArgs ->
+      match left, right with
+      |_ when stop right -> Token("sequence", List.rev left), right
+      |_ when fail right -> failwithf "tokens are incomplete: %A" (left, right)
+      |DatatypeFunction state stop fail x
+      |CommaFunction state stop fail x
+      |Transfer state stop fail x     -> x
+      |_ -> failwithf "unknown: %A" (left, right)
+    |Local ->
+      match left, right with
+      |_ when stop right -> Token("sequence", List.rev left), right
+      |_ when fail right -> failwithf "tokens are incomplete: %A" (left, right)
+      |T ";"::restl, right -> parse state stop fail restl right         //handles a(b); after a(b) has been parsed
+      |DatatypeLocal state stop fail x
+      |Apply state stop fail x
+      |If state stop fail x
+      |While state stop fail x
+      |For state stop fail x
+      |Brackets state stop fail x
+      |Assignment state stop fail x
+      |Operator state stop fail x
+      |Transfer state stop fail x     -> x
+      |_ -> failwithf "unknown: %A" (left, right)
+  and (|Transfer|_|) state stop fail = function
+    |left, x::restr -> Some (parse state stop fail (x::left) restr)
+    |_ -> None
+  and (|DatatypeGlobal|_|) state stop fail = function
+    |left, DatatypeName(datatypeName, restr) ->
+      let parsed, restr =
+        parse Global (function T(";" | "{")::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
+      let parsed, restr =
+        match parsed with
+        |T _ | X("assign", [_; _]) | X(",", _) -> Token("declare", [Token datatypeName; parsed]), restr.Tail
+        |X("apply", [declaredName; args]) ->
+          let functionBody, restr =
+            parse Global (function T "}"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr.Tail
+          Token("declare function", [Token datatypeName; args; functionBody]), restr
+        |_ -> failwith "expression following data type declaration is invalid"
+      Some (parse Global stop fail left (parsed::restr))
+    |_ -> None
+  and (|DatatypeFunction|_|) state stop fail = function
+    |left, DatatypeName(datatypeName, declaredName::restr) ->
+      let parsed = Token("declare", [Token datatypeName; declaredName])
+      Some (parse FunctionArgs stop fail left (parsed::restr))
+    |_ -> None
+  and (|CommaFunction|_|) state stop fail = function
+    |a::restl, T ","::restr ->
+      let parsed, restr = parse FunctionArgs stop fail [] restr
+      let parsed =
+        match parsed with
+        |X(",", args) -> Token(",", a::args)
+        |_ -> Token(",", [a; parsed])
+      Some (parse FunctionArgs stop fail restl (parsed::restr))
+    |_ -> None
+  and (|DatatypeLocal|_|) state stop fail = function
+    |left, DatatypeName(datatypeName, restr) ->
+      let parsed, restr =
+        parse Local (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
+      let parsed, restr = Token("declare", [Token datatypeName; parsed]), restr.Tail
+      Some (parse Local stop fail left (parsed::restr))
+    |_ -> None
+  and (|Apply|_|) state stop fail = function
+    |a::restl, T "("::restr ->
+      let X("sequence", [args]), T ")"::restr =
+        parse FunctionArgs (function T ")"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
+      let parsed = Token("apply", [a; args])
+      Some (parse state stop fail restl (parsed::restr))
+    |_ -> None
+  and (|If|_|) state stop fail = function
+
+
+
+  and (|While|_|) state stop fail = function
+    |T "while"::restl, T "("::restr ->
+      let cond, T ")"::restr =
+        parse state (function T ")"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
+      let body, restr =
+        match restr with
+        |T "{"::restr ->
+          let parsed, T "}"::restr =
+            parse state (function T "}"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
+          parsed, restr
+        |_ ->
+          let parsed, T ";"::restr =
+            parse state (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
+          parsed, restr
+      let parsed = Token("while", [cond; body])
+      Some (parse state stop fail restl (parsed::restr))
+    |_ -> None
+  and (|Brackets|_|) state stop fail = function
+
+
+
+  let parseSyntax _ = Token("", [])
