@@ -1,0 +1,3 @@
+stack ["12"]
+
+output []

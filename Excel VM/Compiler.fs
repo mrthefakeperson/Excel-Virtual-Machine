@@ -30,13 +30,14 @@ let rec ASTCompile' (capture, captured as cpt) = function
   |X("apply", [a; b]) -> Apply(ASTCompile' cpt a, [ASTCompile' cpt b])
   |X("fun", [x; b]) ->
     let rec unpack arg = function
+      |X("declare", [_; T s])
       |T s -> Declare(s, arg), [s]
       |X(",", xprs) ->
         let compiled, extractedVars =
           List.mapi (fun i -> unpack (Get(arg, Const(string i)))) xprs
            |> List.unzip
         Sequence compiled, List.concat extractedVars
-      |_ -> failwith "could not unpack"
+      |e -> failwithf "could not unpack %A" e
     let argName = "arg" + string(nxt())
     let extractCode, extractedVars = unpack (Value argName) x
     let cptr'd = List.map Value capture

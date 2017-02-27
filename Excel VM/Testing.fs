@@ -78,19 +78,21 @@ let testExcelInterpreter a =
      |> printCells outFile
    )
 
+let openAndParse file =
+  let txt = File.ReadAllLines file
+  let parseSyntax, txt =
+    match txt.[0] with
+    |"F#" -> FSharp.parseSyntax, String.concat "\n" txt.[1..]
+    |"Py2" -> Python2.parseSyntax, String.concat "\n" txt.[1..]
+    |"C" -> C.parseSyntax, String.concat "\n" txt.[1..]
+    |_ -> FSharp.parseSyntax, String.concat "\n" txt
+  txt
+   |> groupByRuleset
+   |> parseSyntax
+
 let testParser a =
   test a "test cases - parser" (fun file outFile ->
-    let parsed =
-      let txt = File.ReadAllLines file
-      let parseSyntax, txt =
-        match txt.[0] with
-        |"F#" -> FSharp.parseSyntax, String.concat "\n" txt.[1..]
-        |"Py2" -> Python2.parseSyntax, String.concat "\n" txt.[1..]
-        |"C" -> C.parseSyntax, String.concat "\n" txt.[1..]
-        |_ -> FSharp.parseSyntax, String.concat "\n" txt
-      txt
-       |> groupByRuleset
-       |> parseSyntax
+    let parsed = openAndParse file
     let parsed = parsed.Clean()
     printfn "%A" (File.ReadAllText file)
     printfn "%A" parsed
@@ -101,10 +103,7 @@ let testParser a =
 let testCompilerAST a =
   test a "test cases - compiler AST" (fun file outFile ->
     Console.WindowWidth <- 170
-    let parsed =
-      File.ReadAllText file
-       |> groupByRuleset
-       |> FSharp.parseSyntax
+    let parsed = openAndParse file
     let cmds =
       parsed.Clean()
        |> ASTCompile |> debug
@@ -165,10 +164,7 @@ let testExcelFile =
 let testExcelCompiler =
   test ignore "test cases - compiler AST" (fun file _ ->
     Console.WindowWidth <- 170
-    let parsed =
-      File.ReadAllText file
-       |> groupByRuleset
-       |> FSharp.parseSyntax
+    let parsed = openAndParse file
     let cmds =
       parsed.Clean()
        |> ASTCompile |> debug
@@ -180,10 +176,11 @@ let testExcelCompiler =
 
 let runSpecificTest() =       // `generate` to create outputs, `verify` to test, `ignore` to print
   //testExcelInterpreter verify 1
-  //testParser ignore 15
-  //testCompilerAST generate 14
   //testPAsm verify 1
   //testExcelFile 1
-  testExcelCompiler 14
+
+  testParser ignore 15
+  //testCompilerAST ignore 15
+  //testExcelCompiler 14
   printfn "done"
   ignore (stdin.ReadLine())

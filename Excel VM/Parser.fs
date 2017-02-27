@@ -443,8 +443,8 @@ module C =
       |Apply state stop fail x
       |Brackets state stop fail x
       |Braces state stop fail x
-//      |Assignment state stop fail x
-//      |Operator state stop fail x
+      |Assignment state stop fail x
+      |Operator state stop fail x
       |Transfer state stop fail x     -> x
       |_ -> failwithf "unknown: %A" (left, right)
     |FunctionArgs ->
@@ -465,8 +465,9 @@ module C =
       |If state stop fail x
       |While state stop fail x
 //      |For state stop fail x
-//      |Assignment state stop fail x
-//      |Operator state stop fail x
+      |Return state stop fail x
+      |Assignment state stop fail x
+      |Operator state stop fail x
       |Apply state stop fail x
       |DatatypeLocal state stop fail x         //do this better: preprocess all datatypes into one string
       |Transfer state stop fail x     -> x
@@ -478,14 +479,12 @@ module C =
       |T ";"::restl, right -> parse Local stop fail restl right
       |Brackets state stop fail x
       //|Braces state stop fail x    ({statement;}) with one pair of braces gets parsed, don't know the purpose of this
-//      |Assignment state stop fail x
-//      |Operator state stop fail x
+      |Assignment state stop fail x
+      |Operator state stop fail x
       |Apply state stop fail x
+      |CommaFunction state stop fail x
       |Transfer state stop fail x     -> x
       |_ -> failwithf "unknown: %A" (left, right)
-  and (|Transfer|_|) state stop fail = function
-    |left, x::restr -> Some (parse state stop fail (x::left) restr)
-    |_ -> None
   and (|DatatypeGlobal|_|) state stop fail = function
     |left, DatatypeName(datatypeName, restr) ->
       let identifierName, restr =
@@ -507,12 +506,12 @@ module C =
     |_ -> None
   and (|CommaFunction|_|) state stop fail = function
     |a::restl, T ","::restr ->
-      let parsed, restr = parse FunctionArgs stop fail [] restr
+      let parsed, restr = parse state stop fail [] restr
       let parsed =
         match parsed with
         |X(",", args) -> Token(",", a::args)
         |_ -> Token(",", [a; parsed])
-      Some (parse FunctionArgs stop fail restl (parsed::restr))
+      Some (parse state stop fail restl (parsed::restr))
     |_ -> None
   and (|DatatypeLocal|_|) state stop fail = function
     |left, DatatypeName(datatypeName, restr) ->
@@ -566,15 +565,40 @@ module C =
       let parsed = Token("while", [cond; body])
       Some (parse Local stop fail restl (parsed::restr))
     |_ -> None
+  and (|Return|_|) state stop fail = function
+    |T "return"::restl, right ->
+      let returnedValue, T ";"::restr =
+        parse LocalImd (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] right
+      let parsed = Token("return", [returnedValue])
+      Some (parse Local stop fail restl (parsed::restr))
+    |_ -> None
+  and (|Assignment|_|) state stop fail = function
+    |a::restl, T "="::restr ->
+      let assignment, restr =
+        parse LocalImd (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
+      let parsed = Token("assign", [a; assignment])
+      Some (parse LocalImd stop fail restl (parsed::restr))
+    |_ -> None
+  and (|Operator|_|) state stop fail = function
+    |a::restl, (T s as nfx)::restr when nfx.Priority <> -1 ->
+      let operand, restr =
+        parse LocalImd (function T _ as x::_ when x.Priority <= nfx.Priority -> true | x -> stop x) fail [] restr
+      let parsed = Token("apply", [Token("apply", [Token s; a]); operand])
+      Some (parse LocalImd stop fail restl (parsed::restr))
+    |_ -> None
   and (|Apply|_|) state stop fail = function
     |a::restl, T "("::restr ->
+      let state' = match state with Global -> FunctionArgs | _ -> LocalImd
       let args, restr =
-        match parse FunctionArgs (function T ")"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr with
+        match parse state' (function T ")"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr with
         |X("sequence", [args]), T ")"::restr -> args, restr
         |X("sequence", []), T ")"::restr -> Token(",", []), restr
         |_ -> failwith "arguments were not formatted correctly"
       let parsed = Token("apply", [a; args])
       Some (parse LocalImd stop fail restl (parsed::restr))
+    |_ -> None
+  and (|Transfer|_|) state stop fail = function
+    |left, x::restr -> Some (parse state stop fail (x::left) restr)
     |_ -> None
 
   let rec postProcess = function
