@@ -1,1 +1,0 @@
-heap ["96"; "endArr"; "3"; "endArr"; "1"; "4"; "endArr"]

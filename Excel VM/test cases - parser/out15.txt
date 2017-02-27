@@ -1,1 +1,1 @@
-declare function(int()  {}(if a() then b(); ;() else c(); d(); ;(); declare(int() e()); while f() do p()))
+let k = (fun declare(int a), declare(int b) -> ()); (if a then b else c; d); declare(int e); (while f do p)

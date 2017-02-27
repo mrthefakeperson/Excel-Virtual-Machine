@@ -158,4 +158,4 @@ let interpretPAsm cmds =
     pop instr; push instr (string(pt+1))
     if debug then ignore (stdin.ReadLine())
   List.iter (printfn "%A") (List.rev !stacks.[output])
-  !stacks.[value], heap
+  !stacks.[value], heap, List.rev !stacks.[output]

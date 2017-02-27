@@ -15,7 +15,7 @@ let writeDefaultFile() =
   back.Calculation <- XlCalculation.xlCalculationManual
   back.CalculateBeforeSave <- false
   back.Iteration <- true
-  back.MaxIterations <- 100
+  back.MaxIterations <- 500
   back.MaxChange <- 0.
   let set cellname txt =
     //printfn "%A" (cellname, txt)

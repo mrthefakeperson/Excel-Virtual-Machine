@@ -12,7 +12,7 @@ open System.Diagnostics
 open System.IO
 
 let logPrintf file =
-  let pr = new StreamWriter(file:string)
+  let pr = new StreamWriter(file, true)
   Printf.kprintf (fun e ->
     pr.Write e
     pr.Flush()
@@ -31,7 +31,7 @@ let rec test action folderName runFile n =
     //ignore (stdin.ReadLine())
     test action folderName runFile (n + 1)
 let verify name =
-  if File.ReadAllLines name <> File.ReadAllLines (name + ".ans")
+  if (File.ReadAllLines name) <> (File.ReadAllLines (name + ".ans"))
    then
     printfn "\n\nincorrect file: %s\n" name
     stdin.ReadLine() |> ignore
@@ -111,9 +111,10 @@ let testCompilerAST a =
        |> compile
        |> Array.ofList
     Array.iter (printf "%A   ") cmds
-    let stack, heap = interpretPAsm cmds
+    let stack, heap, output = interpretPAsm cmds
     logPrintf outFile "stack %A\n" stack
-    logPrintf outFile "heap [%s]\n" (String.concat "; " (Seq.map (sprintf "%A") heap))
+    logPrintf outFile "\noutput %A\n" output
+    //logPrintf outFile "heap [%s]\n" (String.concat "; " (Seq.map (sprintf "%A") heap))
     //makeProgram cmds
     // |> interpret 800
     // |> printCells outFile
@@ -179,10 +180,10 @@ let testExcelCompiler =
 
 let runSpecificTest() =       // `generate` to create outputs, `verify` to test, `ignore` to print
   //testExcelInterpreter verify 1
-  testParser ignore 15
-  //testCompilerAST ignore 1
+  //testParser ignore 15
+  //testCompilerAST generate 14
   //testPAsm verify 1
   //testExcelFile 1
-  //testExcelCompiler 13
+  testExcelCompiler 14
   printfn "done"
   ignore (stdin.ReadLine())

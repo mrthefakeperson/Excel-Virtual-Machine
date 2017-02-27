@@ -1,4 +1,5 @@
 ﻿C
+int k(int a, int b) { }
 int main() {
   if(a) {b;} else {c;d;}
   int e;

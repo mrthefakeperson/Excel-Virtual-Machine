@@ -21,13 +21,33 @@ let (|Var|Cnst|Other|) = function               //todo: non-numeric constants
 let rec ASTCompile' (capture, captured as cpt) = function
   |Var s -> if Map.containsKey s captured && captured.[s] <> [] then Apply(Value s, captured.[s]) else Value s   //variables
   |Cnst s -> Const s    //constants, could use some work
+  |X(",", tupled) ->
+    let name = "tuple" + string(nxt())
+    let allocate = [Declare(name, New(Const(string(List.length tupled))))]
+    let assignAll = List.mapi (fun i e -> Assign(Value name, Const(string i), ASTCompile' cpt e)) tupled
+    let returnVal = [Value name]
+    Sequence (allocate @ assignAll @ returnVal)
   |X("apply", [a; b]) -> Apply(ASTCompile' cpt a, [ASTCompile' cpt b])
   |X("fun", [x; b]) ->
-    let unpacked = match x with T s -> s | _ -> failwith "argument unpacking not done"
+    let rec unpack arg = function
+      |T s -> Declare(s, arg), [s]
+      |X(",", xprs) ->
+        let compiled, extractedVars =
+          List.mapi (fun i -> unpack (Get(arg, Const(string i)))) xprs
+           |> List.unzip
+        Sequence compiled, List.concat extractedVars
+      |_ -> failwith "could not unpack"
+    let argName = "arg" + string(nxt())
+    let extractCode, extractedVars = unpack (Value argName) x
     let cptr'd = List.map Value capture
-    let cpt' = unpacked::capture, Map.add "L" cptr'd captured
+    let cpt' = extractedVars @ capture, Map.add "L" cptr'd captured
+    let functionBody = Sequence [extractCode; ASTCompile' cpt' b]
+//    let unpacked = match x with T s -> s | _ -> failwith "argument unpacking not done"
+//    let cptr'd = List.map Value capture
+//    let cpt' = unpacked::capture, Map.add "L" cptr'd captured
     Sequence [
-      yield Define("L", unpacked::capture, ASTCompile' cpt' b)
+//      yield Define("L", unpacked::capture, ASTCompile' cpt' b)
+      yield Define("L", argName::capture, functionBody)
       match ASTCompile' cpt' (Token("L", [])) with
       |Apply(a, args) ->
         yield Declare("K", New (Const(string(List.length args + 1))))

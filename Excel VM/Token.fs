@@ -37,17 +37,18 @@ type Token(name:string, row_col, functionApplication:bool, dependants:Token list
   member x.ToStringExpr() =
     match name, dependants with
     |"apply", [a; b] -> sprintf "(%s) (%s)" (a.ToStringExpr()) (b.ToStringExpr())
-    |"if", [a; b; c] -> sprintf "if %s then %s else %s" (a.ToStringExpr()) (b.ToStringExpr()) (c.ToStringExpr())
+    |"if", [a; b; c] -> sprintf "(if %s then %s else %s)" (a.ToStringExpr()) (b.ToStringExpr()) (c.ToStringExpr())
     |"sequence", _ -> String.concat "; " (List.map (fun (e:Token) -> e.ToStringExpr()) dependants)
     |"()", [a] -> sprintf "(%s)" (a.ToStringExpr())
     |"dot", [a; b] -> sprintf "%s.%s" (a.ToStringExpr()) (b.ToStringExpr())
-    |"while", [a; b] -> sprintf "while %s do %s" (a.ToStringExpr()) (b.ToStringExpr())
+    |"while", [a; b] -> sprintf "(while %s do %s)" (a.ToStringExpr()) (b.ToStringExpr())
     |"for", [a; b; c] -> sprintf "for %s in %s do (%s)" (a.ToStringExpr()) (b.ToStringExpr()) (c.ToStringExpr())
     |"let", [a; b] -> sprintf "let %s = (%s)" (a.ToStringExpr()) (b.ToStringExpr())
     |"let rec", [a; b] -> sprintf "let rec %s = (%s)" (a.ToStringExpr()) (b.ToStringExpr())
     |"fun", [a; b] -> sprintf "fun %s -> (%s)" (a.ToStringExpr()) (b.ToStringExpr())
     |"pattern", [a; b] -> sprintf "| %s -> %s" (a.ToStringExpr()) (b.ToStringExpr())
     |",", members -> List.map (fun (e:Token) -> e.ToStringExpr()) members |> String.concat ", "
+    |_, [] -> name
     |_ -> name + "(" + (String.concat " " (List.map (fun (e:Token) -> e.ToStringExpr()) dependants)) + ")"
   member x.Clean() =
     match name, dependants with
