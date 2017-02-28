@@ -432,7 +432,7 @@ module C =
     |Local
     |LocalImd    //keywords must appear at the beginning of a statement; LocalImd doesn't include them
   let rec parse state stop fail left right =
-    printfn "%A: %A" state (left, right)
+    //printfn "%A: %A" state (left, right)
     match state with
     |Global ->
       match left, right with
@@ -459,7 +459,8 @@ module C =
       match left, right with
       |_ when stop right -> Token("sequence", List.rev left), right
       |_ when fail right -> failwithf "tokens are incomplete: %A" (left, right)
-      |T ";"::restl, right -> parse Local stop fail restl right         //handles a(b); after a(b) has been parsed
+      |T ";"::T _::restl, right    //single value as a statement is meaningless
+      |T ";"::restl, right -> parse Local stop fail restl right        //handles a(b); after a(b) has been parsed
       |Brackets state stop fail x
       |Braces state stop fail x
       |If state stop fail x
@@ -476,7 +477,8 @@ module C =
       match left, right with
       |_ when stop right -> Token("sequence", List.rev left), right
       |_ when fail right -> failwithf "tokens are incomplete: %A" (left, right)
-      |T ";"::restl, right -> parse Local stop fail restl right
+      |T ";"::T _::restl, right    //single value as a statement is meaningless !!! unless it is `break` or `return`+ !!!
+      |T ";"::restl, right -> parse Local stop fail restl right        //handles a(b); after a(b) has been parsed
       |Brackets state stop fail x
       //|Braces state stop fail x    ({statement;}) with one pair of braces gets parsed, don't know the purpose of this
       |Assignment state stop fail x
@@ -517,7 +519,13 @@ module C =
     |left, DatatypeName(datatypeName, restr) ->
       let parsed, restr =
         parse LocalImd (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
-      let parsed = Token("declare", [Token datatypeName; parsed])
+      let parsed =
+        match parsed.Clean() with
+        |X("assign", [T declaredName; value]) ->
+          Token("let", [Token("declare", [Token datatypeName; Token declaredName]); value])
+        |T declaredName ->
+          Token("let", [Token("declare", [Token datatypeName; Token declaredName]); Token "nothing"])
+        |e -> failwithf "could not recognize declaration: %A" e
       Some (parse LocalImd stop fail left (parsed::restr))
     |_ -> None
   and (|Brackets|_|) state stop fail = function
@@ -582,7 +590,9 @@ module C =
   and (|Operator|_|) state stop fail = function
     |a::restl, (T s as nfx)::restr when nfx.Priority <> -1 ->
       let operand, restr =
-        parse LocalImd (function T _ as x::_ when x.Priority <= nfx.Priority -> true | x -> stop x) fail [] restr
+        parse LocalImd
+         (function T _ as x::_ when x.Priority <= nfx.Priority && x.Priority <> -1 -> true | x -> stop x)
+         fail [] restr
       let parsed = Token("apply", [Token("apply", [Token s; a]); operand])
       Some (parse LocalImd stop fail restl (parsed::restr))
     |_ -> None
@@ -592,8 +602,8 @@ module C =
       let args, restr =
         match parse state' (function T ")"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr with
         |X("sequence", [args]), T ")"::restr -> args, restr
-        |X("sequence", []), T ")"::restr -> Token(",", []), restr
-        |_ -> failwith "arguments were not formatted correctly"
+        |X("sequence", []), T ")"::restr -> Token("_", []), restr
+        |e -> failwithf "arguments were not formatted correctly %A" e
       let parsed = Token("apply", [a; args])
       Some (parse LocalImd stop fail restl (parsed::restr))
     |_ -> None
@@ -602,9 +612,8 @@ module C =
     |_ -> None
 
   let rec postProcess = function
-    |X("declare function", [datatype; T "main"; argv; main]) -> postProcess main
     |X("declare function", [datatype; name; args; xprs]) ->
-      Token("let", [name; Token("fun", [postProcess args; postProcess xprs])])
+      Token("let", [name; Token("fun returnable", [postProcess args; postProcess xprs])])
     |X("{}", xprs) -> postProcess (Token("sequence", xprs))
     |X("sequence", xprs) ->
       let xprs' = List.filter (function T ";" -> false | _ -> true) xprs
@@ -616,3 +625,4 @@ module C =
      >> parse Global (function [] -> true | _ -> false) (fun _ -> false) []
      >> fst
      >> postProcess
+     >> function X("sequence", x) -> Token("sequence", x @ [Token("apply", [Token "main"; Token "()"])])

@@ -1,1 +1,1 @@
-for e in ..1 1 10 do (if ((=) (((%) (e)) (3))) (0) then ((printfn) ("%A")) ("fizz") else if ((=) (((%) (e)) (5))) (0) then ((printfn) ("%A")) ("buzz") else if ((=) (((%) (e)) (15))) (0) then ((printfn) ("%A")) ("fizzbuzz") else ((printfn) ("%A")) (e))
+for e in ..(1 1 10) do ((if ((=) (((%) (e)) (3))) (0) then ((printfn) ("%A")) ("fizz") else (if ((=) (((%) (e)) (5))) (0) then ((printfn) ("%A")) ("buzz") else (if ((=) (((%) (e)) (15))) (0) then ((printfn) ("%A")) ("fizzbuzz") else ((printfn) ("%A")) (e)))))

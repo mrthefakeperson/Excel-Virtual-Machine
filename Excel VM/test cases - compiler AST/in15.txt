@@ -1,11 +1,6 @@
 ﻿C
-int k(int a, int b) { return a+b; }
+int k(int a, int b) {return a+b;}
 int main() {
-  int e = 2;
-  if(0) {printf("aaa");}
-  else {
-    printf("bbb\n");
-    printf("%i %i\n", e, k(e, e));
-  }
-  return 0;
+  int e = 98;
+  return k(e, e);
 }

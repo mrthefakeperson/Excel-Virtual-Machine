@@ -14,6 +14,7 @@ type AST =
   |New of n:AST               //allocate n new heap spaces
   |Get of a:AST*i:AST           //get array a at i
   |Assign of a:AST*i:AST*e:AST  //set array a at i to e
+  |Return of a:AST
    with
     override x.ToString() =
       let rec str indent = function
@@ -26,6 +27,7 @@ type AST =
         |New n -> indent + sprintf "alloc %s" (str "" n)
         |Get(a, i) -> indent + sprintf "%s[%s]" (str "" a) (str "" i)
         |Assign(a, i, e) -> indent + sprintf "%s[%s] <- %s" (str "" a) (str "" i) (str "" e)
+        |Return x -> indent + sprintf "return %s" (str "" x)
       str "" x
 
 [<AbstractClass>]     //combinator class

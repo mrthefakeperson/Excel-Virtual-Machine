@@ -1,4 +1,5 @@
-﻿module Compiler
+﻿//todo: variables leaving scope should be popped
+module Compiler
 open Token
 open System.Collections.Generic
 open Compiler_Definitions
@@ -18,16 +19,29 @@ let (|Var|Cnst|Other|) = function               //todo: non-numeric constants
   |T ("true" | "false" as s) -> Cnst s
   |T s -> if s <> "" && '0' <= s.[0] && s.[0] <= '9' then Cnst s else Var s
   |_ -> Other
-let rec ASTCompile' (capture, captured as cpt) = function
+let rec ASTCompile' (capture, captured, yld as cpt) = function
+  |X("return", xl) ->
+    match xl, yld with
+    |[], Some yldName -> AST.Return (Const "()")
+    |[x], Some yldName -> AST.Return (ASTCompile' cpt x)
+    |e -> failwithf "unrecognized return structure: %A" e
   |Var s -> if Map.containsKey s captured && captured.[s] <> [] then Apply(Value s, captured.[s]) else Value s   //variables
   |Cnst s -> Const s    //constants, could use some work
   |X(",", tupled) ->
-    let name = "tuple" + string(nxt())
+    let name = "$tuple" + nxt()
     let allocate = [Declare(name, New(Const(string(List.length tupled))))]
     let assignAll = List.mapi (fun i e -> Assign(Value name, Const(string i), ASTCompile' cpt e)) tupled
     let returnVal = [Value name]
     Sequence (allocate @ assignAll @ returnVal)
-  |X("apply", [a; b]) -> Apply(ASTCompile' cpt a, [ASTCompile' cpt b])
+  |X("apply", [a; b]) ->
+    let applied = Apply(ASTCompile' cpt a, [ASTCompile' cpt b])
+    match yld with
+    |Some yldName ->                 //testing needed
+      Sequence [
+        Declare("T", applied)
+        If(Get(Value yldName, Const "0"), AST.Return(Value "T"), Value "T")
+       ]
+    |None -> applied
   |X("fun", [x; b]) ->
     let rec unpack arg = function
       |X("declare", [_; T s])
@@ -38,16 +52,12 @@ let rec ASTCompile' (capture, captured as cpt) = function
            |> List.unzip
         Sequence compiled, List.concat extractedVars
       |e -> failwithf "could not unpack %A" e
-    let argName = "arg" + string(nxt())
+    let argName = "$arg" + nxt()
     let extractCode, extractedVars = unpack (Value argName) x
     let cptr'd = List.map Value capture
-    let cpt' = extractedVars @ capture, Map.add "L" cptr'd captured
+    let cpt' = extractedVars @ capture, Map.add "L" cptr'd captured, yld
     let functionBody = Sequence [extractCode; ASTCompile' cpt' b]
-//    let unpacked = match x with T s -> s | _ -> failwith "argument unpacking not done"
-//    let cptr'd = List.map Value capture
-//    let cpt' = unpacked::capture, Map.add "L" cptr'd captured
     Sequence [
-//      yield Define("L", unpacked::capture, ASTCompile' cpt' b)
       yield Define("L", argName::capture, functionBody)
       match ASTCompile' cpt' (Token("L", [])) with
       |Apply(a, args) ->
@@ -59,22 +69,24 @@ let rec ASTCompile' (capture, captured as cpt) = function
         yield Value "K"
       |compiled -> yield compiled
      ]
-  |X("let", [a; b]) ->
+  |X("fun returnable", [x; b]) ->
+    let yldName = "$yld" + nxt()
+    let initReturnBool = [
+      Declare(yldName, New(Const "1"))
+      Assign(Value yldName, Const "0", Const "false")
+     ]
+    let compiledFunction = ASTCompile' (capture, captured, Some yldName) (Token("fun", [x; b]))
+    match compiledFunction with Sequence s -> Sequence(initReturnBool @ s) | _ -> failwith "should never happen"
+  |X("declare", [datatypeName; a]) -> ASTCompile' cpt a
+  |X("let", [a; b]) ->           //todo: merge "let rec" with "let", handle non-recursive statements by renaming
     match a with
     |X("apply", [aa; ab]) -> ASTCompile' cpt (Token("let", [aa; Token("fun", [ab; b])]))
-    |T s ->
+    |T s | X("declare", [_; T s]) ->
       match capture with
       |[] -> Declare(s, ASTCompile' cpt b)
-      |ll -> Define(s, capture, ASTCompile' (capture, Map.add s (List.map Value capture) captured) b)    //this is not right, it's a recursive definition
-    |_ -> failwith "patterns in function arguments not supported yet"
-  |X("let rec", [a; b]) ->
-    match a with
-    |X("apply", [aa; ab]) -> ASTCompile' cpt (Token("let rec", [aa; Token("fun", [ab; b])]))
-    |T s ->
-      match capture with
-      |[] -> Declare(s, ASTCompile' cpt b)
-      |ll -> Define(s, capture, ASTCompile' (capture, Map.add s (List.map Value capture) captured) b)
-    |_ -> failwith "patterns in function arguments not supported yet"
+      |ll -> Define(s, capture, ASTCompile' (capture, Map.add s (List.map Value capture) captured, yld) b)
+    |e -> failwithf "patterns in function arguments not supported yet: %A" e
+  |X("let rec", [a; b]) -> ASTCompile' cpt (Token("let", [a; b]))
   |X("if", [cond; aff; neg]) ->
     If(ASTCompile' cpt cond, ASTCompile' cpt aff, ASTCompile' cpt neg)
   |X("do", [b]) -> Apply(Value "ignore", [ASTCompile' cpt b])
@@ -104,11 +116,11 @@ let rec ASTCompile' (capture, captured as cpt) = function
        ]
     |_ -> failwith "iterable objects not supported yet"
   |X("sequence", list) -> //Sequence (List.map (ASTCompile' capture) list)
-    List.fold (fun (acc, (capt', capd' as cpt')) e ->
+    List.fold (fun (acc, (capt', capd', yld as cpt')) e ->
       let compiled = ASTCompile' cpt' e
       let cpt' =
         match compiled with
-        |Declare(a, _) | Define(a, _, _) -> (a::capt', Map.add a (List.map Value capt') capd')
+        |Declare(a, _) | Define(a, _, _) -> (a::capt', Map.add a (List.map Value capt') capd', yld)
         |_ -> cpt'
       (compiled::acc, cpt')
      ) ([], cpt) list
@@ -116,7 +128,7 @@ let rec ASTCompile' (capture, captured as cpt) = function
       |> Sequence
   
   |unknown -> failwithf "unknown: %A" unknown
-let ASTCompile e = ASTCompile' ([], Map.empty) e
+let ASTCompile e = ASTCompile' ([], Map.empty, None) e
   
 let x = "F"    //just a place to store values
 let createComb2Section cmd = [
@@ -193,4 +205,5 @@ let rec compile' = function
     compile' n @ loop
   |Get(a, i) -> compile' a @ compile' i @ [Add; GetHeap]
   |Assign(a, i, e) -> compile' a @ compile' i @ [Add] @ compile' e @ [WriteHeap; Push "()"]
+  |AST.Return x -> compile' x @ [Return]
 let compile e = [GotoFwdShift (List.length operationsPrefix + 1)] @ operationsPrefix @ compile' e

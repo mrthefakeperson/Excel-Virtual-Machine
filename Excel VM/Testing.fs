@@ -104,6 +104,7 @@ let testCompilerAST a =
   test a "test cases - compiler AST" (fun file outFile ->
     Console.WindowWidth <- 170
     let parsed = openAndParse file
+    printfn "%A" (parsed.Clean().ToStringExpr())
     let cmds =
       parsed.Clean()
        |> ASTCompile |> debug
@@ -179,8 +180,8 @@ let runSpecificTest() =       // `generate` to create outputs, `verify` to test,
   //testPAsm verify 1
   //testExcelFile 1
 
-  testParser ignore 15
-  //testCompilerAST ignore 15
+  //testParser ignore 15
+  testCompilerAST ignore 15
   //testExcelCompiler 14
   printfn "done"
   ignore (stdin.ReadLine())
