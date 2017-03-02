@@ -28,7 +28,7 @@ let rec test action folderName runFile n =
     printfn "%s:" name
     runFile name outName
     action outName
-    //ignore (stdin.ReadLine())
+    ignore (stdin.ReadLine())
     test action folderName runFile (n + 1)
 let verify name =
   if (File.ReadAllLines name) <> (File.ReadAllLines (name + ".ans"))
@@ -180,7 +180,7 @@ let runSpecificTest() =       // `generate` to create outputs, `verify` to test,
   //testPAsm verify 1
   //testExcelFile 1
 
-  //testParser ignore 15
+  //testParser ignore 17
   testCompilerAST ignore 15
   //testExcelCompiler 14
   printfn "done"

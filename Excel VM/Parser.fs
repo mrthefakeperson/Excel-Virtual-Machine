@@ -401,6 +401,11 @@ module Python2 =
      >> fst
 
 
+// currently a lot of issues with using ; as an end token
+// ex. if (cond) return v;
+//       => if (cond) (return v)     ; is used to end the return
+//       => if (cond) then (return v)...failed, incomplete without a terminating ;
+//  fix: don't remove the ; upon finishing parsing?
 module C =
   let listOfDatatypeNames = ref ["int"; "long long"; "long"]
   let (|BrokenDatatypeName|_|) (ll:string list) =
@@ -432,7 +437,6 @@ module C =
     |Local
     |LocalImd    //keywords must appear at the beginning of a statement; LocalImd doesn't include them
   let rec parse state stop fail left right =
-    //printfn "%A: %A" state (left, right)
     match state with
     |Global ->
       match left, right with
@@ -477,7 +481,7 @@ module C =
       match left, right with
       |_ when stop right -> Token("sequence", List.rev left), right
       |_ when fail right -> failwithf "tokens are incomplete: %A" (left, right)
-      |T ";"::T _::restl, right    //single value as a statement is meaningless !!! unless it is `break` or `return`+ !!!
+      |T ";"::T _::restl, right    //single value as a statement is meaningless !!! unless it is `break` or `return` !!!
       |T ";"::restl, right -> parse Local stop fail restl right        //handles a(b); after a(b) has been parsed
       |Brackets state stop fail x
       //|Braces state stop fail x    ({statement;}) with one pair of braces gets parsed, don't know the purpose of this
@@ -531,7 +535,7 @@ module C =
   and (|Brackets|_|) state stop fail = function
     |T "("::restl, right ->
       let parsed, T ")"::restr =
-        parse LocalImd (function T ")"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] right
+        parse LocalImd (function T ")"::_ -> true | _ -> false) (fun _ -> false) [] right
       let parsed = Token("()", [parsed])
       Some (parse LocalImd stop fail restl (parsed::restr))
     |_ -> None
@@ -548,9 +552,9 @@ module C =
       let X("sequence", []), X("{}", [body])::restr =
         parse Local (function X("{}", [_])::_ -> true | _ -> false)
          (fun e -> stop e || fail e) [] right
-      body, restr
+      body, Token ";"::restr      //add the ; to make it consistent
     |_ ->
-      let body, T ";"::restr =
+      let body, restr =
         parse Local (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] right
       body, restr
   and (|If|_|) state stop fail = function
@@ -559,7 +563,8 @@ module C =
         parse LocalImd (function X("()", _)::_ -> true | _ -> false) (fun e -> stop e || fail e) [] right
       let aff, restr = getStatementBody stop fail restr
       let neg, restr =
-        match restr with
+        match restr.Tail with
+        |T "else"::T "if"::restr -> parse Local stop fail [] (Token "if"::restr)  // todo: make this redundant (parsing statement body is buggy at the moment, when nested statements without braces are involved)
         |T "else"::restr -> getStatementBody stop fail restr
         |_ -> Token("sequence", []), restr
       let parsed = Token("if", [cond; aff; neg])
@@ -575,7 +580,7 @@ module C =
     |_ -> None
   and (|Return|_|) state stop fail = function
     |T "return"::restl, right ->
-      let returnedValue, T ";"::restr =
+      let returnedValue, restr =
         parse LocalImd (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] right
       let parsed = Token("return", [returnedValue])
       Some (parse Local stop fail restl (parsed::restr))
@@ -591,7 +596,7 @@ module C =
     |a::restl, (T s as nfx)::restr when nfx.Priority <> -1 ->
       let operand, restr =
         parse LocalImd
-         (function T _ as x::_ when x.Priority <= nfx.Priority && x.Priority <> -1 -> true | x -> stop x)
+         (function T _ as x::_ when x.Priority <= nfx.Priority && x.Priority <> -1 -> true | T(";" | ",")::_ -> true | x -> stop x)
          fail [] restr
       let parsed = Token("apply", [Token("apply", [Token s; a]); operand])
       Some (parse LocalImd stop fail restl (parsed::restr))
@@ -600,7 +605,7 @@ module C =
     |a::restl, T "("::restr ->
       let state' = match state with Global -> FunctionArgs | _ -> LocalImd
       let args, restr =
-        match parse state' (function T ")"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr with
+        match parse state' (function T ")"::_ -> true | _ -> false) (fun _ -> false) [] restr with
         |X("sequence", [args]), T ")"::restr -> args, restr
         |X("sequence", []), T ")"::restr -> Token("_", []), restr
         |e -> failwithf "arguments were not formatted correctly %A" e
@@ -613,11 +618,12 @@ module C =
 
   let rec postProcess = function
     |X("declare function", [datatype; name; args; xprs]) ->
-      Token("let", [name; Token("fun returnable", [postProcess args; postProcess xprs])])
+      Token("let", [name; Token("fun", [postProcess args; postProcess xprs])])
     |X("{}", xprs) -> postProcess (Token("sequence", xprs))
     |X("sequence", xprs) ->
       let xprs' = List.filter (function T ";" -> false | _ -> true) xprs
       Token("sequence", List.map postProcess xprs')
+    |X("==", xprs) -> Token("=", List.map postProcess xprs)
     |X(s, xprs) -> Token(s, List.map postProcess xprs)
 
   let parseSyntax =

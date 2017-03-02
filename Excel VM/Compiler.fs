@@ -19,12 +19,12 @@ let (|Var|Cnst|Other|) = function               //todo: non-numeric constants
   |T ("true" | "false" as s) -> Cnst s
   |T s -> if s <> "" && '0' <= s.[0] && s.[0] <= '9' then Cnst s else Var s
   |_ -> Other
-let rec ASTCompile' (capture, captured, yld as cpt) = function
+let rec ASTCompile' (capture, captured as cpt) = function
   |X("return", xl) ->
-    match xl, yld with
-    |[], Some yldName -> AST.Return (Const "()")
-    |[x], Some yldName -> AST.Return (ASTCompile' cpt x)
-    |e -> failwithf "unrecognized return structure: %A" e
+    match xl with
+    |[] -> AST.Return None
+    |[x] -> AST.Return (Some (ASTCompile' cpt x))
+    |_ -> failwith "cannot return more than one item"
   |Var s -> if Map.containsKey s captured && captured.[s] <> [] then Apply(Value s, captured.[s]) else Value s   //variables
   |Cnst s -> Const s    //constants, could use some work
   |X(",", tupled) ->
@@ -33,15 +33,7 @@ let rec ASTCompile' (capture, captured, yld as cpt) = function
     let assignAll = List.mapi (fun i e -> Assign(Value name, Const(string i), ASTCompile' cpt e)) tupled
     let returnVal = [Value name]
     Sequence (allocate @ assignAll @ returnVal)
-  |X("apply", [a; b]) ->
-    let applied = Apply(ASTCompile' cpt a, [ASTCompile' cpt b])
-    match yld with
-    |Some yldName ->                 //testing needed
-      Sequence [
-        Declare("T", applied)
-        If(Get(Value yldName, Const "0"), AST.Return(Value "T"), Value "T")
-       ]
-    |None -> applied
+  |X("apply", [a; b]) -> Apply(ASTCompile' cpt a, [ASTCompile' cpt b])
   |X("fun", [x; b]) ->
     let rec unpack arg = function
       |X("declare", [_; T s])
@@ -55,7 +47,7 @@ let rec ASTCompile' (capture, captured, yld as cpt) = function
     let argName = "$arg" + nxt()
     let extractCode, extractedVars = unpack (Value argName) x
     let cptr'd = List.map Value capture
-    let cpt' = extractedVars @ capture, Map.add "L" cptr'd captured, yld
+    let cpt' = extractedVars @ capture, Map.add "L" cptr'd captured
     let functionBody = Sequence [extractCode; ASTCompile' cpt' b]
     Sequence [
       yield Define("L", argName::capture, functionBody)
@@ -69,14 +61,6 @@ let rec ASTCompile' (capture, captured, yld as cpt) = function
         yield Value "K"
       |compiled -> yield compiled
      ]
-  |X("fun returnable", [x; b]) ->
-    let yldName = "$yld" + nxt()
-    let initReturnBool = [
-      Declare(yldName, New(Const "1"))
-      Assign(Value yldName, Const "0", Const "false")
-     ]
-    let compiledFunction = ASTCompile' (capture, captured, Some yldName) (Token("fun", [x; b]))
-    match compiledFunction with Sequence s -> Sequence(initReturnBool @ s) | _ -> failwith "should never happen"
   |X("declare", [datatypeName; a]) -> ASTCompile' cpt a
   |X("let", [a; b]) ->           //todo: merge "let rec" with "let", handle non-recursive statements by renaming
     match a with
@@ -84,7 +68,7 @@ let rec ASTCompile' (capture, captured, yld as cpt) = function
     |T s | X("declare", [_; T s]) ->
       match capture with
       |[] -> Declare(s, ASTCompile' cpt b)
-      |ll -> Define(s, capture, ASTCompile' (capture, Map.add s (List.map Value capture) captured, yld) b)
+      |ll -> Define(s, capture, ASTCompile' (capture, Map.add s (List.map Value capture) captured) b)
     |e -> failwithf "patterns in function arguments not supported yet: %A" e
   |X("let rec", [a; b]) -> ASTCompile' cpt (Token("let", [a; b]))
   |X("if", [cond; aff; neg]) ->
@@ -116,11 +100,11 @@ let rec ASTCompile' (capture, captured, yld as cpt) = function
        ]
     |_ -> failwith "iterable objects not supported yet"
   |X("sequence", list) -> //Sequence (List.map (ASTCompile' capture) list)
-    List.fold (fun (acc, (capt', capd', yld as cpt')) e ->
+    List.fold (fun (acc, (capt', capd' as cpt')) e ->
       let compiled = ASTCompile' cpt' e
       let cpt' =
         match compiled with
-        |Declare(a, _) | Define(a, _, _) -> (a::capt', Map.add a (List.map Value capt') capd', yld)
+        |Declare(a, _) | Define(a, _, _) -> (a::capt', Map.add a (List.map Value capt') capd')
         |_ -> cpt'
       (compiled::acc, cpt')
      ) ([], cpt) list
@@ -128,7 +112,7 @@ let rec ASTCompile' (capture, captured, yld as cpt) = function
       |> Sequence
   
   |unknown -> failwithf "unknown: %A" unknown
-let ASTCompile e = ASTCompile' ([], Map.empty, None) e
+let ASTCompile e = ASTCompile' ([], Map.empty) e
   
 let x = "F"    //just a place to store values
 let createComb2Section cmd = [
@@ -167,7 +151,7 @@ let rec compile' = function
   |Declare(a, b) -> compile' b @ [Store a; Push "()"]
   |Define(a, args, b) ->       //all function values are arrays: [|&f; arg1; arg2; ... |]
     let functionBody =
-      List.map Store (List.rev args) @ compile' b @ List.map Popv args @ [Return]   //double check `List.rev args`
+      List.map Store (List.rev args) @ compile' b @ List.map Popv args @ [Return]
     let len = List.length functionBody
     [GotoFwdShift (len + 1)] @ functionBody
      @ [NewHeap; Store a; Load a; PushFwdShift (-len - 3); WriteHeap; Load a]
@@ -205,5 +189,8 @@ let rec compile' = function
     compile' n @ loop
   |Get(a, i) -> compile' a @ compile' i @ [Add; GetHeap]
   |Assign(a, i, e) -> compile' a @ compile' i @ [Add] @ compile' e @ [WriteHeap; Push "()"]
-  |AST.Return x -> compile' x @ [Return]
+  |AST.Return a ->
+    match a with
+    |None -> [Return]
+    |Some x -> compile' x @ [Return]
 let compile e = [GotoFwdShift (List.length operationsPrefix + 1)] @ operationsPrefix @ compile' e

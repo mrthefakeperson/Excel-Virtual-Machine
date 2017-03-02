@@ -4,7 +4,7 @@
 let infixOrder = [|
   ["*"; "/"; "%"]
   ["+"; "-"]
-  ["="; "<>"; ">"; ">="; "<"; "<="]
+  ["="; "<>"; ">"; ">="; "<"; "<="] @ ["=="; "!="]      // in the future, this should depend on language
   ["&&"]
   ["||"]
  |]
@@ -32,7 +32,9 @@ type Token(name:string, row_col, functionApplication:bool, dependants:Token list
   member a.EvaluatedFirst (b:Token) = a.Priority <= b.Priority
   member x.Single with get() = dependants = []
   override x.ToString() =
-    sprintf "%s[%i,%i](%s)" name row col
+    //sprintf "%s[%i,%i](%s)" name row col
+    // (String.concat "," (List.map (sprintf "%O") dependants))
+    sprintf "%s(%s)" name
      (String.concat "," (List.map (sprintf "%O") dependants))
   member x.ToStringExpr() =
     match name, dependants with

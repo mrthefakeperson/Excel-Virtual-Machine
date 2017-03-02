@@ -1,0 +1,3 @@
+stack ["88"]
+
+output []

@@ -14,7 +14,7 @@ type AST =
   |New of n:AST               //allocate n new heap spaces
   |Get of a:AST*i:AST           //get array a at i
   |Assign of a:AST*i:AST*e:AST  //set array a at i to e
-  |Return of a:AST
+  |Return of a:AST option
    with
     override x.ToString() =
       let rec str indent = function
@@ -27,7 +27,8 @@ type AST =
         |New n -> indent + sprintf "alloc %s" (str "" n)
         |Get(a, i) -> indent + sprintf "%s[%s]" (str "" a) (str "" i)
         |Assign(a, i, e) -> indent + sprintf "%s[%s] <- %s" (str "" a) (str "" i) (str "" e)
-        |Return x -> indent + sprintf "return %s" (str "" x)
+        |Return None -> indent + "return"
+        |Return(Some x) -> indent + sprintf "return\n%s" (str (indent+"  ") x)
       str "" x
 
 [<AbstractClass>]     //combinator class
@@ -143,7 +144,6 @@ let interpretPAsm cmds =
   push instr "0"
   while int(top instr) < Array.length cmds do
     let i = int(top instr)
-    if debug then printfn "%A" stacks.["e"]
     if debug then printfn "%A" cmds.[i]
     try
       interpretCmd i cmds.[i]

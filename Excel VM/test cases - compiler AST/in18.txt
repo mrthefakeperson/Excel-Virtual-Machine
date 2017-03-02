@@ -1,0 +1,9 @@
+﻿C
+int e(int k) {
+  1+1;
+  if (k == 9) return 7;
+  else return k + e(k + 1);
+}
+int main() {
+  return e(0);
+}
