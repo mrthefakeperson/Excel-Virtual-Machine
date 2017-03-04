@@ -37,18 +37,18 @@ let rec ASTCompile' (capture, captured as cpt) = function
   |X("fun", [x; b]) ->
     let rec unpack arg = function
       |X("declare", [_; T s])
-      |T s -> Declare(s, arg), [s]
+      |T s -> [Declare(s, arg)], [s]
       |X(",", xprs) ->
         let compiled, extractedVars =
           List.mapi (fun i -> unpack (Get(arg, Const(string i)))) xprs
            |> List.unzip
-        Sequence compiled, List.concat extractedVars
+        List.concat compiled, List.concat extractedVars
       |e -> failwithf "could not unpack %A" e
     let argName = "$arg" + nxt()
     let extractCode, extractedVars = unpack (Value argName) x
     let cptr'd = List.map Value capture
     let cpt' = extractedVars @ capture, Map.add "L" cptr'd captured
-    let functionBody = Sequence [extractCode; ASTCompile' cpt' b]
+    let functionBody = Sequence (extractCode @ [ASTCompile' cpt' b])
     Sequence [
       yield Define("L", argName::capture, functionBody)
       match ASTCompile' cpt' (Token("L", [])) with
@@ -142,16 +142,29 @@ let (|Inline|_|) = function
   |Value "ignore" -> Some [Push "not implemented"]
   |Apply(Value "printfn", [Const "%A"]) -> Some [NewHeap; Store x; Load x; Push (string _PrintAddress); WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
   |_ -> None
-let rec compile' = function
+let rec compile' inScope = function
   |Inline ll -> ll
-  |Sequence ll ->               //make sure they all return a value (or this will screw up stuff)
-    match List.collect (fun e -> Pop :: List.rev (compile' e)) (List.rev ll) with
-    |_::revCmds -> List.rev revCmds
-    |[] -> failwith "this should never happen unless the sequence was empty"
-  |Declare(a, b) -> compile' b @ [Store a; Push "()"]
+  |Sequence ll ->
+    let x = (List.collect (fun e -> Pop :: List.rev (compile' inScope e)) (List.rev ll)).Tail
+    List.fold (fun (acc, scope) e ->
+      let acc' = Pop :: List.rev (compile' (scope @ inScope) e) @ acc //assuming no Returns within Declares
+      match e with
+      |Declare(a, _) -> (acc', a::scope)
+      |_ -> (acc', scope)
+     ) ([], []) ll
+     |> function
+          |(Pop::revCmds, scopedVars) ->
+            //printfn "\n%A\n%A" revCmds x
+            //assert (revCmds = x)
+            List.rev revCmds @ List.map Popv scopedVars
+          |_ -> failwith "this should never happen unless the sequence was empty"
+    //match List.collect (fun e -> Pop :: List.rev (compile' e)) (List.rev ll) with
+    //|_::revCmds -> List.rev revCmds
+    //|[] -> failwith "this should never happen unless the sequence was empty"
+  |Declare(a, b) -> compile' (a::inScope) b @ [Store a; Push "()"]
   |Define(a, args, b) ->       //all function values are arrays: [|&f; arg1; arg2; ... |]
     let functionBody =
-      List.map Store (List.rev args) @ compile' b @ List.map Popv args @ [Return]
+      List.map Store (List.rev args) @ compile' args b @ List.map Popv args @ [Return]
     let len = List.length functionBody
     [GotoFwdShift (len + 1)] @ functionBody
      @ [NewHeap; Store a; Load a; PushFwdShift (-len - 3); WriteHeap; Load a]
@@ -159,7 +172,7 @@ let rec compile' = function
   |Value a -> [Load a]
   |Const v -> [Push v]
   |Apply(a, args) ->     //maybe put in prefix
-    let functionArray = compile' a @ [Store x; Load x]
+    let functionArray = compile' inScope a @ [Store x; Load x]
     let loop = [   //start with address of array (representing function value)
       Push "1"; Add; Store x   //x <- f[1] (arg 1)
       Load x; GetHeap; Push "endArr"; Equals; GotoIfTrueFwdShift 9; //while not (f[x] = terminator)
@@ -169,9 +182,9 @@ let rec compile' = function
       Popv x
      ]
     let call = [Load x; GetHeap; Call; Popv x]
-    List.collect compile' args @ functionArray @ loop @ call
+    List.collect (compile' inScope) args @ functionArray @ loop @ call
   |If(a, b, c) ->
-    let cond, aff, neg = compile' a, compile' b, compile' c
+    let cond, aff, neg = compile' inScope a, compile' inScope b, compile' inScope c
     cond
      @ [GotoIfTrueFwdShift (List.length neg + 2)] @ neg
      @ [GotoFwdShift (List.length aff + 1)] @ aff
@@ -186,11 +199,13 @@ let rec compile' = function
       Popv x
       NewHeap; Push "endArr"; WriteHeap    //put a terminator at the end
      ]
-    compile' n @ loop
-  |Get(a, i) -> compile' a @ compile' i @ [Add; GetHeap]
-  |Assign(a, i, e) -> compile' a @ compile' i @ [Add] @ compile' e @ [WriteHeap; Push "()"]
+    compile' inScope n @ loop
+  |Get(a, i) -> compile' inScope a @ compile' inScope i @ [Add; GetHeap]
+  |Assign(a, i, e) ->
+    compile' inScope a @ compile' inScope i @ [Add] @ compile' inScope e @ [WriteHeap; Push "()"]
   |AST.Return a ->
+    let exitScope = List.map Popv inScope @ [Return]
     match a with
-    |None -> [Return]
-    |Some x -> compile' x @ [Return]
-let compile e = [GotoFwdShift (List.length operationsPrefix + 1)] @ operationsPrefix @ compile' e
+    |None -> exitScope
+    |Some x -> compile' inScope x @ exitScope
+let compile e = [GotoFwdShift (List.length operationsPrefix + 1)] @ operationsPrefix @ compile' [] e

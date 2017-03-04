@@ -181,7 +181,7 @@ let runSpecificTest() =       // `generate` to create outputs, `verify` to test,
   //testExcelFile 1
 
   //testParser ignore 17
-  testCompilerAST ignore 15
-  //testExcelCompiler 14
+  //testCompilerAST verify 15
+  testExcelCompiler 14
   printfn "done"
   ignore (stdin.ReadLine())

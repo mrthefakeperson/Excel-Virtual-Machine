@@ -154,8 +154,11 @@ let interpretPAsm cmds =
       printfn "heap [%s]" (String.concat "; " (Seq.map (sprintf "%A") heap))
       printfn "%A" cmds.[i]
       failwith "failed"
-    if debug then printfn "stack %A" !stacks.[value]
-    if debug then printfn "heap [%s]" (String.concat "; " (Seq.map (sprintf "%A") heap))
+    if debug then
+      printfn "stack %A" !stacks.[value]
+      printfn "heap [%s]" (String.concat "; " (Seq.map (sprintf "%A") heap))
+      printfn "A: %A" !stacks.["a"]
+      printfn "B: %A" !stacks.["b"]
     let pt = int(top instr)
     pop instr; push instr (string(pt+1))
     if debug then ignore (stdin.ReadLine())
