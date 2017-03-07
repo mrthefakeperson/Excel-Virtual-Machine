@@ -66,9 +66,10 @@ let rec ASTCompile' (capture, captured as cpt) = function
     match a with
     |X("apply", [aa; ab]) -> ASTCompile' cpt (Token("let", [aa; Token("fun", [ab; b])]))
     |T s | X("declare", [_; T s]) ->
-      match capture with
-      |[] -> Declare(s, ASTCompile' cpt b)
-      |ll -> Define(s, capture, ASTCompile' (capture, Map.add s (List.map Value capture) captured) b)
+      Declare(s, ASTCompile' cpt b)
+//      match capture with
+//      |[] -> Declare(s, ASTCompile' cpt b)
+//      |ll -> Define(s, capture, ASTCompile' (capture, Map.add s (List.map Value capture) captured) b)
     |e -> failwithf "patterns in function arguments not supported yet: %A" e
   |X("let rec", [a; b]) -> ASTCompile' cpt (Token("let", [a; b]))
   |X("assign", [a; b]) ->
@@ -109,7 +110,8 @@ let rec ASTCompile' (capture, captured as cpt) = function
       let compiled = ASTCompile' cpt' e
       let cpt' =
         match compiled with
-        |Declare(a, _) | Define(a, _, _) -> (a::capt', Map.add a (List.map Value capt') capd')
+        |Declare(a, _) -> (a::capt', capd')
+        |Define(a, _, _) -> (a::capt', Map.add a (List.map Value capt') capd')
         |_ -> cpt'
       (compiled::acc, cpt')
      ) ([], cpt) list
