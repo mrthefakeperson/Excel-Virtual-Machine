@@ -67,14 +67,19 @@ let rec ASTCompile' (capture, captured as cpt) = function
     |X("apply", [aa; ab]) -> ASTCompile' cpt (Token("let", [aa; Token("fun", [ab; b])]))
     |T s | X("declare", [_; T s]) ->
       Declare(s, ASTCompile' cpt b)
-//      match capture with
-//      |[] -> Declare(s, ASTCompile' cpt b)
-//      |ll -> Define(s, capture, ASTCompile' (capture, Map.add s (List.map Value capture) captured) b)
     |e -> failwithf "patterns in function arguments not supported yet: %A" e
   |X("let rec", [a; b]) -> ASTCompile' cpt (Token("let", [a; b]))
+  |X("array", [sz]) -> New (ASTCompile' cpt sz)
+  |X("dot", [a; b]) ->
+    match b with
+    |X("[]", [i]) -> Get(ASTCompile' cpt a, ASTCompile' cpt i)
+    |_ -> failwith "todo: objects"
   |X("assign", [a; b]) ->
-    let name = match a with X(name, []) -> name | _ -> failwith "todo: unpacking"
-    Mutate(name, ASTCompile' cpt b)
+    match a with
+    |X(name, []) -> Mutate(name, ASTCompile' cpt b)
+    |X("dot", [a; X("[]", [i])]) ->
+      Assign(ASTCompile' cpt a, ASTCompile' cpt i, ASTCompile' cpt b)
+    |_ -> failwith "todo: unpacking"
   |X("if", [cond; aff; neg]) ->
     If(ASTCompile' cpt cond, ASTCompile' cpt aff, ASTCompile' cpt neg)
   |X("do", [b]) -> Apply(Value "ignore", [ASTCompile' cpt b])

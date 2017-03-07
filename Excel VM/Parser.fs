@@ -437,6 +437,7 @@ module C =
     |Local
     |LocalImd    //keywords must appear at the beginning of a statement; LocalImd doesn't include them
   let rec parse state stop fail left right =
+    //printfn "%A" (left, right)
     match state with
     |Global ->
       match left, right with
@@ -445,6 +446,7 @@ module C =
       |DatatypeGlobal state stop fail x
       //|Struct
       |Apply state stop fail x
+      |Index state stop fail x
       |Brackets state stop fail x
       |Braces state stop fail x
       |Assignment state stop fail x
@@ -474,6 +476,7 @@ module C =
       |Assignment state stop fail x
       |Operator state stop fail x
       |Apply state stop fail x
+      |Index state stop fail x
       |DatatypeLocal state stop fail x         //do this better: preprocess all datatypes into one string
       |Transfer state stop fail x     -> x
       |_ -> failwithf "unknown: %A" (left, right)
@@ -488,6 +491,7 @@ module C =
       |Assignment state stop fail x
       |Operator state stop fail x
       |Apply state stop fail x
+      |Index state stop fail x
       |CommaFunction state stop fail x
       |Transfer state stop fail x     -> x
       |_ -> failwithf "unknown: %A" (left, right)
@@ -497,7 +501,8 @@ module C =
         parse Global (function T(";" | "{")::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
       let parsed, restr =
         match identifierName with
-        |T _ | X("assign", [_; _]) | X(",", _) -> Token("declare", [Token datatypeName; identifierName]), restr.Tail
+        |T _ | X("assign", [_; _]) | X(",", _) | X("dot", [_; X("[]", _)]) ->
+          Token("declare", [Token datatypeName; identifierName]), restr.Tail
         |X("sequence", [X("apply", [identifierName; args])]) ->
           let X("sequence", []), functionBody::restr =
             parse Local (function X("{}", _)::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
@@ -505,7 +510,7 @@ module C =
         |o -> failwithf "expression following data type declaration is invalid %O" o
       Some (parse Global stop fail left (parsed::restr))
     |_ -> None
-  and (|DatatypeFunction|_|) state stop fail = function
+  and (|DatatypeFunction|_|) state stop fail = function           //todo: array parameters
     |left, DatatypeName(datatypeName, declaredName::restr) ->
       let parsed = Token("declare", [Token datatypeName; declaredName])
       Some (parse FunctionArgs stop fail left (parsed::restr))
@@ -525,10 +530,12 @@ module C =
         parse LocalImd (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
       let parsed =
         match parsed.Clean() with
-        |X("assign", [T declaredName; value]) ->
-          Token("let", [Token("declare", [Token datatypeName; Token declaredName]); value])
-        |T declaredName ->
-          Token("let", [Token("declare", [Token datatypeName; Token declaredName]); Token "nothing"])
+        |X("assign", [T declaredName as t; value]) ->
+          Token("let", [Token("declare", [Token datatypeName; t]); value])
+        |T declaredName as t ->
+          Token("let", [Token("declare", [Token datatypeName; t]); Token "nothing"])
+        |X("dot", [T declaredName as t; X("[]", a)]) ->
+          Token("let", [Token("declare", [Token datatypeName; t]); Token("array", a)])
         |e -> failwithf "could not recognize declaration: %A" e
       Some (parse LocalImd stop fail left (parsed::restr))
     |_ -> None
@@ -611,6 +618,13 @@ module C =
         |e -> failwithf "arguments were not formatted correctly %A" e
       let parsed = Token("apply", [a; args])
       Some (parse LocalImd stop fail restl (parsed::restr))
+    |_ -> None
+  and (|Index|_|) state stop fail = function
+    |a::restl, T "["::restr ->
+      let indexXpr, T "]"::restr =
+        parse state (function T "]"::_ -> true | _ -> false) (fun _ -> false) [] restr
+      let parsed = Token("dot", [a; Token("[]", [indexXpr])])
+      Some (parse state stop fail restl (parsed::restr))
     |_ -> None
   and (|Transfer|_|) state stop fail = function
     |left, x::restr -> Some (parse state stop fail (x::left) restr)

@@ -42,6 +42,7 @@ type Token(name:string, row_col, functionApplication:bool, dependants:Token list
     |"if", [a; b; c] -> sprintf "(if %s then %s else %s)" (a.ToStringExpr()) (b.ToStringExpr()) (c.ToStringExpr())
     |"sequence", _ -> String.concat "; " (List.map (fun (e:Token) -> e.ToStringExpr()) dependants)
     |"()", [a] -> sprintf "(%s)" (a.ToStringExpr())
+    |"[]", [a] -> sprintf "[%s]" (a.ToStringExpr())
     |"dot", [a; b] -> sprintf "%s.%s" (a.ToStringExpr()) (b.ToStringExpr())
     |"while", [a; b] -> sprintf "(while %s do %s)" (a.ToStringExpr()) (b.ToStringExpr())
     |"for", [a; b; c] -> sprintf "for %s in %s do (%s)" (a.ToStringExpr()) (b.ToStringExpr()) (c.ToStringExpr())
