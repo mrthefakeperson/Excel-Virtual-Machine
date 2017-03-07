@@ -214,7 +214,8 @@ let rec compile' inScope = function
     |Some x -> compile' inScope x @ exitScope
   |Loop(a, b) ->
     let cond, body = compile' inScope a, compile' inScope b
-    let a = cond @ [Push "False"; Equals; GotoIfTrueFwdShift(List.length body + 3)] @ body @ [Pop]
+    let a = cond @ [GotoIfTrueFwdShift 2; GotoFwdShift(List.length body + 3)] @ body @ [Pop]
+    //let a = cond @ [Push "False"; Equals; GotoIfTrueFwdShift(List.length body + 3)] @ body @ [Pop]
     a @ [GotoFwdShift(-(List.length a)); Push "()"]
   |Mutate(a, b) -> compile' inScope b @ [Popv a; Store a; Push "()"]
 let compile e = [GotoFwdShift (List.length operationsPrefix + 1)] @ operationsPrefix @ compile' [] e

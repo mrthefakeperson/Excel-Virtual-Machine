@@ -1,3 +1,0 @@
-stack ["10"]
-
-output []
