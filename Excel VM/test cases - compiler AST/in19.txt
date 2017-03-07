@@ -1,0 +1,8 @@
+﻿C
+int main()
+{
+  bool e = true;
+  while (e) {
+    return e;
+  }
+}

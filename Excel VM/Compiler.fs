@@ -62,7 +62,7 @@ let rec ASTCompile' (capture, captured as cpt) = function
       |compiled -> yield compiled
      ]
   |X("declare", [datatypeName; a]) -> ASTCompile' cpt a
-  |X("let", [a; b]) ->           //todo: merge "let rec" with "let", handle non-recursive statements by renaming
+  |X("let", [a; b]) ->           //todo: handle non-recursive statements by renaming
     match a with
     |X("apply", [aa; ab]) -> ASTCompile' cpt (Token("let", [aa; Token("fun", [ab; b])]))
     |T s | X("declare", [_; T s]) ->
@@ -71,34 +71,39 @@ let rec ASTCompile' (capture, captured as cpt) = function
       |ll -> Define(s, capture, ASTCompile' (capture, Map.add s (List.map Value capture) captured) b)
     |e -> failwithf "patterns in function arguments not supported yet: %A" e
   |X("let rec", [a; b]) -> ASTCompile' cpt (Token("let", [a; b]))
+  |X("assign", [a; b]) ->
+    let name = match a with X(name, []) -> name | _ -> failwith "todo: unpacking"
+    Mutate(name, ASTCompile' cpt b)
   |X("if", [cond; aff; neg]) ->
     If(ASTCompile' cpt cond, ASTCompile' cpt aff, ASTCompile' cpt neg)
   |X("do", [b]) -> Apply(Value "ignore", [ASTCompile' cpt b])
-  |X("while", [cond; b]) ->
-    let loop = "$loop" + nxt()
-    Sequence [
-      Define(loop, ["()"],
-        If(ASTCompile' cpt cond,
-          Sequence [ASTCompile' cpt b; Apply(Value loop, [Const "()"])],
-          Const "()"
-         ) )
-      Apply(Value loop, [Const "()"])
-     ]
+  |X("while", [cond; b]) -> Loop(ASTCompile' cpt cond, ASTCompile' cpt b)
   |X("for", [name; iterable; body]) ->
-    let loop = "$loop" + nxt()
-    //todo: flatten name pattern, change call to loop function accordingly
-    let name = match name with X(name, []) -> name | _ -> failwith "patterns not supported yet"
+    let name = match name with X(name, []) -> name | _ -> failwith "todo: unpacking"
     match iterable with
     |X("..", [a; step; b]) ->
-      Sequence [
-        Define(loop, [name],
-          If(Apply(Apply(Value "<=", [Value name]), [ASTCompile' cpt b]),          //todo: negative step values
-            Sequence [ASTCompile' cpt body; Apply(Value loop, [Apply(Apply(Value "+", [Value name]), [ASTCompile' cpt step])])],
-            Const "()"
-           ) )
-        Apply(Value loop, [ASTCompile' cpt a])
+      Sequence [    //todo: negative step values
+        Declare(name, ASTCompile' cpt a)      //no need to capture, since no part of the code can touch it
+        Loop(Apply(Apply(Value "<=", [Value name]), [ASTCompile' cpt b]),
+          Sequence
+           [ASTCompile' cpt body; Mutate(name, Apply(Apply(Value "+", [Value name]), [ASTCompile' cpt step]))]
+         )
        ]
     |_ -> failwith "iterable objects not supported yet"
+//    let loop = "$loop" + nxt()
+//    //todo: flatten name pattern, change call to loop function accordingly
+//    let name = match name with X(name, []) -> name | _ -> failwith "patterns not supported yet"
+//    match iterable with
+//    |X("..", [a; step; b]) ->
+//      Sequence [
+//        Define(loop, [name],
+//          If(Apply(Apply(Value "<=", [Value name]), [ASTCompile' cpt b]),          //todo: negative step values
+//            Sequence [ASTCompile' cpt body; Apply(Value loop, [Apply(Apply(Value "+", [Value name]), [ASTCompile' cpt step])])],
+//            Const "()"
+//           ) )
+//        Apply(Value loop, [ASTCompile' cpt a])
+//       ]
+//    |_ -> failwith "iterable objects not supported yet"
   |X("sequence", list) -> //Sequence (List.map (ASTCompile' capture) list)
     List.fold (fun (acc, (capt', capd' as cpt')) e ->
       let compiled = ASTCompile' cpt' e
@@ -158,9 +163,6 @@ let rec compile' inScope = function
             //assert (revCmds = x)
             List.rev revCmds @ List.map Popv scopedVars
           |_ -> failwith "this should never happen unless the sequence was empty"
-    //match List.collect (fun e -> Pop :: List.rev (compile' e)) (List.rev ll) with
-    //|_::revCmds -> List.rev revCmds
-    //|[] -> failwith "this should never happen unless the sequence was empty"
   |Declare(a, b) -> compile' (a::inScope) b @ [Store a; Push "()"]
   |Define(a, args, b) ->       //all function values are arrays: [|&f; arg1; arg2; ... |]
     let functionBody =
@@ -208,4 +210,9 @@ let rec compile' inScope = function
     match a with
     |None -> exitScope
     |Some x -> compile' inScope x @ exitScope
+  |Loop(a, b) ->
+    let cond, body = compile' inScope a, compile' inScope b
+    let a = cond @ [Push "False"; Equals; GotoIfTrueFwdShift(List.length body + 3)] @ body @ [Pop]
+    a @ [GotoFwdShift(-(List.length a)); Push "()"]
+  |Mutate(a, b) -> compile' inScope b @ [Popv a; Store a; Push "()"]
 let compile e = [GotoFwdShift (List.length operationsPrefix + 1)] @ operationsPrefix @ compile' [] e

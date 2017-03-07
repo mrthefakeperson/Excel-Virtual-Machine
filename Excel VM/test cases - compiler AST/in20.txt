@@ -1,0 +1,10 @@
+﻿C
+int k()
+{
+  while (true)
+    return 3;
+}
+int main()
+{
+  return k() + 2;
+}

@@ -407,7 +407,7 @@ module Python2 =
 //       => if (cond) then (return v)...failed, incomplete without a terminating ;
 //  fix: don't remove the ; upon finishing parsing?
 module C =
-  let listOfDatatypeNames = ref ["int"; "long long"; "long"]
+  let listOfDatatypeNames = ref ["int"; "long long"; "long"; "bool"]
   let (|BrokenDatatypeName|_|) (ll:string list) =
     let matchString (s:string) =
       let matching = s.Split ' ' |> Array.toList

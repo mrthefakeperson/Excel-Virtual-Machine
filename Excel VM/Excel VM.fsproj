@@ -100,6 +100,9 @@
     <Content Include="test cases - compiler AST\in16.txt" />
     <Content Include="test cases - compiler AST\in17.txt" />
     <Content Include="test cases - compiler AST\in18.txt" />
+    <Content Include="test cases - compiler AST\in19.txt" />
+    <Content Include="test cases - compiler AST\in20.txt" />
+    <Content Include="test cases - compiler AST\in21.txt" />
     <Content Include="test cases - Excel pseudo-asm\in1.txt" />
     <Content Include="test cases - Excel pseudo-asm\in2.txt" />
     <Content Include="test cases - Excel pseudo-asm\in3.txt" />
