@@ -3,5 +3,6 @@ int main()
 {
   int a[50];
   a[1] = 4;
-  return a[1];
+  a[49] = 20;
+  return a[1] + a[49];
 }

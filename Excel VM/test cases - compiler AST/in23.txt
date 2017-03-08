@@ -1,0 +1,8 @@
+﻿C
+int main()
+{
+  int a[50];
+  for (int e = 1; e <= 20; e = e + 1) a[e] = e + 1;
+  for (int e = 1; e <= 20; e = e + 1) printf("%i\n", a[e]);
+  return 0;
+}

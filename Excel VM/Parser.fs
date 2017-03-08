@@ -427,6 +427,12 @@ module C =
     List.filter (ruleset " " >> not)
      >> tokenizeDatatypes
      >> List.map (fun e -> Token e)
+     >> List.fold (fun acc e ->
+          match acc, e with
+          |T "{"::rest, T "}" -> Token ";"::rest
+          |_ -> e::acc
+         ) []
+     >> List.rev
   let (|DatatypeName|_|) = function
     |T s::rest when List.exists ((=) s) !listOfDatatypeNames -> Some(s, rest)
     |_ -> None
@@ -471,7 +477,7 @@ module C =
       |Braces state stop fail x
       |If state stop fail x
       |While state stop fail x
-//      |For state stop fail x
+      |For state stop fail x
       |Return state stop fail x
       |Assignment state stop fail x
       |Operator state stop fail x
@@ -585,6 +591,19 @@ module C =
       let parsed = Token("while", [cond; body])
       Some (parse Local stop fail restl (parsed::restr))
     |_ -> None
+  and (|For|_|) state stop fail = function
+    |T "for"::restl, T "("::restr ->
+      let decl, T ";"::restr =
+        parse Local (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
+      let X("declare", [datatypeName; name]) = decl
+      let cond, T ";"::restr =
+        parse Local (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
+      let incr, T ")"::restr =
+        parse Local (function T ")"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
+      let body, restr = getStatementBody stop fail restr
+      let parsed = Token("sequence", [decl; Token("while", [cond; Token("sequence", [body; incr])])])
+      Some (parse Local stop fail restl (parsed::restr))
+    |_ -> None
   and (|Return|_|) state stop fail = function
     |T "return"::restl, right ->
       let returnedValue, restr =
@@ -595,7 +614,7 @@ module C =
   and (|Assignment|_|) state stop fail = function
     |a::restl, T "="::restr ->
       let assignment, restr =
-        parse LocalImd (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
+        parse LocalImd (function T ";"::_ -> true | e -> stop e) fail [] restr     //consider: a = b }    close block w/o ;
       let parsed = Token("assign", [a; assignment])
       Some (parse LocalImd stop fail restl (parsed::restr))
     |_ -> None
@@ -638,8 +657,8 @@ module C =
       let xprs' = List.filter (function T ";" -> false | _ -> true) xprs
       Token("sequence", List.map postProcess xprs')
     |X("==", xprs) -> Token("=", List.map postProcess xprs)
+    |X("apply", [T "printf"; X(",", [T "\"%i\\n\""; a])]) -> Token("apply", [Token("apply", [Token "printfn"; Token "\"%A\""]); a])
     |X(s, xprs) -> Token(s, List.map postProcess xprs)
-
   let parseSyntax =
     preprocess
      >> parse Global (function [] -> true | _ -> false) (fun _ -> false) []

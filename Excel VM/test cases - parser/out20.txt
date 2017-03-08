@@ -1,0 +1,1 @@
+let main = (fun _ -> (((printfn) ("%A")) (1))); (main) (())
