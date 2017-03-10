@@ -79,6 +79,9 @@
     <Compile Include="Compiler Definitions.fs" />
     <Compile Include="Compiler.fs" />
     <Compile Include="Excel Conversion.fs" />
+    <Content Include="template.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Compile Include="Write File.fs" />
     <Compile Include="Testing.fs" />
     <Compile Include="Main.fs" />

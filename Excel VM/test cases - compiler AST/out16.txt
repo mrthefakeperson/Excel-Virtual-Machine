@@ -1,0 +1,3 @@
+stack ["17"]
+
+output []

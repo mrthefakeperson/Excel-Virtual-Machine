@@ -28,7 +28,7 @@ let rec test action folderName runFile n =
     printfn "%s:" name
     runFile name outName
     action outName
-    //ignore (stdin.ReadLine())
+    ignore (stdin.ReadLine())
     test action folderName runFile (n + 1)
 let verify name =
   if (File.ReadAllLines name) <> (File.ReadAllLines (name + ".ans"))
@@ -62,6 +62,17 @@ let parseInstructionList lines =
     |_ -> failwith "unrecognized instruction"
   let input = Array.filter ((<>) "") lines
   Array.map parseInstruction input
+let getInstruction = fun i -> function
+  |"push", x -> Push x | "pop", _ -> Pop
+  |"store", x -> Store x | "load", x -> Load x | "popv", x -> Popv x
+  |"goto", x -> GotoFwdShift (int x - i) |"gotoiftrue", x -> GotoIfTrueFwdShift (int x - i)
+  |"call", _ -> Call | "return", _ -> Return
+  |"getheap", _ -> GetHeap | "newheap", _ -> NewHeap | "writeheap", _ -> WriteHeap
+  |"inputline", _ -> InputLine | "outputline", _ -> OutputLine
+  |name, "" when
+    List.exists (function Combinator_2 c -> c.Name = name | _ -> false) allCombinators ->
+    List.find (function Combinator_2 c -> c.Name = name | _ -> false) allCombinators
+  |unknown -> failwithf "unknown: %A" unknown
   
 let testExcelInterpreter a =
   test a "test cases - Excel pseudo-asm" (fun file outFile ->
@@ -124,19 +135,7 @@ let testPAsm a =
   test a "test cases - Excel pseudo-asm" (fun file outFile ->
     File.ReadAllLines file
      |> parseInstructionList
-     |> Array.mapi (fun i ->
-          function
-          |"push", x -> Push x | "pop", _ -> Pop
-          |"store", x -> Store x | "load", x -> Load x | "popv", x -> Popv x
-          |"goto", x -> GotoFwdShift (int x - i) |"gotoiftrue", x -> GotoIfTrueFwdShift (int x - i)
-          |"call", _ -> Call | "return", _ -> Return
-          |"getheap", _ -> GetHeap | "newheap", _ -> NewHeap | "writeheap", _ -> WriteHeap
-          |"inputline", _ -> InputLine | "outputline", _ -> OutputLine
-          |name, "" when
-            List.exists (function Combinator_2 c -> c.Name = name | _ -> false) allCombinators ->
-            List.find (function Combinator_2 c -> c.Name = name | _ -> false) allCombinators
-          |unknown -> failwithf "unknown: %A" unknown
-         )
+     |> Array.mapi getInstruction
      |> Array.map (fun e -> printfn "%A" e; e)
      |> interpretPAsm
      |> logPrintf outFile "%A\n"
@@ -175,13 +174,34 @@ let testExcelCompiler =
     writeExcelFile (file + ".xlsx") cmds
    )
 
+let testAsmCompilerSimple =
+  test ignore "test cases - Excel pseudo-asm" (fun file _ ->
+    File.ReadAllLines file
+     |> parseInstructionList
+     |> Array.mapi getInstruction
+     |> writeBytecode (file + ".s")
+   )
+
+let testAsmCompiler =
+  test ignore "test cases - compiler AST" (fun file _ ->
+    let parsed = openAndParse file
+    let cmds =
+      parsed.Clean()
+       |> ASTCompile |> debug
+       |> compile
+       |> Array.ofList
+    writeBytecode (file + ".s") cmds
+   )
+
 let runSpecificTest() =       // `generate` to create outputs, `verify` to test, `ignore` to print
   //testExcelInterpreter verify 1
   //testPAsm verify 1
   //testExcelFile 1
 
   //testParser verify 1
-  testCompilerAST generate 23
+  //testCompilerAST verify 6
   //testExcelCompiler 22
+  testAsmCompiler 1
+  //testAsmCompilerSimple 1
   printfn "done"
   ignore (stdin.ReadLine())

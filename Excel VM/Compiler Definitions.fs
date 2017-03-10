@@ -57,8 +57,8 @@ type PseudoAsm =
   |GotoIfTrueFwdShift of int
   |Call
   |Return
-  |GetHeap     //let i = topstack; pop stack; push heap value at i to stack
   |NewHeap     //allocate a new spot in heap (update size, make sure to `WriteHeap (size) (value)` before)
+  |GetHeap     //let i = topstack; pop stack; push heap value at i to stack
   |WriteHeap   //let v = topstack; pop stack; let i = topstack; pop stack; heap at i <- v
   |InputLine
   |OutputLine
@@ -144,7 +144,7 @@ let interpretPAsm cmds =
       let a = top value in pop value
       let b = top value in pop value
       push value (c.Interpret a b)
-  let debug = false
+  let debug = true
   push instr "0"
   while int(top instr) < Array.length cmds && List.length !stacks.[output] < 50 do
     let i = int(top instr)
@@ -161,7 +161,7 @@ let interpretPAsm cmds =
     if debug then
       printfn "stack %A" !stacks.[value]
       printfn "heap [%s]" (String.concat "; " (Seq.map (sprintf "%A") heap))
-      printfn "e %A" !stacks.["e"]
+      printfn "instruction %s" (top instr)
     let pt = int(top instr)
     pop instr; push instr (string(pt+1))
     if debug then ignore (stdin.ReadLine())
