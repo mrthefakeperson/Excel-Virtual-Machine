@@ -1,2 +1,2 @@
 ﻿while true do
-  printfn "%A" 74
+  printfn "%i" 74

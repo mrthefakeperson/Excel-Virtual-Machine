@@ -1,3 +1,0 @@
-stack ["24"]
-
-output []

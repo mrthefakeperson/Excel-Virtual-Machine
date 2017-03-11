@@ -1,3 +1,0 @@
-stack ["true"]
-
-output []

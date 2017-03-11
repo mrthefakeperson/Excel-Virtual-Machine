@@ -20,29 +20,29 @@ _cmds:
 	.long 8
 	.long 0
 	.long 2
-	.long 8
+	.long 7
 	.long 9
 	.long 0
 	.long 2
-	.long 8
+	.long 7
 	.long 3
-	.long 8
+	.long 7
 	.long 0
 	.long 1
 	.long 11
 	.long 0
 	.long 3
-	.long 8
+	.long 7
 	.long 4
-	.long 8
+	.long 7
 	.long 9
 	.long 0
 	.long 3
-	.long 8
+	.long 7
 	.long 11
 	.long 0
 	.long 4
-	.long 8
+	.long 7
 	.long 9
 	.long 0
 	.long 0
@@ -56,29 +56,29 @@ _cmds:
 	.long 8
 	.long 0
 	.long 2
-	.long 8
+	.long 7
 	.long 9
 	.long 0
 	.long 2
-	.long 8
+	.long 7
 	.long 3
-	.long 8
+	.long 7
 	.long 0
 	.long 19
 	.long 11
 	.long 0
 	.long 3
-	.long 8
+	.long 7
 	.long 4
-	.long 8
+	.long 7
 	.long 9
 	.long 0
 	.long 3
-	.long 8
+	.long 7
 	.long 11
 	.long 0
 	.long 4
-	.long 8
+	.long 7
 	.long 9
 	.long 0
 	.long 0
@@ -92,29 +92,29 @@ _cmds:
 	.long 8
 	.long 0
 	.long 2
-	.long 8
+	.long 7
 	.long 9
 	.long 0
 	.long 2
-	.long 8
+	.long 7
 	.long 3
-	.long 8
+	.long 7
 	.long 0
 	.long 37
 	.long 11
 	.long 0
 	.long 3
-	.long 8
+	.long 7
 	.long 4
-	.long 8
+	.long 7
 	.long 9
 	.long 0
 	.long 3
-	.long 8
+	.long 7
 	.long 11
 	.long 0
 	.long 4
-	.long 8
+	.long 7
 	.long 9
 	.long 0
 	.long 0
@@ -128,29 +128,29 @@ _cmds:
 	.long 8
 	.long 0
 	.long 2
-	.long 8
+	.long 7
 	.long 9
 	.long 0
 	.long 2
-	.long 8
+	.long 7
 	.long 3
-	.long 8
+	.long 7
 	.long 0
 	.long 55
 	.long 11
 	.long 0
 	.long 3
-	.long 8
+	.long 7
 	.long 4
-	.long 8
+	.long 7
 	.long 9
 	.long 0
 	.long 3
-	.long 8
+	.long 7
 	.long 11
 	.long 0
 	.long 4
-	.long 8
+	.long 7
 	.long 9
 	.long 0
 	.long 0
@@ -164,29 +164,29 @@ _cmds:
 	.long 8
 	.long 0
 	.long 2
-	.long 8
+	.long 7
 	.long 9
 	.long 0
 	.long 2
-	.long 8
+	.long 7
 	.long 3
-	.long 8
+	.long 7
 	.long 0
 	.long 73
 	.long 11
 	.long 0
 	.long 3
-	.long 8
+	.long 7
 	.long 4
-	.long 8
+	.long 7
 	.long 9
 	.long 0
 	.long 3
-	.long 8
+	.long 7
 	.long 11
 	.long 0
 	.long 4
-	.long 8
+	.long 7
 	.long 9
 	.long 0
 	.long 0
@@ -208,195 +208,603 @@ _cmds:
 	.long 8
 	.long 0
 	.long 5
-	.long 240
+	.long 444
 	.long 2
 	.long 5
 	.long 3
 	.long 5
 	.long 2
-	.long 12
+	.long 10
 	.long 0
 	.long 0
 	.long 1
 	.long 0
 	.long 5
-	.long 186
+	.long 390
 	.long 2
-	.long 12
+	.long 10
 	.long 2
 	.long 6
 	.long 3
 	.long 6
 	.long 2
-	.long 13
+	.long 11
 	.long 0
 	.long 0
 	.long 1
 	.long 0
-	.long 5
-	.long 124
-	.long 2
-	.long 12
-	.long 2
-	.long 13
-	.long 2
-	.long 7
 	.long 3
-	.long 7
-	.long 2
-	.long 14
-	.long 0
-	.long 0
-	.long 1
-	.long 0
-	.long 0
-	.long 7
-	.long 4
-	.long 14
-	.long 4
-	.long 7
-	.long 4
-	.long 13
-	.long 4
-	.long 12
-	.long 8
-	.long 0
+	.long 11
+	.long 3
+	.long 10
 	.long 9
 	.long 0
 	.long 2
-	.long 10
+	.long 7
 	.long 3
-	.long 10
+	.long 7
 	.long 0
-	.long 111
+	.long 57
 	.long 11
 	.long 0
-	.long 3
-	.long 10
 	.long 9
 	.long 0
 	.long 0
 	.long -7777777
 	.long 11
 	.long 0
-	.long 1
-	.long 0
-	.long 0
 	.long 3
+	.long 7
+	.long 4
+	.long 7
 	.long 2
-	.long 8
-	.long 9
-	.long 0
+	.long 7
 	.long 3
-	.long 8
+	.long 7
 	.long 0
 	.long 1
+	.long 15
+	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 0
+	.long -7777777
 	.long 16
 	.long 0
 	.long 6
-	.long 149
-	.long 9
-	.long 0
-	.long 1
+	.long 140
+	.long 3
+	.long 7
+	.long 10
 	.long 0
 	.long 3
-	.long 8
+	.long 7
 	.long 0
-	.long -1
+	.long 1
 	.long 15
 	.long 0
 	.long 4
-	.long 8
+	.long 7
 	.long 2
-	.long 8
+	.long 7
 	.long 5
-	.long 137
+	.long 127
 	.long 4
-	.long 8
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 7
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 0
+	.long -7777777
+	.long 16
+	.long 0
+	.long 6
+	.long 163
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 5
+	.long 150
+	.long 4
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 7
+	.long 0
+	.long 4
+	.long 7
+	.long 6
+	.long 337
+	.long 0
+	.long 0
+	.long 3
+	.long 10
+	.long 9
+	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 0
+	.long 21
+	.long 11
+	.long 0
 	.long 9
 	.long 0
 	.long 0
 	.long -7777777
 	.long 11
 	.long 0
+	.long 3
+	.long 7
+	.long 4
+	.long 7
 	.long 2
-	.long 9
-	.long 0
+	.long 7
+	.long 3
+	.long 7
 	.long 0
 	.long 1
-	.long 0
-	.long 3
-	.long 9
-	.long 0
-	.long 0
 	.long 15
 	.long 0
+	.long 2
+	.long 7
 	.long 3
+	.long 7
 	.long 10
 	.long 0
 	.long 0
-	.long 15
+	.long -7777777
+	.long 16
 	.long 0
+	.long 6
+	.long 199
+	.long 3
+	.long 7
 	.long 10
 	.long 0
-	.long 11
-	.long 0
-	.long 0
-	.long 0
-	.long 1
-	.long 0
 	.long 3
-	.long 9
+	.long 7
 	.long 0
 	.long 1
 	.long 15
 	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 5
+	.long 186
+	.long 4
+	.long 7
 	.long 3
-	.long 13
-	.long 11
+	.long 7
+	.long 10
 	.long 0
+	.long 7
 	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 3
+	.long 7
 	.long 0
 	.long 1
+	.long 15
+	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 0
+	.long -7777777
+	.long 16
+	.long 0
+	.long 6
+	.long 222
+	.long 3
+	.long 7
+	.long 10
 	.long 0
 	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 5
+	.long 209
+	.long 4
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 7
+	.long 0
+	.long 4
+	.long 7
+	.long 6
+	.long 335
+	.long 3
+	.long 10
+	.long 3
+	.long 10
+	.long 3
+	.long 11
 	.long 9
 	.long 0
 	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 0
+	.long 75
+	.long 11
+	.long 0
+	.long 9
+	.long 0
+	.long 0
+	.long -7777777
+	.long 11
+	.long 0
+	.long 3
+	.long 7
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 0
+	.long 1
 	.long 15
 	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 0
+	.long -7777777
+	.long 16
+	.long 0
+	.long 6
+	.long 259
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 5
+	.long 246
+	.long 4
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 7
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 0
+	.long -7777777
+	.long 16
+	.long 0
+	.long 6
+	.long 282
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 5
+	.long 269
+	.long 4
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 7
+	.long 0
+	.long 4
+	.long 7
 	.long 3
 	.long 12
-	.long 11
-	.long 0
-	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
 	.long 0
 	.long 1
+	.long 15
+	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 0
+	.long -7777777
+	.long 16
+	.long 0
+	.long 6
+	.long 306
+	.long 3
+	.long 7
+	.long 10
 	.long 0
 	.long 3
-	.long 9
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
 	.long 4
-	.long 9
+	.long 7
+	.long 2
+	.long 7
+	.long 5
+	.long 293
 	.long 4
-	.long 13
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 7
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 0
+	.long -7777777
+	.long 16
+	.long 0
+	.long 6
+	.long 329
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 5
+	.long 316
+	.long 4
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 7
+	.long 0
+	.long 4
+	.long 7
+	.long 5
+	.long 336
+	.long 3
+	.long 11
+	.long 5
+	.long 386
+	.long 3
+	.long 10
+	.long 3
+	.long 11
+	.long 3
+	.long 12
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 0
+	.long -7777777
+	.long 16
+	.long 0
+	.long 6
+	.long 358
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 5
+	.long 345
+	.long 4
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 7
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 0
+	.long -7777777
+	.long 16
+	.long 0
+	.long 6
+	.long 381
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 5
+	.long 368
+	.long 4
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 7
+	.long 0
+	.long 4
+	.long 7
+	.long 4
+	.long 11
 	.long 4
 	.long 6
 	.long 4
-	.long 12
+	.long 10
 	.long 8
 	.long 0
 	.long 9
 	.long 0
 	.long 2
-	.long 10
+	.long 9
 	.long 3
-	.long 10
+	.long 9
 	.long 0
 	.long 104
 	.long 11
 	.long 0
 	.long 3
-	.long 10
+	.long 9
 	.long 9
 	.long 0
 	.long 0
@@ -408,35 +816,35 @@ _cmds:
 	.long 0
 	.long 2
 	.long 2
-	.long 8
+	.long 7
 	.long 9
 	.long 0
 	.long 3
-	.long 8
+	.long 7
 	.long 0
 	.long 1
 	.long 16
 	.long 0
 	.long 6
-	.long 211
+	.long 415
 	.long 9
 	.long 0
 	.long 1
 	.long 0
 	.long 3
-	.long 8
+	.long 7
 	.long 0
 	.long -1
 	.long 15
 	.long 0
 	.long 4
-	.long 8
+	.long 7
 	.long 2
-	.long 8
+	.long 7
 	.long 5
-	.long 199
+	.long 403
 	.long 4
-	.long 8
+	.long 7
 	.long 9
 	.long 0
 	.long 0
@@ -444,19 +852,19 @@ _cmds:
 	.long 11
 	.long 0
 	.long 2
-	.long 9
+	.long 8
 	.long 0
 	.long 0
 	.long 1
 	.long 0
 	.long 3
-	.long 9
+	.long 8
 	.long 0
 	.long 0
 	.long 15
 	.long 0
 	.long 3
-	.long 10
+	.long 9
 	.long 0
 	.long 0
 	.long 15
@@ -470,13 +878,13 @@ _cmds:
 	.long 1
 	.long 0
 	.long 3
-	.long 9
+	.long 8
 	.long 0
 	.long 1
 	.long 15
 	.long 0
 	.long 3
-	.long 12
+	.long 10
 	.long 11
 	.long 0
 	.long 0
@@ -484,11 +892,11 @@ _cmds:
 	.long 1
 	.long 0
 	.long 3
-	.long 9
+	.long 8
 	.long 4
-	.long 9
+	.long 8
 	.long 4
-	.long 12
+	.long 10
 	.long 4
 	.long 5
 	.long 8
@@ -496,15 +904,15 @@ _cmds:
 	.long 9
 	.long 0
 	.long 2
-	.long 10
+	.long 9
 	.long 3
-	.long 10
+	.long 9
 	.long 0
 	.long 98
 	.long 11
 	.long 0
 	.long 3
-	.long 10
+	.long 9
 	.long 9
 	.long 0
 	.long 0
@@ -514,33 +922,143 @@ _cmds:
 	.long 1
 	.long 0
 	.long 3
-	.long 10
+	.long 9
 	.long 2
+	.long 12
+	.long 0
+	.long 0
+	.long 1
+	.long 0
+	.long 0
+	.long 25
+	.long 0
+	.long 15
+	.long 3
+	.long 12
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 0
+	.long -7777777
+	.long 16
+	.long 0
+	.long 6
+	.long 479
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 5
+	.long 466
+	.long 4
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 7
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 0
+	.long -7777777
+	.long 16
+	.long 0
+	.long 6
+	.long 502
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 5
+	.long 489
+	.long 4
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 7
+	.long 0
+	.long 4
+	.long 7
+	.long 9
+	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 0
+	.long 91
 	.long 11
 	.long 0
+	.long 9
 	.long 0
-	.long 1
 	.long 0
-	.long 0
-	.long 103
-	.long 0
-	.long 102
-	.long 0
-	.long 101
-	.long 3
+	.long -7777777
 	.long 11
-	.long 2
-	.long 8
+	.long 0
 	.long 3
-	.long 8
+	.long 7
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 3
+	.long 7
 	.long 0
 	.long 1
 	.long 15
 	.long 0
 	.long 2
-	.long 8
+	.long 7
 	.long 3
-	.long 8
+	.long 7
 	.long 10
 	.long 0
 	.long 0
@@ -548,45 +1066,53 @@ _cmds:
 	.long 16
 	.long 0
 	.long 6
-	.long 276
+	.long 535
 	.long 3
-	.long 8
+	.long 7
 	.long 10
 	.long 0
 	.long 3
-	.long 8
+	.long 7
 	.long 0
 	.long 1
 	.long 15
 	.long 0
 	.long 4
-	.long 8
+	.long 7
 	.long 2
-	.long 8
+	.long 7
 	.long 5
-	.long 263
+	.long 522
 	.long 4
-	.long 8
+	.long 7
 	.long 3
-	.long 8
+	.long 7
 	.long 10
 	.long 0
 	.long 7
 	.long 0
 	.long 4
-	.long 8
-	.long 2
-	.long 8
+	.long 7
+	.long 1
+	.long 0
+	.long 0
+	.long 7
+	.long 0
+	.long 14
 	.long 3
-	.long 8
+	.long 12
+	.long 2
+	.long 7
+	.long 3
+	.long 7
 	.long 0
 	.long 1
 	.long 15
 	.long 0
 	.long 2
-	.long 8
+	.long 7
 	.long 3
-	.long 8
+	.long 7
 	.long 10
 	.long 0
 	.long 0
@@ -594,45 +1120,45 @@ _cmds:
 	.long 16
 	.long 0
 	.long 6
-	.long 299
+	.long 562
 	.long 3
-	.long 8
+	.long 7
 	.long 10
 	.long 0
 	.long 3
-	.long 8
+	.long 7
 	.long 0
 	.long 1
 	.long 15
 	.long 0
 	.long 4
-	.long 8
+	.long 7
 	.long 2
-	.long 8
+	.long 7
 	.long 5
-	.long 286
+	.long 549
 	.long 4
-	.long 8
+	.long 7
 	.long 3
-	.long 8
+	.long 7
 	.long 10
 	.long 0
 	.long 7
 	.long 0
 	.long 4
-	.long 8
+	.long 7
 	.long 2
-	.long 8
+	.long 7
 	.long 3
-	.long 8
+	.long 7
 	.long 0
 	.long 1
 	.long 15
 	.long 0
 	.long 2
-	.long 8
+	.long 7
 	.long 3
-	.long 8
+	.long 7
 	.long 10
 	.long 0
 	.long 0
@@ -640,183 +1166,433 @@ _cmds:
 	.long 16
 	.long 0
 	.long 6
-	.long 322
+	.long 585
 	.long 3
-	.long 8
+	.long 7
 	.long 10
 	.long 0
 	.long 3
-	.long 8
+	.long 7
 	.long 0
 	.long 1
 	.long 15
 	.long 0
 	.long 4
-	.long 8
+	.long 7
 	.long 2
-	.long 8
+	.long 7
 	.long 5
-	.long 309
+	.long 572
 	.long 4
-	.long 8
+	.long 7
 	.long 3
-	.long 8
+	.long 7
 	.long 10
 	.long 0
 	.long 7
 	.long 0
 	.long 4
-	.long 8
-	.long 1
+	.long 7
+	.long 9
 	.long 0
-	.long 0
-	.long 103
-	.long 0
-	.long 102
-	.long 0
-	.long 101
+	.long 2
+	.long 7
 	.long 3
+	.long 7
+	.long 0
+	.long 91
 	.long 11
-	.long 2
-	.long 8
-	.long 3
-	.long 8
 	.long 0
-	.long 1
-	.long 15
-	.long 0
-	.long 2
-	.long 8
-	.long 3
-	.long 8
-	.long 10
+	.long 9
 	.long 0
 	.long 0
 	.long -7777777
-	.long 16
-	.long 0
-	.long 6
-	.long 350
-	.long 3
-	.long 8
-	.long 10
-	.long 0
-	.long 3
-	.long 8
-	.long 0
-	.long 1
-	.long 15
-	.long 0
-	.long 4
-	.long 8
-	.long 2
-	.long 8
-	.long 5
-	.long 337
-	.long 4
-	.long 8
-	.long 3
-	.long 8
-	.long 10
-	.long 0
-	.long 7
-	.long 0
-	.long 4
-	.long 8
-	.long 2
-	.long 8
-	.long 3
-	.long 8
-	.long 0
-	.long 1
-	.long 15
-	.long 0
-	.long 2
-	.long 8
-	.long 3
-	.long 8
-	.long 10
-	.long 0
-	.long 0
-	.long -7777777
-	.long 16
-	.long 0
-	.long 6
-	.long 373
-	.long 3
-	.long 8
-	.long 10
-	.long 0
-	.long 3
-	.long 8
-	.long 0
-	.long 1
-	.long 15
-	.long 0
-	.long 4
-	.long 8
-	.long 2
-	.long 8
-	.long 5
-	.long 360
-	.long 4
-	.long 8
-	.long 3
-	.long 8
-	.long 10
-	.long 0
-	.long 7
-	.long 0
-	.long 4
-	.long 8
-	.long 2
-	.long 8
-	.long 3
-	.long 8
-	.long 0
-	.long 1
-	.long 15
-	.long 0
-	.long 2
-	.long 8
-	.long 3
-	.long 8
-	.long 10
-	.long 0
-	.long 0
-	.long -7777777
-	.long 16
-	.long 0
-	.long 6
-	.long 396
-	.long 3
-	.long 8
-	.long 10
-	.long 0
-	.long 3
-	.long 8
-	.long 0
-	.long 1
-	.long 15
-	.long 0
-	.long 4
-	.long 8
-	.long 2
-	.long 8
-	.long 5
-	.long 383
-	.long 4
-	.long 8
-	.long 3
-	.long 8
-	.long 10
-	.long 0
-	.long 7
-	.long 0
-	.long 4
-	.long 8
-	.long 4
 	.long 11
+	.long 0
+	.long 3
+	.long 7
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 0
+	.long -7777777
+	.long 16
+	.long 0
+	.long 6
+	.long 618
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 5
+	.long 605
+	.long 4
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 7
+	.long 0
+	.long 4
+	.long 7
+	.long 1
+	.long 0
+	.long 0
+	.long 2
+	.long 0
+	.long 1001
+	.long 3
+	.long 12
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 0
+	.long -7777777
+	.long 16
+	.long 0
+	.long 6
+	.long 645
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 5
+	.long 632
+	.long 4
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 7
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 0
+	.long -7777777
+	.long 16
+	.long 0
+	.long 6
+	.long 668
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 5
+	.long 655
+	.long 4
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 7
+	.long 0
+	.long 4
+	.long 7
+	.long 9
+	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 0
+	.long 91
+	.long 11
+	.long 0
+	.long 9
+	.long 0
+	.long 0
+	.long -7777777
+	.long 11
+	.long 0
+	.long 3
+	.long 7
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 0
+	.long -7777777
+	.long 16
+	.long 0
+	.long 6
+	.long 701
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 5
+	.long 688
+	.long 4
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 7
+	.long 0
+	.long 4
+	.long 7
+	.long 1
+	.long 0
+	.long 0
+	.long 391
+	.long 0
+	.long 255
+	.long 3
+	.long 12
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 0
+	.long -7777777
+	.long 16
+	.long 0
+	.long 6
+	.long 728
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 5
+	.long 715
+	.long 4
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 7
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 0
+	.long -7777777
+	.long 16
+	.long 0
+	.long 6
+	.long 751
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 5
+	.long 738
+	.long 4
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 7
+	.long 0
+	.long 4
+	.long 7
+	.long 9
+	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 0
+	.long 91
+	.long 11
+	.long 0
+	.long 9
+	.long 0
+	.long 0
+	.long -7777777
+	.long 11
+	.long 0
+	.long 3
+	.long 7
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 2
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 0
+	.long -7777777
+	.long 16
+	.long 0
+	.long 6
+	.long 784
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 3
+	.long 7
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 4
+	.long 7
+	.long 2
+	.long 7
+	.long 5
+	.long 771
+	.long 4
+	.long 7
+	.long 3
+	.long 7
+	.long 10
+	.long 0
+	.long 7
+	.long 0
+	.long 4
+	.long 7
+	.long 4
+	.long 12
 	.long 8
 	.long 0
 .globl _instr

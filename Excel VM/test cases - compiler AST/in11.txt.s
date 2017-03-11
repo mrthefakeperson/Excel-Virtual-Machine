@@ -6,13 +6,16 @@ ___gnu_compiled_cplusplus:
 .text
 LC0:
 	.ascii "bad_alloc\0"
-.globl _cmds
+.globl _strs
 .data
+_strs:
+
+.globl _cmds
 	.align 4
 _cmds:
 	.long 5
-	.long 94
-	.long 14
+	.long 97
+	.long 15
 	.long 0
 	.long 8
 	.long 0
@@ -43,12 +46,12 @@ _cmds:
 	.long 9
 	.long 0
 	.long 0
-	.long 0
+	.long -7777777
 	.long 11
 	.long 0
 	.long 8
 	.long 0
-	.long 15
+	.long 16
 	.long 0
 	.long 8
 	.long 0
@@ -79,12 +82,12 @@ _cmds:
 	.long 9
 	.long 0
 	.long 0
-	.long 0
+	.long -7777777
 	.long 11
 	.long 0
 	.long 8
 	.long 0
-	.long 16
+	.long 17
 	.long 0
 	.long 8
 	.long 0
@@ -115,12 +118,12 @@ _cmds:
 	.long 9
 	.long 0
 	.long 0
-	.long 0
+	.long -7777777
 	.long 11
 	.long 0
 	.long 8
 	.long 0
-	.long 17
+	.long 18
 	.long 0
 	.long 8
 	.long 0
@@ -151,12 +154,12 @@ _cmds:
 	.long 9
 	.long 0
 	.long 0
-	.long 0
+	.long -7777777
 	.long 11
 	.long 0
 	.long 8
 	.long 0
-	.long 18
+	.long 19
 	.long 0
 	.long 8
 	.long 0
@@ -187,7 +190,7 @@ _cmds:
 	.long 9
 	.long 0
 	.long 0
-	.long 0
+	.long -7777777
 	.long 11
 	.long 0
 	.long 8
@@ -198,6 +201,12 @@ _cmds:
 	.long 0
 	.long 8
 	.long 0
+	.long 14
+	.long 0
+	.long 0
+	.long 0
+	.long 8
+	.long 0
 	.long 0
 	.long 5
 	.long 2
@@ -223,7 +232,7 @@ _cmds:
 	.long 9
 	.long 0
 	.long 0
-	.long 0
+	.long -7777777
 	.long 11
 	.long 0
 	.long 3
@@ -236,7 +245,7 @@ _cmds:
 	.long 5
 	.long 0
 	.long 1
-	.long 14
+	.long 15
 	.long 0
 	.long 2
 	.long 5
@@ -245,11 +254,11 @@ _cmds:
 	.long 10
 	.long 0
 	.long 0
-	.long 0
-	.long 15
+	.long -7777777
+	.long 16
 	.long 0
 	.long 6
-	.long 128
+	.long 131
 	.long 3
 	.long 5
 	.long 10
@@ -258,14 +267,14 @@ _cmds:
 	.long 5
 	.long 0
 	.long 1
-	.long 14
+	.long 15
 	.long 0
 	.long 4
 	.long 5
 	.long 2
 	.long 5
 	.long 5
-	.long 115
+	.long 118
 	.long 4
 	.long 5
 	.long 3
@@ -282,7 +291,7 @@ _cmds:
 	.long 5
 	.long 0
 	.long 1
-	.long 14
+	.long 15
 	.long 0
 	.long 2
 	.long 5
@@ -291,11 +300,11 @@ _cmds:
 	.long 10
 	.long 0
 	.long 0
-	.long 0
-	.long 15
+	.long -7777777
+	.long 16
 	.long 0
 	.long 6
-	.long 151
+	.long 154
 	.long 3
 	.long 5
 	.long 10
@@ -304,14 +313,14 @@ _cmds:
 	.long 5
 	.long 0
 	.long 1
-	.long 14
+	.long 15
 	.long 0
 	.long 4
 	.long 5
 	.long 2
 	.long 5
 	.long 5
-	.long 138
+	.long 141
 	.long 4
 	.long 5
 	.long 3
@@ -323,9 +332,9 @@ _cmds:
 	.long 4
 	.long 5
 	.long 6
-	.long 158
+	.long 161
 	.long 5
-	.long 386
+	.long 389
 	.long 3
 	.long 6
 	.long 2
@@ -351,7 +360,7 @@ _cmds:
 	.long 9
 	.long 0
 	.long 0
-	.long 0
+	.long -7777777
 	.long 11
 	.long 0
 	.long 3
@@ -364,7 +373,7 @@ _cmds:
 	.long 5
 	.long 0
 	.long 1
-	.long 14
+	.long 15
 	.long 0
 	.long 2
 	.long 5
@@ -373,11 +382,11 @@ _cmds:
 	.long 10
 	.long 0
 	.long 0
-	.long 0
-	.long 15
+	.long -7777777
+	.long 16
 	.long 0
 	.long 6
-	.long 192
+	.long 195
 	.long 3
 	.long 5
 	.long 10
@@ -386,14 +395,14 @@ _cmds:
 	.long 5
 	.long 0
 	.long 1
-	.long 14
+	.long 15
 	.long 0
 	.long 4
 	.long 5
 	.long 2
 	.long 5
 	.long 5
-	.long 179
+	.long 182
 	.long 4
 	.long 5
 	.long 3
@@ -410,7 +419,7 @@ _cmds:
 	.long 5
 	.long 0
 	.long 1
-	.long 14
+	.long 15
 	.long 0
 	.long 2
 	.long 5
@@ -419,11 +428,11 @@ _cmds:
 	.long 10
 	.long 0
 	.long 0
-	.long 0
-	.long 15
+	.long -7777777
+	.long 16
 	.long 0
 	.long 6
-	.long 215
+	.long 218
 	.long 3
 	.long 5
 	.long 10
@@ -432,14 +441,14 @@ _cmds:
 	.long 5
 	.long 0
 	.long 1
-	.long 14
+	.long 15
 	.long 0
 	.long 4
 	.long 5
 	.long 2
 	.long 5
 	.long 5
-	.long 202
+	.long 205
 	.long 4
 	.long 5
 	.long 3
@@ -451,9 +460,9 @@ _cmds:
 	.long 4
 	.long 5
 	.long 6
-	.long 222
+	.long 225
 	.long 5
-	.long 320
+	.long 323
 	.long 3
 	.long 7
 	.long 9
@@ -469,7 +478,7 @@ _cmds:
 	.long 9
 	.long 0
 	.long 0
-	.long 0
+	.long -7777777
 	.long 11
 	.long 0
 	.long 3
@@ -482,7 +491,7 @@ _cmds:
 	.long 5
 	.long 0
 	.long 1
-	.long 14
+	.long 15
 	.long 0
 	.long 2
 	.long 5
@@ -491,11 +500,11 @@ _cmds:
 	.long 10
 	.long 0
 	.long 0
-	.long 0
-	.long 15
+	.long -7777777
+	.long 16
 	.long 0
 	.long 6
-	.long 251
+	.long 254
 	.long 3
 	.long 5
 	.long 10
@@ -504,14 +513,14 @@ _cmds:
 	.long 5
 	.long 0
 	.long 1
-	.long 14
+	.long 15
 	.long 0
 	.long 4
 	.long 5
 	.long 2
 	.long 5
 	.long 5
-	.long 238
+	.long 241
 	.long 4
 	.long 5
 	.long 3
@@ -541,7 +550,7 @@ _cmds:
 	.long 9
 	.long 0
 	.long 0
-	.long 0
+	.long -7777777
 	.long 11
 	.long 0
 	.long 3
@@ -554,20 +563,20 @@ _cmds:
 	.long 5
 	.long 0
 	.long 1
-	.long 14
-	.long 0
-	.long 2
-	.long 5
-	.long 3
-	.long 5
-	.long 10
-	.long 0
-	.long 0
-	.long 0
 	.long 15
 	.long 0
+	.long 2
+	.long 5
+	.long 3
+	.long 5
+	.long 10
+	.long 0
+	.long 0
+	.long -7777777
+	.long 16
+	.long 0
 	.long 6
-	.long 287
+	.long 290
 	.long 3
 	.long 5
 	.long 10
@@ -576,44 +585,44 @@ _cmds:
 	.long 5
 	.long 0
 	.long 1
-	.long 14
-	.long 0
-	.long 4
-	.long 5
-	.long 2
-	.long 5
-	.long 5
-	.long 274
-	.long 4
-	.long 5
-	.long 3
-	.long 5
-	.long 10
-	.long 0
-	.long 7
-	.long 0
-	.long 4
-	.long 5
-	.long 2
-	.long 5
-	.long 3
-	.long 5
-	.long 0
-	.long 1
-	.long 14
-	.long 0
-	.long 2
-	.long 5
-	.long 3
-	.long 5
-	.long 10
-	.long 0
-	.long 0
-	.long 0
 	.long 15
 	.long 0
+	.long 4
+	.long 5
+	.long 2
+	.long 5
+	.long 5
+	.long 277
+	.long 4
+	.long 5
+	.long 3
+	.long 5
+	.long 10
+	.long 0
+	.long 7
+	.long 0
+	.long 4
+	.long 5
+	.long 2
+	.long 5
+	.long 3
+	.long 5
+	.long 0
+	.long 1
+	.long 15
+	.long 0
+	.long 2
+	.long 5
+	.long 3
+	.long 5
+	.long 10
+	.long 0
+	.long 0
+	.long -7777777
+	.long 16
+	.long 0
 	.long 6
-	.long 310
+	.long 313
 	.long 3
 	.long 5
 	.long 10
@@ -622,14 +631,14 @@ _cmds:
 	.long 5
 	.long 0
 	.long 1
-	.long 14
+	.long 15
 	.long 0
 	.long 4
 	.long 5
 	.long 2
 	.long 5
 	.long 5
-	.long 297
+	.long 300
 	.long 4
 	.long 5
 	.long 3
@@ -649,7 +658,7 @@ _cmds:
 	.long 1
 	.long 0
 	.long 5
-	.long 162
+	.long 165
 	.long 0
 	.long 0
 	.long 4
@@ -673,7 +682,7 @@ _cmds:
 	.long 9
 	.long 0
 	.long 0
-	.long 0
+	.long -7777777
 	.long 11
 	.long 0
 	.long 3
@@ -686,7 +695,7 @@ _cmds:
 	.long 5
 	.long 0
 	.long 1
-	.long 14
+	.long 15
 	.long 0
 	.long 2
 	.long 5
@@ -695,11 +704,11 @@ _cmds:
 	.long 10
 	.long 0
 	.long 0
-	.long 0
-	.long 15
+	.long -7777777
+	.long 16
 	.long 0
 	.long 6
-	.long 353
+	.long 356
 	.long 3
 	.long 5
 	.long 10
@@ -708,14 +717,14 @@ _cmds:
 	.long 5
 	.long 0
 	.long 1
-	.long 14
+	.long 15
 	.long 0
 	.long 4
 	.long 5
 	.long 2
 	.long 5
 	.long 5
-	.long 340
+	.long 343
 	.long 4
 	.long 5
 	.long 3
@@ -732,7 +741,7 @@ _cmds:
 	.long 5
 	.long 0
 	.long 1
-	.long 14
+	.long 15
 	.long 0
 	.long 2
 	.long 5
@@ -741,11 +750,11 @@ _cmds:
 	.long 10
 	.long 0
 	.long 0
-	.long 0
-	.long 15
+	.long -7777777
+	.long 16
 	.long 0
 	.long 6
-	.long 376
+	.long 379
 	.long 3
 	.long 5
 	.long 10
@@ -754,14 +763,14 @@ _cmds:
 	.long 5
 	.long 0
 	.long 1
-	.long 14
+	.long 15
 	.long 0
 	.long 4
 	.long 5
 	.long 2
 	.long 5
 	.long 5
-	.long 363
+	.long 366
 	.long 4
 	.long 5
 	.long 3
@@ -781,7 +790,7 @@ _cmds:
 	.long 1
 	.long 0
 	.long 5
-	.long 98
+	.long 101
 	.long 0
 	.long 0
 	.long 4
@@ -814,39 +823,13 @@ LC1:
 	.ascii "stack size: \0"
 LC2:
 	.ascii "topstack: \0"
-LC3:
-	.ascii "current instruction: \0"
-LC4:
-	.ascii "push\0"
-LC5:
-	.ascii "pop\0"
-LC6:
-	.ascii "store \0"
-LC7:
-	.ascii "x: \0"
-LC8:
-	.ascii "success\0"
-LC9:
-	.ascii "load\0"
-LC10:
-	.ascii "popv \0"
-LC11:
-	.ascii "goto \0"
-LC12:
-	.ascii "goto if true \0"
-LC13:
-	.ascii "call\0"
-LC14:
-	.ascii "return\0"
-LC15:
-	.ascii "add\0"
 	.align 4
 .globl _main
 	.def	_main;	.scl	2;	.type	32;	.endef
 _main:
 	pushl %ebp
 	movl %esp,%ebp
-	subl $208,%esp
+	subl $160,%esp
 	pushl %edi
 	pushl %esi
 	pushl %ebx
@@ -854,7 +837,7 @@ _main:
 	movl %eax,%eax
 	movl %eax,%edx
 	movl %edx,%eax
-	movl %eax,-204(%ebp)
+	movl %eax,-144(%ebp)
 	call ___main
 	movl $0,-4(%ebp)
 	.p2align 4,,7
@@ -867,14 +850,14 @@ L460:
 	movl -4(%ebp),%eax
 	movl %eax,%edx
 	leal 0(,%edx,4),%esi
-	movl %esi,-192(%ebp)
-	movl $_vars,-196(%ebp)
+	movl %esi,-132(%ebp)
+	movl $_vars,-136(%ebp)
 	pushl $40
 	call ___builtin_new
 	addl $4,%esp
 	movl %eax,%eax
-	movl %eax,-200(%ebp)
-	movl -204(%ebp),%eax
+	movl %eax,-140(%ebp)
+	movl -144(%ebp),%eax
 	addl $4,%eax
 	movl (%eax),%edx
 	movl %edx,-40(%ebp)
@@ -894,18 +877,18 @@ L489:
 L488:
 	leal -40(%ebp),%edi
 	movl %edi,(%eax)
-	movl -200(%ebp),%esi
+	movl -140(%ebp),%esi
 	pushl %esi
 	call ___t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
 	addl $4,%esp
 	movl %eax,%eax
-	movl -204(%ebp),%edx
+	movl -144(%ebp),%edx
 	addl $4,%edx
 	movl (%edx),%ecx
 	movl (%ecx),%ebx
 	movl %ebx,(%edx)
-	movl -196(%ebp),%edi
-	movl -192(%ebp),%esi
+	movl -136(%ebp),%edi
+	movl -132(%ebp),%esi
 	movl %eax,(%esi,%edi)
 L459:
 	incl -4(%ebp)
@@ -949,73 +932,6 @@ L506:
 	jmp L497
 	.p2align 4,,7
 L505:
-	pushl $_endl__FR7ostream
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _size__Ct5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movl %eax,%eax
-	pushl %eax
-	pushl $LC1
-	pushl $_cout
-	call ___ls__7ostreamPCc
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreamUi
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreamPFR7ostream_R7ostream
-	addl $8,%esp
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _empty__Ct5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movb %al,%al
-	testb %al,%al
-	jne L507
-	pushl $_endl__FR7ostream
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movl %eax,%eax
-	movl (%eax),%edx
-	pushl %edx
-	pushl $LC2
-	pushl $_cout
-	call ___ls__7ostreamPCc
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreami
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreamPFR7ostream_R7ostream
-	addl $8,%esp
-L507:
-	pushl $_endl__FR7ostream
-	movl -44(%ebp),%eax
-	pushl %eax
-	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movl %eax,%eax
-	movl (%eax),%edx
-	pushl %edx
-	pushl $LC3
-	pushl $_cout
-	call ___ls__7ostreamPCc
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreami
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreamPFR7ostream_R7ostream
-	addl $8,%esp
 	movl -44(%ebp),%eax
 	pushl %eax
 	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
@@ -1061,202 +977,91 @@ L507:
 	movl $_cmds,%eax
 	movl (%edx,%eax),%edx
 	movl %edx,-76(%ebp)
-	cmpl $18,-72(%ebp)
-	ja L556
+	cmpl $19,-72(%ebp)
+	ja L560
 	movl -72(%ebp),%eax
 	movl %eax,%edx
 	leal 0(,%edx,4),%eax
-	movl L557(%eax),%edx
+	movl L561(%eax),%edx
 	jmp *%edx
 	.p2align 4,,7
-L557:
+L561:
+	.long L519
 	.long L520
 	.long L521
 	.long L522
 	.long L523
 	.long L524
 	.long L525
-	.long L526
+	.long L527
 	.long L528
 	.long L529
-	.long L530
-	.long L543
+	.long L542
+	.long L547
 	.long L548
 	.long L549
 	.long L550
-	.long L551
-	.long L552
-	.long L553
-	.long L554
 	.long L555
+	.long L556
+	.long L557
+	.long L558
+	.long L559
 	.p2align 4,,7
-L520:
-	pushl $_endl__FR7ostream
-	pushl $LC4
-	pushl $_cout
-	call ___ls__7ostreamPCc
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreamPFR7ostream_R7ostream
-	addl $8,%esp
+L519:
 	leal -76(%ebp),%eax
 	pushl %eax
 	movl -48(%ebp),%eax
 	pushl %eax
 	call _push__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0RCi
 	addl $8,%esp
-	jmp L519
+	jmp L518
+	.p2align 4,,7
+L520:
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
+	addl $4,%esp
+	jmp L518
 	.p2align 4,,7
 L521:
-	pushl $_endl__FR7ostream
-	pushl $LC5
-	pushl $_cout
-	call ___ls__7ostreamPCc
-	addl $8,%esp
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
+	addl $4,%esp
 	movl %eax,%eax
 	pushl %eax
-	call ___ls__7ostreamPFR7ostream_R7ostream
+	movl -76(%ebp),%eax
+	movl %eax,%edx
+	leal 0(,%edx,4),%eax
+	movl $_vars,%edx
+	movl (%eax,%edx),%eax
+	pushl %eax
+	call _push__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0RCi
 	addl $8,%esp
 	movl -48(%ebp),%eax
 	pushl %eax
 	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
 	addl $4,%esp
-	jmp L519
+	jmp L518
 	.p2align 4,,7
 L522:
-	pushl $_endl__FR7ostream
-	movl -76(%ebp),%eax
-	pushl %eax
-	pushl $LC6
-	pushl $_cout
-	call ___ls__7ostreamPCc
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreami
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreamPFR7ostream_R7ostream
-	addl $8,%esp
-	pushl $_endl__FR7ostream
 	movl -76(%ebp),%eax
 	movl %eax,%edx
 	leal 0(,%edx,4),%eax
 	movl $_vars,%edx
 	movl (%eax,%edx),%eax
-	pushl %eax
-	call _size__Ct5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movl %eax,%eax
-	pushl %eax
-	pushl $LC7
-	pushl $_cout
-	call ___ls__7ostreamPCc
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreami
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreamPFR7ostream_R7ostream
-	addl $8,%esp
-	movl -48(%ebp),%eax
 	pushl %eax
 	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
 	addl $4,%esp
 	movl %eax,%eax
 	pushl %eax
-	movl -76(%ebp),%eax
-	movl %eax,%edx
-	leal 0(,%edx,4),%eax
-	movl $_vars,%edx
-	movl (%eax,%edx),%eax
+	movl -48(%ebp),%eax
 	pushl %eax
 	call _push__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0RCi
 	addl $8,%esp
-	pushl $_endl__FR7ostream
-	pushl $LC8
-	pushl $_cout
-	call ___ls__7ostreamPCc
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreamPFR7ostream_R7ostream
-	addl $8,%esp
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	jmp L519
+	jmp L518
 	.p2align 4,,7
 L523:
-	pushl $_endl__FR7ostream
-	pushl $LC9
-	pushl $_cout
-	call ___ls__7ostreamPCc
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreamPFR7ostream_R7ostream
-	addl $8,%esp
-	movl -76(%ebp),%eax
-	movl %eax,%edx
-	leal 0(,%edx,4),%eax
-	movl $_vars,%edx
-	movl (%eax,%edx),%eax
-	pushl %eax
-	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movl %eax,%eax
-	pushl %eax
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _push__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0RCi
-	addl $8,%esp
-	jmp L519
-	.p2align 4,,7
-L524:
-	pushl $_endl__FR7ostream
-	movl -76(%ebp),%eax
-	pushl %eax
-	pushl $LC10
-	pushl $_cout
-	call ___ls__7ostreamPCc
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreami
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreamPFR7ostream_R7ostream
-	addl $8,%esp
-	pushl $_endl__FR7ostream
-	movl -76(%ebp),%eax
-	movl %eax,%edx
-	leal 0(,%edx,4),%eax
-	movl $_vars,%edx
-	movl (%eax,%edx),%eax
-	pushl %eax
-	call _size__Ct5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movl %eax,%eax
-	pushl %eax
-	pushl $LC7
-	pushl $_cout
-	call ___ls__7ostreamPCc
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreami
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreamPFR7ostream_R7ostream
-	addl $8,%esp
 	movl -76(%ebp),%eax
 	movl %eax,%edx
 	leal 0(,%edx,4),%eax
@@ -1265,24 +1070,9 @@ L524:
 	pushl %eax
 	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
 	addl $4,%esp
-	jmp L519
+	jmp L518
 	.p2align 4,,7
-L525:
-	pushl $_endl__FR7ostream
-	movl -76(%ebp),%eax
-	pushl %eax
-	pushl $LC11
-	pushl $_cout
-	call ___ls__7ostreamPCc
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreami
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreamPFR7ostream_R7ostream
-	addl $8,%esp
+L524:
 	movl -44(%ebp),%eax
 	pushl %eax
 	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
@@ -1296,31 +1086,16 @@ L525:
 	pushl %eax
 	call _push__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0RCi
 	addl $8,%esp
-	jmp L519
+	jmp L518
 	.p2align 4,,7
-L526:
-	pushl $_endl__FR7ostream
-	movl -76(%ebp),%eax
-	pushl %eax
-	pushl $LC12
-	pushl $_cout
-	call ___ls__7ostreamPCc
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreami
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreamPFR7ostream_R7ostream
-	addl $8,%esp
+L525:
 	movl -48(%ebp),%eax
 	pushl %eax
 	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
 	addl $4,%esp
 	movl %eax,%eax
 	cmpl $0,(%eax)
-	je L527
+	je L526
 	movl -44(%ebp),%eax
 	pushl %eax
 	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
@@ -1334,23 +1109,14 @@ L526:
 	pushl %eax
 	call _push__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0RCi
 	addl $8,%esp
-L527:
+L526:
 	movl -48(%ebp),%eax
 	pushl %eax
 	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
 	addl $4,%esp
-	jmp L519
+	jmp L518
 	.p2align 4,,7
-L528:
-	pushl $_endl__FR7ostream
-	pushl $LC13
-	pushl $_cout
-	call ___ls__7ostreamPCc
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreamPFR7ostream_R7ostream
-	addl $8,%esp
+L527:
 	movl -48(%ebp),%eax
 	pushl %eax
 	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
@@ -1369,34 +1135,16 @@ L528:
 	pushl %eax
 	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
 	addl $4,%esp
-	jmp L519
+	jmp L518
 	.p2align 4,,7
-L529:
-	pushl $_endl__FR7ostream
-	pushl $LC14
-	pushl $_cout
-	call ___ls__7ostreamPCc
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreamPFR7ostream_R7ostream
-	addl $8,%esp
+L528:
 	movl -44(%ebp),%eax
 	pushl %eax
 	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
 	addl $4,%esp
-	pushl $_endl__FR7ostream
-	pushl $LC8
-	pushl $_cout
-	call ___ls__7ostreamPCc
-	addl $8,%esp
-	movl %eax,%eax
-	pushl %eax
-	call ___ls__7ostreamPFR7ostream_R7ostream
-	addl $8,%esp
-	jmp L519
+	jmp L518
 	.p2align 4,,7
-L530:
+L529:
 	pushl $_heap
 	call _size__Ct6vector2ZiZt24__default_alloc_template2b0i0
 	addl $4,%esp
@@ -1413,9 +1161,9 @@ L530:
 	pushl $_heap
 	call _push_back__t6vector2ZiZt24__default_alloc_template2b0i0RCi
 	addl $8,%esp
-	jmp L519
+	jmp L518
 	.p2align 4,,7
-L543:
+L542:
 	movl -48(%ebp),%eax
 	pushl %eax
 	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
@@ -1438,9 +1186,9 @@ L543:
 	pushl %eax
 	call _push__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0RCi
 	addl $8,%esp
-	jmp L519
+	jmp L518
 	.p2align 4,,7
-L548:
+L547:
 	movl -48(%ebp),%eax
 	pushl %eax
 	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
@@ -1463,41 +1211,30 @@ L548:
 	call ___vc__t6vector2ZiZt24__default_alloc_template2b0i0Ui
 	addl $8,%esp
 	movl %eax,%eax
-	movl %eax,-208(%ebp)
+	movl %eax,-148(%ebp)
 	movl -100(%ebp),%eax
-	movl -208(%ebp),%edi
+	movl -148(%ebp),%edi
 	movl %eax,(%edi)
 	movl -48(%ebp),%eax
 	pushl %eax
 	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
 	addl $4,%esp
-	jmp L519
+	jmp L518
+	.p2align 4,,7
+L548:
+	jmp L518
 	.p2align 4,,7
 L549:
-	jmp L519
-	.p2align 4,,7
-L550:
+	pushl $_endl__FR7ostream
 	movl -48(%ebp),%eax
 	pushl %eax
 	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
 	addl $4,%esp
 	movl %eax,%eax
-	pushl %eax
-	movl -56(%ebp),%eax
-	pushl %eax
-	call _push__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0RCi
-	addl $8,%esp
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	jmp L519
-	.p2align 4,,7
-L551:
-	pushl $_endl__FR7ostream
-	pushl $LC15
+	movl (%eax),%edx
+	pushl %edx
 	pushl $_cout
-	call ___ls__7ostreamPCc
+	call ___ls__7ostreami
 	addl $8,%esp
 	movl %eax,%eax
 	pushl %eax
@@ -1505,50 +1242,11 @@ L551:
 	addl $8,%esp
 	movl -48(%ebp),%eax
 	pushl %eax
-	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movl %eax,%eax
-	movl (%eax),%edx
-	movl %edx,-100(%ebp)
-	movl -48(%ebp),%eax
-	pushl %eax
 	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
 	addl $4,%esp
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movl %eax,%eax
-	movl (%eax),%edx
-	movl %edx,-104(%ebp)
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movl -100(%ebp),%eax
-	movl -104(%ebp),%edx
-	leal (%edx,%eax),%esi
-	movl %esi,-108(%ebp)
-	leal -108(%ebp),%eax
-	pushl %eax
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _push__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0RCi
-	addl $8,%esp
-	jmp L519
+	jmp L518
 	.p2align 4,,7
-L552:
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movl %eax,%eax
-	movl (%eax),%edx
-	movl %edx,-104(%ebp)
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
+L550:
 	movl -48(%ebp),%eax
 	pushl %eax
 	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
@@ -1556,97 +1254,36 @@ L552:
 	movl %eax,%eax
 	movl (%eax),%edx
 	movl %edx,-100(%ebp)
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movl -104(%ebp),%eax
-	cmpl -100(%ebp),%eax
-	sete %al
-	xorl %edx,%edx
-	movb %al,%dl
-	movl %edx,-112(%ebp)
-	leal -112(%ebp),%eax
-	pushl %eax
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _push__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0RCi
-	addl $8,%esp
-	jmp L519
 	.p2align 4,,7
-L553:
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movl %eax,%eax
-	movl (%eax),%edx
-	movl %edx,-104(%ebp)
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movl %eax,%eax
-	movl (%eax),%edx
-	movl %edx,-100(%ebp)
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movl -104(%ebp),%eax
-	cmpl -100(%ebp),%eax
-	setle %al
-	xorl %edx,%edx
-	movb %al,%dl
-	movl %edx,-116(%ebp)
-	leal -116(%ebp),%eax
-	pushl %eax
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _push__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0RCi
-	addl $8,%esp
-	jmp L519
+L551:
+	movl $_strs,%eax
+	movl -100(%ebp),%edx
+	cmpb $0,(%edx,%eax)
+	jg L554
+	jmp L552
 	.p2align 4,,7
 L554:
-	movl -48(%ebp),%eax
+	movl $_strs,%eax
+	movl -100(%ebp),%edx
+	movsbl (%edx,%eax),%eax
 	pushl %eax
-	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movl %eax,%eax
-	movl (%eax),%edx
-	movl %edx,-104(%ebp)
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movl %eax,%eax
-	movl (%eax),%edx
-	movl %edx,-100(%ebp)
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movl -104(%ebp),%eax
-	cmpl -100(%ebp),%eax
-	setg %al
-	xorl %edx,%edx
-	movb %al,%dl
-	movl %edx,-120(%ebp)
-	leal -120(%ebp),%eax
-	pushl %eax
-	movl -48(%ebp),%eax
-	pushl %eax
-	call _push__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0RCi
+	pushl $_cout
+	call ___ls__7ostreamc
 	addl $8,%esp
-	jmp L519
+L553:
+	incl -100(%ebp)
+	jmp L551
+	.p2align 4,,7
+L552:
+	pushl $_endl__FR7ostream
+	pushl $_cout
+	call ___ls__7ostreamPFR7ostream_R7ostream
+	addl $8,%esp
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
+	addl $4,%esp
+	jmp L518
 	.p2align 4,,7
 L555:
 	movl -48(%ebp),%eax
@@ -1666,15 +1303,125 @@ L555:
 	addl $4,%esp
 	movl %eax,%eax
 	movl (%eax),%edx
-	movl %edx,-100(%ebp)
+	movl %edx,-108(%ebp)
 	movl -48(%ebp),%eax
 	pushl %eax
 	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
 	addl $4,%esp
-	movl -104(%ebp),%ecx
-	movl %ecx,%eax
-	cltd
-	idivl -100(%ebp)
+	movl -104(%ebp),%eax
+	movl -108(%ebp),%edx
+	leal (%edx,%eax),%esi
+	movl %esi,-112(%ebp)
+	leal -112(%ebp),%eax
+	pushl %eax
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _push__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0RCi
+	addl $8,%esp
+	jmp L518
+	.p2align 4,,7
+L556:
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
+	addl $4,%esp
+	movl %eax,%eax
+	movl (%eax),%edx
+	movl %edx,-108(%ebp)
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
+	addl $4,%esp
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
+	addl $4,%esp
+	movl %eax,%eax
+	movl (%eax),%edx
+	movl %edx,-104(%ebp)
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
+	addl $4,%esp
+	movl -108(%ebp),%eax
+	cmpl -104(%ebp),%eax
+	sete %al
+	xorl %edx,%edx
+	movb %al,%dl
+	movl %edx,-116(%ebp)
+	leal -116(%ebp),%eax
+	pushl %eax
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _push__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0RCi
+	addl $8,%esp
+	jmp L518
+	.p2align 4,,7
+L557:
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
+	addl $4,%esp
+	movl %eax,%eax
+	movl (%eax),%edx
+	movl %edx,-108(%ebp)
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
+	addl $4,%esp
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
+	addl $4,%esp
+	movl %eax,%eax
+	movl (%eax),%edx
+	movl %edx,-104(%ebp)
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
+	addl $4,%esp
+	movl -108(%ebp),%eax
+	cmpl -104(%ebp),%eax
+	setle %al
+	xorl %edx,%edx
+	movb %al,%dl
+	movl %edx,-120(%ebp)
+	leal -120(%ebp),%eax
+	pushl %eax
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _push__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0RCi
+	addl $8,%esp
+	jmp L518
+	.p2align 4,,7
+L558:
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
+	addl $4,%esp
+	movl %eax,%eax
+	movl (%eax),%edx
+	movl %edx,-108(%ebp)
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
+	addl $4,%esp
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
+	addl $4,%esp
+	movl %eax,%eax
+	movl (%eax),%edx
+	movl %edx,-104(%ebp)
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
+	addl $4,%esp
+	movl -108(%ebp),%eax
+	cmpl -104(%ebp),%eax
+	setg %al
+	xorl %edx,%edx
+	movb %al,%dl
 	movl %edx,-124(%ebp)
 	leal -124(%ebp),%eax
 	pushl %eax
@@ -1682,120 +1429,112 @@ L555:
 	pushl %eax
 	call _push__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0RCi
 	addl $8,%esp
-	jmp L519
+	jmp L518
 	.p2align 4,,7
-L556:
-	jmp L519
-	.p2align 4,,7
-L519:
-	jmp L496
-	.p2align 4,,7
-L497:
-	leal -176(%ebp),%eax
-	pushl %eax
-	call ___t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movl -204(%ebp),%edx
-	addl $4,%edx
-	movl (%edx),%eax
-	addl $4,%eax
-	movl (%eax),%edx
-	movl %edx,-188(%ebp)
-	movl $__$_t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0,-184(%ebp)
-	leal -176(%ebp),%edi
-	movl %edi,-180(%ebp)
-	leal -188(%ebp),%esi
-	movl %esi,(%eax)
-	.p2align 4,,7
-L562:
-	movl -56(%ebp),%eax
-	pushl %eax
-	call _empty__Ct5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	movb %al,%al
-	testb %al,%al
-	je L564
-	jmp L563
-	.p2align 4,,7
-L564:
-	movl -56(%ebp),%eax
+L559:
+	movl -48(%ebp),%eax
 	pushl %eax
 	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
 	addl $4,%esp
 	movl %eax,%eax
-	pushl %eax
-	leal -176(%ebp),%eax
-	pushl %eax
-	call _push__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0RCi
-	addl $8,%esp
-	movl -56(%ebp),%eax
+	movl (%eax),%edx
+	movl %edx,-108(%ebp)
+	movl -48(%ebp),%eax
 	pushl %eax
 	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
 	addl $4,%esp
-	jmp L562
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
+	addl $4,%esp
+	movl %eax,%eax
+	movl (%eax),%edx
+	movl %edx,-104(%ebp)
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
+	addl $4,%esp
+	movl -108(%ebp),%ecx
+	movl %ecx,%eax
+	cltd
+	idivl -104(%ebp)
+	movl %edx,-128(%ebp)
+	leal -128(%ebp),%eax
+	pushl %eax
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _push__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0RCi
+	addl $8,%esp
+	jmp L518
 	.p2align 4,,7
-L563:
-	nop
+L560:
+	jmp L518
 	.p2align 4,,7
-L565:
-	leal -176(%ebp),%eax
+L518:
+	jmp L496
+	.p2align 4,,7
+L497:
+	pushl $_endl__FR7ostream
+	movl -48(%ebp),%eax
+	pushl %eax
+	call _size__Ct5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
+	addl $4,%esp
+	movl %eax,%eax
+	pushl %eax
+	pushl $LC1
+	pushl $_cout
+	call ___ls__7ostreamPCc
+	addl $8,%esp
+	movl %eax,%eax
+	pushl %eax
+	call ___ls__7ostreamUi
+	addl $8,%esp
+	movl %eax,%eax
+	pushl %eax
+	call ___ls__7ostreamPFR7ostream_R7ostream
+	addl $8,%esp
+	movl -48(%ebp),%eax
 	pushl %eax
 	call _empty__Ct5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
 	addl $4,%esp
 	movb %al,%al
 	testb %al,%al
-	je L567
-	jmp L566
-	.p2align 4,,7
-L567:
+	jne L562
 	pushl $_endl__FR7ostream
-	leal -176(%ebp),%eax
+	movl -48(%ebp),%eax
 	pushl %eax
 	call _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
 	addl $4,%esp
 	movl %eax,%eax
 	movl (%eax),%edx
 	pushl %edx
+	pushl $LC2
 	pushl $_cout
+	call ___ls__7ostreamPCc
+	addl $8,%esp
+	movl %eax,%eax
+	pushl %eax
 	call ___ls__7ostreami
 	addl $8,%esp
 	movl %eax,%eax
 	pushl %eax
 	call ___ls__7ostreamPFR7ostream_R7ostream
 	addl $8,%esp
-	leal -176(%ebp),%eax
-	pushl %eax
-	call _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $4,%esp
-	jmp L565
-	.p2align 4,,7
-L566:
-	movl -204(%ebp),%edx
-	addl $4,%edx
-	movl (%edx),%eax
-	addl $4,%eax
-	movl (%eax),%edx
-	movl (%edx),%ecx
-	movl %ecx,(%eax)
-	pushl $2
-	leal -176(%ebp),%eax
-	pushl %eax
-	call __$_t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $8,%esp
+L562:
 	xorl %eax,%eax
 	jmp L456
-	jmp L568
+	jmp L563
 	.p2align 4,,7
 L487:
-	movl -200(%ebp),%edi
+	movl -140(%ebp),%edi
 	pushl %edi
 	call ___builtin_delete
 	addl $4,%esp
 	call ___sjthrow
 	.p2align 4,,7
-L568:
+L563:
 L456:
-	leal -220(%ebp),%esp
+	leal -172(%ebp),%esp
 	popl %ebx
 	popl %esi
 	popl %edi
@@ -1812,59 +1551,59 @@ _lexicographical_compare__H2ZPCScZPCSc_X01T0X11T2_b:
 	movl %esp,%ebp
 	nop
 	.p2align 4,,7
-L570:
+L565:
 	movl 8(%ebp),%eax
 	cmpl 12(%ebp),%eax
-	je L574
+	je L569
 	movl 16(%ebp),%eax
 	cmpl 20(%ebp),%eax
-	jne L573
-	jmp L574
+	jne L568
+	jmp L569
 	.p2align 4,,7
-L574:
-	jmp L571
+L569:
+	jmp L566
 	.p2align 4,,7
-L573:
+L568:
 	movl 8(%ebp),%eax
 	movl 16(%ebp),%edx
 	movb (%eax),%al
 	cmpb (%edx),%al
-	jge L575
+	jge L570
 	movb $1,%al
-	jmp L569
+	jmp L564
 	.p2align 4,,7
-L575:
+L570:
 	movl 16(%ebp),%eax
 	movl 8(%ebp),%edx
 	movb (%eax),%al
 	cmpb (%edx),%al
-	jge L572
+	jge L567
 	movb $0,%al
-	jmp L569
-	.p2align 4,,7
-L576:
-L572:
-	incl 8(%ebp)
-	incl 16(%ebp)
-	jmp L570
+	jmp L564
 	.p2align 4,,7
 L571:
+L567:
+	incl 8(%ebp)
+	incl 16(%ebp)
+	jmp L565
+	.p2align 4,,7
+L566:
 	movb $0,%al
 	movl 8(%ebp),%edx
 	cmpl 12(%ebp),%edx
-	jne L577
+	jne L572
 	movl 16(%ebp),%edx
 	cmpl 20(%ebp),%edx
-	je L577
+	je L572
 	movb $1,%al
-L577:
+L572:
 	movb %al,%al
-	jmp L569
-	jmp L578
-	jmp L569
+	jmp L564
+	jmp L573
+	jmp L564
 	.p2align 4,,7
-L578:
-L569:
+L573:
+L564:
 	movl %ebp,%esp
 	popl %ebp
 	ret
@@ -1878,64 +1617,64 @@ _lexicographical_compare_3way__H2ZPCScZPCSc_X01T0X11T2_i:
 	movl %esp,%ebp
 	nop
 	.p2align 4,,7
-L580:
+L575:
 	movl 8(%ebp),%eax
 	cmpl 12(%ebp),%eax
-	je L583
+	je L578
 	movl 16(%ebp),%eax
 	cmpl 20(%ebp),%eax
-	jne L582
-	jmp L583
+	jne L577
+	jmp L578
 	.p2align 4,,7
-L583:
-	jmp L581
+L578:
+	jmp L576
 	.p2align 4,,7
-L582:
+L577:
 	movl 8(%ebp),%eax
 	movl 16(%ebp),%edx
 	movb (%eax),%al
 	cmpb (%edx),%al
-	jge L584
+	jge L579
 	movl $-1,%eax
-	jmp L579
+	jmp L574
 	.p2align 4,,7
-L584:
+L579:
 	movl 16(%ebp),%eax
 	movl 8(%ebp),%edx
 	movb (%eax),%al
 	cmpb (%edx),%al
-	jge L585
+	jge L580
 	movl $1,%eax
-	jmp L579
+	jmp L574
 	.p2align 4,,7
-L585:
+L580:
 	incl 8(%ebp)
 	incl 16(%ebp)
-	jmp L580
+	jmp L575
 	.p2align 4,,7
-L581:
+L576:
 	movl 16(%ebp),%eax
 	cmpl 20(%ebp),%eax
-	jne L586
+	jne L581
 	movl 8(%ebp),%eax
 	cmpl 12(%ebp),%eax
 	setne %al
 	xorl %edx,%edx
 	movb %al,%dl
 	movl %edx,%eax
-	jmp L579
-	jmp L587
+	jmp L574
+	jmp L582
 	.p2align 4,,7
-L586:
+L581:
 	movl $-1,%eax
-	jmp L579
+	jmp L574
 	.p2align 4,,7
-L587:
-	jmp L588
-	jmp L579
+L582:
+	jmp L583
+	jmp L574
 	.p2align 4,,7
-L588:
-L579:
+L583:
+L574:
 	movl %ebp,%esp
 	popl %ebp
 	ret
@@ -1953,12 +1692,12 @@ _buffer_size__t5deque3ZiZt24__default_alloc_template2b0i0Ui0:
 	addl $8,%esp
 	movl %eax,%edx
 	movl %edx,%eax
-	jmp L590
-	jmp L591
-	jmp L590
+	jmp L585
+	jmp L586
+	jmp L585
 	.p2align 4,,7
-L591:
-L590:
+L586:
+L585:
 	movl %ebp,%esp
 	popl %ebp
 	ret
@@ -1971,12 +1710,12 @@ _initial_map_size__t5deque3ZiZt24__default_alloc_template2b0i0Ui0:
 	pushl %ebp
 	movl %esp,%ebp
 	movl $8,%eax
-	jmp L592
-	jmp L593
-	jmp L592
+	jmp L587
+	jmp L588
+	jmp L587
 	.p2align 4,,7
-L593:
-L592:
+L588:
+L587:
 	movl %ebp,%esp
 	popl %ebp
 	ret
@@ -1992,20 +1731,20 @@ _max__H1ZUi_RCX01T0_RCX01:
 	movl 12(%ebp),%ecx
 	movl (%edx),%eax
 	cmpl (%ecx),%eax
-	jae L595
+	jae L590
 	movl %ecx,%eax
-	jmp L596
+	jmp L591
 	.p2align 4,,7
-L595:
+L590:
 	movl %edx,%eax
-L596:
+L591:
 	movl %eax,%eax
-	jmp L594
-	jmp L597
-	jmp L594
+	jmp L589
+	jmp L592
+	jmp L589
 	.p2align 4,,7
-L597:
-L594:
+L592:
+L589:
 	movl %ebp,%esp
 	popl %ebp
 	ret
@@ -2016,7 +1755,7 @@ L594:
 __t23__malloc_alloc_template1i0$__malloc_alloc_oom_handler:
 	.long 0
 .text
-LC16:
+LC3:
 	.ascii "out of memory\0"
 .section	.text$oom_malloc__t23__malloc_alloc_template1i0Ui,"x"
 	.linkonce discard
@@ -2030,13 +1769,13 @@ _oom_malloc__t23__malloc_alloc_template1i0Ui:
 	pushl %ebx
 	nop
 	.p2align 4,,7
-L604:
+L599:
 	movl __t23__malloc_alloc_template1i0$__malloc_alloc_oom_handler,%eax
 	movl %eax,-4(%ebp)
 	cmpl $0,-4(%ebp)
-	jne L607
+	jne L602
 	pushl $_endl__FR7ostream
-	pushl $LC16
+	pushl $LC3
 	pushl $_cerr
 	call ___ls__7ostreamPCc
 	addl $8,%esp
@@ -2048,7 +1787,7 @@ L604:
 	call _exit
 	addl $4,%esp
 	.p2align 4,,7
-L607:
+L602:
 	movl -4(%ebp),%ebx
 	call *%ebx
 	movl 8(%ebp),%eax
@@ -2059,21 +1798,21 @@ L607:
 	movl %eax,%edx
 	movl %edx,-8(%ebp)
 	cmpl $0,-8(%ebp)
-	je L606
+	je L601
 	movl -8(%ebp),%edx
 	movl %edx,%eax
-	jmp L603
+	jmp L598
 	.p2align 4,,7
-L608:
-L606:
-	jmp L604
-	.p2align 4,,7
-L605:
-	jmp L609
-	jmp L603
-	.p2align 4,,7
-L609:
 L603:
+L601:
+	jmp L599
+	.p2align 4,,7
+L600:
+	jmp L604
+	jmp L598
+	.p2align 4,,7
+L604:
+L598:
 	movl -20(%ebp),%ebx
 	movl %ebp,%esp
 	popl %ebp
@@ -2096,17 +1835,17 @@ _allocate__t23__malloc_alloc_template1i0Ui:
 	movl %eax,%edx
 	movl %edx,-4(%ebp)
 	cmpl $0,-4(%ebp)
-	jne L602
+	jne L597
 	pushl %ebx
 	call _oom_malloc__t23__malloc_alloc_template1i0Ui
 	addl $4,%esp
 	movl %eax,%eax
 	movl %eax,-4(%ebp)
-L602:
+L597:
 	movl -4(%ebp),%edx
 	movl %edx,%eax
-	jmp L601
-L601:
+	jmp L596
+L596:
 	movl -20(%ebp),%ebx
 	movl %ebp,%esp
 	popl %ebp
@@ -2146,8 +1885,8 @@ _FREELIST_INDEX__t24__default_alloc_template2b0i0Ui:
 	shrl $3,%eax
 	leal -1(%eax),%ecx
 	movl %ecx,%eax
-	jmp L610
-L610:
+	jmp L605
+L605:
 	movl %ebp,%esp
 	popl %ebp
 	ret
@@ -2163,8 +1902,8 @@ _ROUND_UP__t24__default_alloc_template2b0i0Ui:
 	leal 7(%edx),%ecx
 	andl $-8,%ecx
 	movl %ecx,%eax
-	jmp L612
-L612:
+	jmp L607
+L607:
 	movl %ebp,%esp
 	popl %ebp
 	ret
@@ -2212,7 +1951,7 @@ _chunk_alloc__t24__default_alloc_template2b0i0UiRi:
 	movl %eax,-36(%ebp)
 	movl -36(%ebp),%eax
 	cmpl -8(%ebp),%eax
-	jb L615
+	jb L610
 	movl __t24__default_alloc_template2b0i0$start_free,%eax
 	movl %eax,-36(%ebp)
 	movl -36(%ebp),%eax
@@ -2223,15 +1962,15 @@ _chunk_alloc__t24__default_alloc_template2b0i0UiRi:
 	addl %eax,__t24__default_alloc_template2b0i0$start_free
 	movl -4(%ebp),%edx
 	movl %edx,%eax
-	jmp L614
-	jmp L616
+	jmp L609
+	jmp L611
 	.p2align 4,,7
-L615:
+L610:
 	movl -12(%ebp),%eax
 	movl %eax,-36(%ebp)
 	movl -36(%ebp),%eax
 	cmpl 8(%ebp),%eax
-	jb L617
+	jb L612
 	movl 12(%ebp),%eax
 	movl %eax,-36(%ebp)
 	movl -12(%ebp),%ebx
@@ -2257,10 +1996,10 @@ L615:
 	addl %eax,__t24__default_alloc_template2b0i0$start_free
 	movl -4(%ebp),%edx
 	movl %edx,%eax
-	jmp L614
-	jmp L616
+	jmp L609
+	jmp L611
 	.p2align 4,,7
-L617:
+L612:
 	movl __t24__default_alloc_template2b0i0$heap_size,%eax
 	shrl $4,%eax
 	movl %eax,-36(%ebp)
@@ -2277,7 +2016,7 @@ L617:
 	addl %edx,%eax
 	movl %eax,-16(%ebp)
 	cmpl $0,-12(%ebp)
-	je L619
+	je L614
 	movl -12(%ebp),%eax
 	movl %eax,-36(%ebp)
 	movl -36(%ebp),%eax
@@ -2302,7 +2041,7 @@ L617:
 	movl __t24__default_alloc_template2b0i0$start_free,%edx
 	movl -36(%ebp),%eax
 	movl %edx,(%eax)
-L619:
+L614:
 	movl -16(%ebp),%eax
 	movl %eax,-36(%ebp)
 	movl -36(%ebp),%eax
@@ -2313,18 +2052,18 @@ L619:
 	movl -36(%ebp),%eax
 	movl %eax,__t24__default_alloc_template2b0i0$start_free
 	cmpl $0,__t24__default_alloc_template2b0i0$start_free
-	jne L620
+	jne L615
 	movl 8(%ebp),%eax
 	movl %eax,-36(%ebp)
 	movl -36(%ebp),%eax
 	movl %eax,-20(%ebp)
 	.p2align 4,,7
-L621:
+L616:
 	cmpl $128,-20(%ebp)
-	jle L624
-	jmp L622
+	jle L619
+	jmp L617
 	.p2align 4,,7
-L624:
+L619:
 	movl -20(%ebp),%eax
 	movl %eax,-36(%ebp)
 	movl -36(%ebp),%eax
@@ -2344,7 +2083,7 @@ L624:
 	movl (%eax),%edx
 	movl %edx,-28(%ebp)
 	cmpl $0,-28(%ebp)
-	je L623
+	je L618
 	movl -24(%ebp),%eax
 	movl %eax,-36(%ebp)
 	movl -28(%ebp),%edx
@@ -2373,14 +2112,14 @@ L624:
 	addl $8,%esp
 	movl %eax,%edx
 	movl %edx,%eax
-	jmp L614
+	jmp L609
 	.p2align 4,,7
-L625:
-L623:
+L620:
+L618:
 	addl $8,-20(%ebp)
-	jmp L621
+	jmp L616
 	.p2align 4,,7
-L622:
+L617:
 	movl $0,__t24__default_alloc_template2b0i0$end_free
 	movl -16(%ebp),%eax
 	movl %eax,-36(%ebp)
@@ -2389,7 +2128,7 @@ L622:
 	call _allocate__t23__malloc_alloc_template1i0Ui
 	addl $4,%esp
 	movl %eax,__t24__default_alloc_template2b0i0$start_free
-L620:
+L615:
 	movl -16(%ebp),%eax
 	movl %eax,-36(%ebp)
 	movl -36(%ebp),%eax
@@ -2412,11 +2151,11 @@ L620:
 	addl $8,%esp
 	movl %eax,%edx
 	movl %edx,%eax
-	jmp L614
+	jmp L609
 	.p2align 4,,7
-L618:
-L616:
-L614:
+L613:
+L611:
+L609:
 	movl -52(%ebp),%ebx
 	movl %ebp,%esp
 	popl %ebp
@@ -2441,12 +2180,12 @@ _refill__t24__default_alloc_template2b0i0Ui:
 	movl %eax,%eax
 	movl %eax,-8(%ebp)
 	cmpl $1,-4(%ebp)
-	jne L626
+	jne L621
 	movl -8(%ebp),%edx
 	movl %edx,%eax
-	jmp L613
+	jmp L608
 	.p2align 4,,7
-L626:
+L621:
 	movl 8(%ebp),%eax
 	pushl %eax
 	call _FREELIST_INDEX__t24__default_alloc_template2b0i0Ui
@@ -2467,7 +2206,7 @@ L626:
 	movl %ecx,(%eax)
 	movl $1,-28(%ebp)
 	.p2align 4,,7
-L627:
+L622:
 	movl -24(%ebp),%eax
 	movl %eax,-20(%ebp)
 	movl 8(%ebp),%eax
@@ -2475,27 +2214,27 @@ L627:
 	movl -4(%ebp),%eax
 	decl %eax
 	cmpl -28(%ebp),%eax
-	jne L630
+	jne L625
 	movl -20(%ebp),%eax
 	movl $0,(%eax)
-	jmp L628
-	jmp L629
+	jmp L623
+	jmp L624
 	.p2align 4,,7
-L630:
+L625:
 	movl -20(%ebp),%eax
 	movl -24(%ebp),%edx
 	movl %edx,(%eax)
-L631:
-L629:
+L626:
+L624:
 	incl -28(%ebp)
-	jmp L627
+	jmp L622
 	.p2align 4,,7
-L628:
+L623:
 	movl -16(%ebp),%edx
 	movl %edx,%eax
-	jmp L613
+	jmp L608
 	.p2align 4,,7
-L613:
+L608:
 	movl -36(%ebp),%ebx
 	movl %ebp,%esp
 	popl %ebp
@@ -2513,15 +2252,15 @@ _allocate__t24__default_alloc_template2b0i0Ui:
 	pushl %ebx
 	movl 8(%ebp),%ebx
 	cmpl $128,%ebx
-	jbe L600
+	jbe L595
 	pushl %ebx
 	call _allocate__t23__malloc_alloc_template1i0Ui
 	addl $4,%esp
 	movl %eax,%edx
 	movl %edx,%eax
-	jmp L599
+	jmp L594
 	.p2align 4,,7
-L600:
+L595:
 	pushl %ebx
 	call _FREELIST_INDEX__t24__default_alloc_template2b0i0Ui
 	addl $4,%esp
@@ -2534,7 +2273,7 @@ L600:
 	movl (%eax),%edx
 	movl %edx,-8(%ebp)
 	cmpl $0,-8(%ebp)
-	jne L611
+	jne L606
 	pushl %ebx
 	call _ROUND_UP__t24__default_alloc_template2b0i0Ui
 	addl $4,%esp
@@ -2546,17 +2285,17 @@ L600:
 	movl %eax,-12(%ebp)
 	movl -12(%ebp),%edx
 	movl %edx,%eax
-	jmp L599
+	jmp L594
 	.p2align 4,,7
-L611:
+L606:
 	movl -4(%ebp),%eax
 	movl -8(%ebp),%edx
 	movl (%edx),%ecx
 	movl %ecx,(%eax)
 	movl -8(%ebp),%edx
 	movl %edx,%eax
-	jmp L599
-L599:
+	jmp L594
+L594:
 	leal -24(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -2574,20 +2313,20 @@ _allocate__t12simple_alloc2ZPiZt24__default_alloc_template2b0i0Ui:
 	pushl %ebx
 	movl 8(%ebp),%ebx
 	testl %ebx,%ebx
-	je L632
+	je L627
 	leal 0(,%ebx,4),%eax
 	pushl %eax
 	call _allocate__t24__default_alloc_template2b0i0Ui
 	addl $4,%esp
 	movl %eax,%eax
-	jmp L633
+	jmp L628
 	.p2align 4,,7
-L632:
+L627:
 	xorl %eax,%eax
-L633:
+L628:
 	movl %eax,%eax
-	jmp L598
-L598:
+	jmp L593
+L593:
 	movl -4(%ebp),%ebx
 	movl %ebp,%esp
 	popl %ebp
@@ -2603,20 +2342,20 @@ _allocate__t12simple_alloc2ZiZt24__default_alloc_template2b0i0Ui:
 	pushl %ebx
 	movl 8(%ebp),%ebx
 	testl %ebx,%ebx
-	je L644
+	je L639
 	leal 0(,%ebx,4),%eax
 	pushl %eax
 	call _allocate__t24__default_alloc_template2b0i0Ui
 	addl $4,%esp
 	movl %eax,%eax
-	jmp L645
+	jmp L640
 	.p2align 4,,7
-L644:
+L639:
 	xorl %eax,%eax
-L645:
+L640:
 	movl %eax,%eax
-	jmp L643
-L643:
+	jmp L638
+L638:
 	movl -4(%ebp),%ebx
 	movl %ebp,%esp
 	popl %ebp
@@ -2638,8 +2377,8 @@ _allocate_node__t5deque3ZiZt24__default_alloc_template2b0i0Ui0:
 	addl $4,%esp
 	movl %eax,%edx
 	movl %edx,%eax
-	jmp L642
-L642:
+	jmp L637
+L637:
 	movl -4(%ebp),%ebx
 	movl %ebp,%esp
 	popl %ebp
@@ -2659,7 +2398,7 @@ _deallocate__t23__malloc_alloc_template1i0PvUi:
 	pushl %esi
 	call _free
 	addl $4,%esp
-L661:
+L656:
 	leal -8(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -2682,14 +2421,14 @@ _deallocate__t24__default_alloc_template2b0i0PvUi:
 	movl 12(%ebp),%esi
 	movl %ebx,-4(%ebp)
 	cmpl $128,%esi
-	jbe L660
+	jbe L655
 	pushl %esi
 	pushl %ebx
 	call _deallocate__t23__malloc_alloc_template1i0PvUi
 	addl $8,%esp
-	jmp L659
+	jmp L654
 	.p2align 4,,7
-L660:
+L655:
 	pushl %esi
 	call _FREELIST_INDEX__t24__default_alloc_template2b0i0Ui
 	addl $4,%esp
@@ -2705,7 +2444,7 @@ L660:
 	movl -8(%ebp),%eax
 	movl -4(%ebp),%edx
 	movl %edx,(%eax)
-L659:
+L654:
 	leal -28(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -2726,14 +2465,14 @@ _deallocate__t12simple_alloc2ZiZt24__default_alloc_template2b0i0PiUi:
 	movl 8(%ebp),%ebx
 	movl 12(%ebp),%esi
 	testl %esi,%esi
-	je L658
+	je L653
 	leal 0(,%esi,4),%eax
 	pushl %eax
 	pushl %ebx
 	call _deallocate__t24__default_alloc_template2b0i0PvUi
 	addl $8,%esp
-L658:
-L657:
+L653:
+L652:
 	leal -8(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -2758,7 +2497,7 @@ _deallocate_node__t5deque3ZiZt24__default_alloc_template2b0i0Ui0Pi:
 	pushl %esi
 	call _deallocate__t12simple_alloc2ZiZt24__default_alloc_template2b0i0PiUi
 	addl $8,%esp
-L656:
+L651:
 	leal -8(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -2778,14 +2517,14 @@ _deallocate__t12simple_alloc2ZPiZt24__default_alloc_template2b0i0PPiUi:
 	movl 8(%ebp),%ebx
 	movl 12(%ebp),%esi
 	testl %esi,%esi
-	je L663
+	je L658
 	leal 0(,%esi,4),%eax
 	pushl %eax
 	pushl %ebx
 	call _deallocate__t24__default_alloc_template2b0i0PvUi
 	addl $8,%esp
-L663:
-L662:
+L658:
+L657:
 	leal -8(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -2888,17 +2627,17 @@ _create_map_and_nodes__t5deque3ZiZt24__default_alloc_template2b0i0Ui0Ui:
 	movl $0,-52(%ebp)
 	leal -48(%ebp),%edx
 	movl %ebp,(%edx)
-	movl $L637,4(%edx)
+	movl $L632,4(%edx)
 	movl %esp,8(%edx)
 	xorl %edx,%edx
-	jmp L636
+	jmp L631
 	.p2align 4,,7
-L637:
+L632:
 	movl %ebp,%ebp
 	movl $1,%edx
-	jmp L635
+	jmp L630
 	.p2align 4,,7
-L636:
+L631:
 	leal -56(%ebp),%eax
 	movl -132(%ebp),%ebx
 	movl %eax,(%ebx)
@@ -2907,15 +2646,15 @@ L636:
 	movl -132(%ebp),%eax
 	movl %eax,-24(%ebp)
 	.p2align 4,,7
-L638:
+L633:
 	movl -24(%ebp),%ebx
 	movl %ebx,-132(%ebp)
 	movl -132(%ebp),%eax
 	cmpl -20(%ebp),%eax
-	jbe L641
-	jmp L639
+	jbe L636
+	jmp L634
 	.p2align 4,,7
-L641:
+L636:
 	movl 8(%ebp),%ebx
 	pushl %ebx
 	call _allocate_node__t5deque3ZiZt24__default_alloc_template2b0i0Ui0
@@ -2924,11 +2663,11 @@ L641:
 	movl -24(%ebp),%edx
 	movl -132(%ebp),%eax
 	movl %eax,(%edx)
-L640:
+L635:
 	addl $4,-24(%ebp)
-	jmp L638
+	jmp L633
 	.p2align 4,,7
-L639:
+L634:
 	movl -128(%ebp),%ebx
 	addl $4,%ebx
 	movl %ebx,-132(%ebp)
@@ -2937,7 +2676,7 @@ L639:
 	movl (%edx),%ecx
 	movl -132(%ebp),%ebx
 	movl %ecx,(%ebx)
-L646:
+L641:
 	movl -16(%ebp),%eax
 	movl %eax,-132(%ebp)
 	movl -132(%ebp),%ebx
@@ -2974,9 +2713,9 @@ L646:
 	movl 20(%ebx),%eax
 	addl %ecx,%eax
 	movl %eax,16(%ebx)
-	jmp L668
+	jmp L663
 	.p2align 4,,7
-L635:
+L630:
 	call ___cp_eh_info
 	movl %eax,-132(%ebp)
 	movl -132(%ebp),%ebx
@@ -2994,17 +2733,17 @@ L635:
 	movl $0,-84(%ebp)
 	leal -80(%ebp),%edx
 	movl %ebp,(%edx)
-	movl $L651,4(%edx)
+	movl $L646,4(%edx)
 	movl %esp,8(%edx)
 	xorl %edx,%edx
-	jmp L650
+	jmp L645
 	.p2align 4,,7
-L651:
+L646:
 	movl %ebp,%ebp
 	movl $1,%edx
-	jmp L649
+	jmp L644
 	.p2align 4,,7
-L650:
+L645:
 	leal -88(%ebp),%ebx
 	movl -132(%ebp),%eax
 	movl %ebx,(%eax)
@@ -3017,15 +2756,15 @@ L650:
 	movl -132(%ebp),%ebx
 	movl %ebx,-92(%ebp)
 	.p2align 4,,7
-L652:
+L647:
 	movl -92(%ebp),%eax
 	movl %eax,-132(%ebp)
 	movl -132(%ebp),%ebx
 	cmpl -24(%ebp),%ebx
-	jb L655
-	jmp L653
+	jb L650
+	jmp L648
 	.p2align 4,,7
-L655:
+L650:
 	movl -92(%ebp),%eax
 	movl %eax,-132(%ebp)
 	movl -132(%ebp),%ebx
@@ -3035,11 +2774,11 @@ L655:
 	pushl %eax
 	call _deallocate_node__t5deque3ZiZt24__default_alloc_template2b0i0Ui0Pi
 	addl $8,%esp
-L654:
+L649:
 	addl $4,-92(%ebp)
-	jmp L652
+	jmp L647
 	.p2align 4,,7
-L653:
+L648:
 	movl 8(%ebp),%ebx
 	movl 36(%ebx),%ebx
 	movl %ebx,-132(%ebp)
@@ -3068,12 +2807,12 @@ L653:
 	pushl %ebx
 	call ___cp_pop_exception
 	addl $4,%esp
-	jmp L646
+	jmp L641
 	.p2align 4,,7
-L647:
+L642:
 	call ___sjthrow
 	.p2align 4,,7
-L649:
+L644:
 	movl -128(%ebp),%eax
 	addl $4,%eax
 	movl %eax,-132(%ebp)
@@ -3083,17 +2822,17 @@ L649:
 	movl $0,-116(%ebp)
 	leal -112(%ebp),%edx
 	movl %ebp,(%edx)
-	movl $L667,4(%edx)
+	movl $L662,4(%edx)
 	movl %esp,8(%edx)
 	xorl %edx,%edx
-	jmp L666
+	jmp L661
 	.p2align 4,,7
-L667:
+L662:
 	movl %ebp,%ebp
 	movl $1,%edx
-	jmp L665
+	jmp L660
 	.p2align 4,,7
-L666:
+L661:
 	leal -120(%ebp),%ebx
 	movl -132(%ebp),%eax
 	movl %ebx,(%eax)
@@ -3113,11 +2852,11 @@ L666:
 	movl %ecx,(%eax)
 	call ___sjthrow
 	.p2align 4,,7
-L665:
+L660:
 	call ___terminate
 	.p2align 4,,7
-L668:
-L589:
+L663:
+L584:
 	leal -156(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -3139,31 +2878,31 @@ _destroy_map_and_nodes__t5deque3ZiZt24__default_alloc_template2b0i0Ui0:
 	movl 12(%ebx),%eax
 	movl %eax,-4(%ebp)
 	.p2align 4,,7
-L670:
+L665:
 	movl -4(%ebp),%eax
 	cmpl 28(%ebx),%eax
-	jbe L673
-	jmp L671
+	jbe L668
+	jmp L666
 	.p2align 4,,7
-L673:
+L668:
 	movl -4(%ebp),%eax
 	movl (%eax),%edx
 	pushl %edx
 	pushl %ebx
 	call _deallocate_node__t5deque3ZiZt24__default_alloc_template2b0i0Ui0Pi
 	addl $8,%esp
-L672:
+L667:
 	addl $4,-4(%ebp)
-	jmp L670
+	jmp L665
 	.p2align 4,,7
-L671:
+L666:
 	movl 36(%ebx),%eax
 	pushl %eax
 	movl 32(%ebx),%eax
 	pushl %eax
 	call _deallocate__t12simple_alloc2ZPiZt24__default_alloc_template2b0i0PPiUi
 	addl $8,%esp
-L669:
+L664:
 	movl -20(%ebp),%ebx
 	movl %ebp,%esp
 	popl %ebp
@@ -3198,8 +2937,8 @@ ___copy_t__H1ZPi_PCX01T0PX01G11__true_type_PX01:
 	subl 8(%ebp),%eax
 	leal (%eax,%edi),%edx
 	movl %edx,%eax
-	jmp L683
-L683:
+	jmp L678
+L678:
 	leal -12(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -3232,8 +2971,8 @@ ___cl__t15__copy_dispatch2ZPPiZPPiPPiN21:
 	addl $16,%esp
 	movl %eax,%edx
 	movl %edx,%eax
-	jmp L682
-L682:
+	jmp L677
+L677:
 	leal -12(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -3266,8 +3005,8 @@ _copy__H2ZPPiZPPi_X01T0X11_X11:
 	addl $16,%esp
 	movl %eax,%edx
 	movl %edx,%eax
-	jmp L681
-L681:
+	jmp L676
+L676:
 	leal -28(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -3318,8 +3057,8 @@ ___copy_backward_t__H1ZPi_PCX01T0PX01G11__true_type_PX01:
 	movl 16(%ebp),%edx
 	subl %eax,%edx
 	movl %edx,%eax
-	jmp L687
-L687:
+	jmp L682
+L682:
 	leal -28(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -3352,8 +3091,8 @@ ___cl__t24__copy_backward_dispatch2ZPPiZPPiPPiN21:
 	addl $16,%esp
 	movl %eax,%edx
 	movl %edx,%eax
-	jmp L686
-L686:
+	jmp L681
+L681:
 	leal -12(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -3386,8 +3125,8 @@ _copy_backward__H2ZPPiZPPi_X01T0X11_X11:
 	addl $16,%esp
 	movl %eax,%edx
 	movl %edx,%eax
-	jmp L685
-L685:
+	jmp L680
+L680:
 	leal -28(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -3425,7 +3164,7 @@ _reallocate_map__t5deque3ZiZt24__default_alloc_template2b0i0Ui0Uib:
 	movl %edx,%eax
 	addl %edx,%eax
 	cmpl %eax,36(%edi)
-	jbe L678
+	jbe L673
 	movl 36(%edi),%eax
 	movl -8(%ebp),%edx
 	subl %edx,%eax
@@ -3436,16 +3175,16 @@ _reallocate_map__t5deque3ZiZt24__default_alloc_template2b0i0Ui0Uib:
 	addl 32(%edi),%esi
 	movl %esi,%ebx
 	cmpb $0,16(%ebp)
-	je L679
+	je L674
 	movl 12(%ebp),%eax
 	movl %eax,%edx
 	leal 0(,%edx,4),%eax
 	addl %eax,%ebx
-L679:
+L674:
 	movl %ebx,-12(%ebp)
 	movl -12(%ebp),%eax
 	cmpl 12(%edi),%eax
-	jae L680
+	jae L675
 	movl -12(%ebp),%eax
 	pushl %eax
 	movl 28(%edi),%eax
@@ -3455,9 +3194,9 @@ L679:
 	pushl %eax
 	call _copy__H2ZPPiZPPi_X01T0X11_X11
 	addl $12,%esp
-	jmp L684
+	jmp L679
 	.p2align 4,,7
-L680:
+L675:
 	movl -4(%ebp),%eax
 	movl %eax,%edx
 	leal 0(,%edx,4),%eax
@@ -3471,10 +3210,10 @@ L680:
 	pushl %eax
 	call _copy_backward__H2ZPPiZPPi_X01T0X11_X11
 	addl $12,%esp
-L684:
-	jmp L688
+L679:
+	jmp L683
 	.p2align 4,,7
-L678:
+L673:
 	leal 12(%ebp),%eax
 	pushl %eax
 	leal 36(%edi),%eax
@@ -3507,12 +3246,12 @@ L678:
 	movl -28(%ebp),%ecx
 	movl %ecx,-24(%ebp)
 	cmpb $0,16(%ebp)
-	je L689
+	je L684
 	movl 12(%ebp),%eax
 	movl %eax,%edx
 	leal 0(,%edx,4),%eax
 	addl %eax,-24(%ebp)
-L689:
+L684:
 	movl -24(%ebp),%ecx
 	movl %ecx,-12(%ebp)
 	movl -12(%ebp),%eax
@@ -3534,7 +3273,7 @@ L689:
 	movl %eax,32(%edi)
 	movl -16(%ebp),%eax
 	movl %eax,36(%edi)
-L688:
+L683:
 	movl -12(%ebp),%eax
 	pushl %eax
 	pushl %edi
@@ -3551,7 +3290,7 @@ L688:
 	pushl %eax
 	call _set_node__t16__deque_iterator4ZiZRiZPiUi0PPi
 	addl $8,%esp
-L677:
+L672:
 	leal -60(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -3581,15 +3320,15 @@ _reserve_map_at_back__t5deque3ZiZt24__default_alloc_template2b0i0Ui0Ui:
 	movl 36(%esi),%ecx
 	subl %edx,%ecx
 	cmpl %ecx,%eax
-	jbe L676
+	jbe L671
 	addl $-2,%esp
 	pushw $0
 	pushl %ebx
 	pushl %esi
 	call _reallocate_map__t5deque3ZiZt24__default_alloc_template2b0i0Ui0Uib
 	addl $12,%esp
-L676:
-L675:
+L671:
+L670:
 	leal -8(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -3637,17 +3376,17 @@ _push_back_aux__t5deque3ZiZt24__default_alloc_template2b0i0Ui0RCi:
 	movl $0,-36(%ebp)
 	leal -32(%ebp),%edx
 	movl %ebp,(%edx)
-	movl $L693,4(%edx)
+	movl $L688,4(%edx)
 	movl %esp,8(%edx)
 	xorl %edx,%edx
-	jmp L692
+	jmp L687
 	.p2align 4,,7
-L693:
+L688:
 	movl %ebp,%ebp
 	movl $1,%edx
-	jmp L691
+	jmp L686
 	.p2align 4,,7
-L692:
+L687:
 	leal -40(%ebp),%ebx
 	movl %ebx,(%eax)
 	leal -4(%ebp),%eax
@@ -3675,10 +3414,10 @@ L692:
 	movl (%eax),%edx
 	movl (%edx),%ecx
 	movl %ecx,(%eax)
-L694:
-	jmp L704
+L689:
+	jmp L699
 	.p2align 4,,7
-L691:
+L686:
 	call ___cp_eh_info
 	movl %eax,%eax
 	movl %eax,-44(%ebp)
@@ -3691,17 +3430,17 @@ L691:
 	movl $0,-68(%ebp)
 	leal -64(%ebp),%edx
 	movl %ebp,(%edx)
-	movl $L699,4(%edx)
+	movl $L694,4(%edx)
 	movl %esp,8(%edx)
 	xorl %edx,%edx
-	jmp L698
+	jmp L693
 	.p2align 4,,7
-L699:
+L694:
 	movl %ebp,%ebp
 	movl $1,%edx
-	jmp L697
+	jmp L692
 	.p2align 4,,7
-L698:
+L693:
 	leal -72(%ebp),%ebx
 	movl %ebx,(%eax)
 	movl -44(%ebp),%eax
@@ -3717,12 +3456,12 @@ L698:
 	addl $8,%esp
 	call ___uncatch_exception
 	call ___sjthrow
-	jmp L694
+	jmp L689
 	.p2align 4,,7
-L695:
+L690:
 	call ___sjthrow
 	.p2align 4,,7
-L697:
+L692:
 	movl -108(%ebp),%eax
 	addl $4,%eax
 	movl (%eax),%edx
@@ -3730,17 +3469,17 @@ L697:
 	movl $0,-100(%ebp)
 	leal -96(%ebp),%edx
 	movl %ebp,(%edx)
-	movl $L703,4(%edx)
+	movl $L698,4(%edx)
 	movl %esp,8(%edx)
 	xorl %edx,%edx
-	jmp L702
+	jmp L697
 	.p2align 4,,7
-L703:
+L698:
 	movl %ebp,%ebp
 	movl $1,%edx
-	jmp L701
+	jmp L696
 	.p2align 4,,7
-L702:
+L697:
 	leal -104(%ebp),%ebx
 	movl %ebx,(%eax)
 	movl -44(%ebp),%eax
@@ -3754,11 +3493,11 @@ L702:
 	movl %ecx,(%eax)
 	call ___sjthrow
 	.p2align 4,,7
-L701:
+L696:
 	call ___terminate
 	.p2align 4,,7
-L704:
-L674:
+L699:
+L669:
 	leal -124(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -3795,7 +3534,7 @@ _pop_back_aux__t5deque3ZiZt24__default_alloc_template2b0i0Ui0:
 	pushl %eax
 	call _destroy__H1Zi_PX01_v
 	addl $4,%esp
-L705:
+L700:
 	movl -4(%ebp),%ebx
 	movl %ebp,%esp
 	popl %ebp
@@ -3843,8 +3582,8 @@ ___copy_backward_t__H1Zi_PCX01T0PX01G11__true_type_PX01:
 	movl 16(%ebp),%edx
 	subl %eax,%edx
 	movl %edx,%eax
-	jmp L710
-L710:
+	jmp L705
+L705:
 	leal -28(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -3877,8 +3616,8 @@ ___cl__t24__copy_backward_dispatch2ZPiZPiPiN21:
 	addl $16,%esp
 	movl %eax,%edx
 	movl %edx,%eax
-	jmp L709
-L709:
+	jmp L704
+L704:
 	leal -12(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -3911,8 +3650,8 @@ _copy_backward__H2ZPiZPi_X01T0X11_X11:
 	addl $16,%esp
 	movl %eax,%edx
 	movl %edx,%eax
-	jmp L708
-L708:
+	jmp L703
+L703:
 	leal -28(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -3930,8 +3669,8 @@ _value_type__H1ZPi_RCX01_PQ2t15iterator_traits1ZX0110value_type:
 	movl %esp,%ebp
 	movl 8(%ebp),%edx
 	xorl %eax,%eax
-	jmp L719
-L719:
+	jmp L714
+L714:
 	movl %ebp,%esp
 	popl %ebp
 	ret
@@ -3965,8 +3704,8 @@ ___copy_t__H1Zi_PCX01T0PX01G11__true_type_PX01:
 	subl 8(%ebp),%eax
 	leal (%eax,%edi),%edx
 	movl %edx,%eax
-	jmp L724
-L724:
+	jmp L719
+L719:
 	leal -12(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -3999,8 +3738,8 @@ ___cl__t15__copy_dispatch2ZPiZPiPiN21:
 	addl $16,%esp
 	movl %eax,%edx
 	movl %edx,%eax
-	jmp L723
-L723:
+	jmp L718
+L718:
 	leal -12(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -4033,8 +3772,8 @@ _copy__H2ZPiZPi_X01T0X11_X11:
 	addl $16,%esp
 	movl %eax,%edx
 	movl %edx,%eax
-	jmp L722
-L722:
+	jmp L717
+L717:
 	leal -28(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -4064,8 +3803,8 @@ ___uninitialized_copy_aux__H2ZPiZPi_X01T0X11G11__true_type_X11:
 	addl $12,%esp
 	movl %eax,%edx
 	movl %edx,%eax
-	jmp L721
-L721:
+	jmp L716
+L716:
 	leal -12(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -4098,8 +3837,8 @@ ___uninitialized_copy__H3ZPiZPiZi_X01T0X11PX21_X11:
 	addl $16,%esp
 	movl %eax,%edx
 	movl %edx,%eax
-	jmp L720
-L720:
+	jmp L715
+L715:
 	leal -12(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -4134,8 +3873,8 @@ _uninitialized_copy__H2ZPiZPi_X01T0X11_X11:
 	addl $16,%esp
 	movl %eax,%edx
 	movl %edx,%eax
-	jmp L718
-L718:
+	jmp L713
+L713:
 	leal -8(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -4153,7 +3892,7 @@ ___destroy_aux__H1ZPi_X01T0G11__true_type_v:
 	movl 8(%ebp),%eax
 	movl 12(%ebp),%edx
 	movb 16(%ebp),%cl
-L733:
+L728:
 	movl %ebp,%esp
 	popl %ebp
 	ret
@@ -4178,7 +3917,7 @@ ___destroy__H2ZPiZi_X01T0PX11_v:
 	pushl %esi
 	call ___destroy_aux__H1ZPi_X01T0G11__true_type_v
 	addl $12,%esp
-L732:
+L727:
 	leal -12(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -4208,7 +3947,7 @@ _destroy__H1ZPi_X01T0_v:
 	pushl %eax
 	call ___destroy__H2ZPiZi_X01T0PX11_v
 	addl $12,%esp
-L731:
+L726:
 	movl -4(%ebp),%ebx
 	movl %ebp,%esp
 	popl %ebp
@@ -4224,7 +3963,7 @@ _deallocate__t6vector2ZiZt24__default_alloc_template2b0i0:
 	pushl %ebx
 	movl 8(%ebp),%ebx
 	cmpl $0,(%ebx)
-	je L735
+	je L730
 	movl 8(%ebx),%eax
 	movl (%ebx),%edx
 	subl %edx,%eax
@@ -4236,8 +3975,8 @@ _deallocate__t6vector2ZiZt24__default_alloc_template2b0i0:
 	pushl %eax
 	call _deallocate__t12simple_alloc2ZiZt24__default_alloc_template2b0i0PiUi
 	addl $8,%esp
-L735:
-L734:
+L730:
+L729:
 	movl -4(%ebp),%ebx
 	movl %ebp,%esp
 	popl %ebp
@@ -4263,7 +4002,7 @@ _insert_aux__t6vector2ZiZt24__default_alloc_template2b0i0PiRCi:
 	movl 4(%ebx),%eax
 	movl 8(%ebp),%esi
 	cmpl 8(%esi),%eax
-	je L707
+	je L702
 	movl 8(%ebp),%ebx
 	movl 4(%ebx),%eax
 	addl $-4,%eax
@@ -4293,9 +4032,9 @@ _insert_aux__t6vector2ZiZt24__default_alloc_template2b0i0PiRCi:
 	movl 12(%ebp),%eax
 	movl -4(%ebp),%edx
 	movl %edx,(%eax)
-	jmp L711
+	jmp L706
 	.p2align 4,,7
-L707:
+L702:
 	movl 8(%ebp),%esi
 	pushl %esi
 	call _size__Ct6vector2ZiZt24__default_alloc_template2b0i0
@@ -4304,17 +4043,17 @@ L707:
 	movl -108(%ebp),%ebx
 	movl %ebx,-4(%ebp)
 	cmpl $0,-4(%ebp)
-	je L712
+	je L707
 	movl -4(%ebp),%eax
 	movl %eax,%edx
 	movl %edx,%eax
 	addl %edx,%eax
 	movl %eax,-112(%ebp)
-	jmp L713
+	jmp L708
 	.p2align 4,,7
-L712:
+L707:
 	movl $1,-112(%ebp)
-L713:
+L708:
 	movl -112(%ebp),%esi
 	movl %esi,-8(%ebp)
 	movl -8(%ebp),%eax
@@ -4332,17 +4071,17 @@ L713:
 	movl $0,-36(%ebp)
 	leal -32(%ebp),%edx
 	movl %ebp,(%edx)
-	movl $L717,4(%edx)
+	movl $L712,4(%edx)
 	movl %esp,8(%edx)
 	xorl %edx,%edx
-	jmp L716
+	jmp L711
 	.p2align 4,,7
-L717:
+L712:
 	movl %ebp,%ebp
 	movl $1,%edx
-	jmp L715
+	jmp L710
 	.p2align 4,,7
-L716:
+L711:
 	leal -40(%ebp),%ebx
 	movl %ebx,(%eax)
 	movl -12(%ebp),%eax
@@ -4379,7 +4118,7 @@ L716:
 	movl (%eax),%edx
 	movl (%edx),%ecx
 	movl %ecx,(%eax)
-L725:
+L720:
 	movl 8(%ebp),%esi
 	pushl %esi
 	call _end__t6vector2ZiZt24__default_alloc_template2b0i0
@@ -4411,10 +4150,10 @@ L725:
 	addl %eax,%esi
 	movl 8(%ebp),%ebx
 	movl %esi,8(%ebx)
-L711:
-	jmp L740
+L706:
+	jmp L735
 	.p2align 4,,7
-L715:
+L710:
 	call ___cp_eh_info
 	movl %eax,%eax
 	movl %eax,-44(%ebp)
@@ -4427,17 +4166,17 @@ L715:
 	movl $0,-68(%ebp)
 	leal -64(%ebp),%edx
 	movl %ebp,(%edx)
-	movl $L730,4(%edx)
+	movl $L725,4(%edx)
 	movl %esp,8(%edx)
 	xorl %edx,%edx
-	jmp L729
+	jmp L724
 	.p2align 4,,7
-L730:
+L725:
 	movl %ebp,%ebp
 	movl $1,%edx
-	jmp L728
+	jmp L723
 	.p2align 4,,7
-L729:
+L724:
 	leal -72(%ebp),%ebx
 	movl %ebx,(%eax)
 	movl -44(%ebp),%eax
@@ -4456,12 +4195,12 @@ L729:
 	addl $8,%esp
 	call ___uncatch_exception
 	call ___sjthrow
-	jmp L725
+	jmp L720
 	.p2align 4,,7
-L726:
+L721:
 	call ___sjthrow
 	.p2align 4,,7
-L728:
+L723:
 	movl -116(%ebp),%eax
 	addl $4,%eax
 	movl (%eax),%edx
@@ -4469,17 +4208,17 @@ L728:
 	movl $0,-100(%ebp)
 	leal -96(%ebp),%edx
 	movl %ebp,(%edx)
-	movl $L739,4(%edx)
+	movl $L734,4(%edx)
 	movl %esp,8(%edx)
 	xorl %edx,%edx
-	jmp L738
+	jmp L733
 	.p2align 4,,7
-L739:
+L734:
 	movl %ebp,%ebp
 	movl $1,%edx
-	jmp L737
+	jmp L732
 	.p2align 4,,7
-L738:
+L733:
 	leal -104(%ebp),%esi
 	movl %esi,(%eax)
 	movl -44(%ebp),%eax
@@ -4493,11 +4232,11 @@ L738:
 	movl %ecx,(%eax)
 	call ___sjthrow
 	.p2align 4,,7
-L737:
+L732:
 	call ___terminate
 	.p2align 4,,7
-L740:
-L706:
+L735:
+L701:
 	leal -140(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -4526,19 +4265,19 @@ __$_t6vector2ZiZt24__default_alloc_template2b0i0:
 	pushl %esi
 	call _deallocate__t6vector2ZiZt24__default_alloc_template2b0i0
 	addl $4,%esp
-L743:
+L738:
 	movl %ebx,%eax
 	andl $1,%eax
 	testl %eax,%eax
-	je L745
+	je L740
 	pushl %esi
 	call ___builtin_delete
 	addl $4,%esp
-	jmp L745
+	jmp L740
 	.p2align 4,,7
-L744:
-L745:
-L742:
+L739:
+L740:
+L737:
 	leal -8(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -4547,21 +4286,21 @@ L742:
 	ret
 .text
 	.align 4
-.globl __GLOBAL_$D$cmds
-	.def	__GLOBAL_$D$cmds;	.scl	2;	.type	32;	.endef
-__GLOBAL_$D$cmds:
+.globl __GLOBAL_$D$strs
+	.def	__GLOBAL_$D$strs;	.scl	2;	.type	32;	.endef
+__GLOBAL_$D$strs:
 	pushl %ebp
 	movl %esp,%ebp
 	pushl $2
 	pushl $_heap
 	call __$_t6vector2ZiZt24__default_alloc_template2b0i0
 	addl $8,%esp
-L741:
+L736:
 	movl %ebp,%esp
 	popl %ebp
 	ret
 	.section .dtor
-	.long	__GLOBAL_$D$cmds
+	.long	__GLOBAL_$D$strs
 .section	.text$__t6vector2ZiZt24__default_alloc_template2b0i0,"x"
 	.linkonce discard
 	.align 4
@@ -4574,18 +4313,18 @@ ___t6vector2ZiZt24__default_alloc_template2b0i0:
 	movl $0,(%edx)
 	movl $0,4(%edx)
 	movl $0,8(%edx)
-L748:
+L743:
 	movl %edx,%eax
-	jmp L747
-L747:
+	jmp L742
+L742:
 	movl %ebp,%esp
 	popl %ebp
 	ret
 .text
 	.align 4
-.globl __GLOBAL_$I$cmds
-	.def	__GLOBAL_$I$cmds;	.scl	2;	.type	32;	.endef
-__GLOBAL_$I$cmds:
+.globl __GLOBAL_$I$strs
+	.def	__GLOBAL_$I$strs;	.scl	2;	.type	32;	.endef
+__GLOBAL_$I$strs:
 	pushl %ebp
 	movl %esp,%ebp
 	movl _vars,%eax
@@ -4599,12 +4338,12 @@ __GLOBAL_$I$cmds:
 	pushl $_heap
 	call ___t6vector2ZiZt24__default_alloc_template2b0i0
 	addl $4,%esp
-L746:
+L741:
 	movl %ebp,%esp
 	popl %ebp
 	ret
 	.section .ctor
-	.long	__GLOBAL_$I$cmds
+	.long	__GLOBAL_$I$strs
 .section	.text$__vc__t6vector2ZiZt24__default_alloc_template2b0i0Ui,"x"
 	.linkonce discard
 	.align 4
@@ -4624,12 +4363,12 @@ ___vc__t6vector2ZiZt24__default_alloc_template2b0i0Ui:
 	leal 0(,%esi,4),%ecx
 	leal (%ecx,%eax),%edx
 	movl %edx,%eax
-	jmp L544
-	jmp L547
-	jmp L544
+	jmp L543
+	jmp L546
+	jmp L543
 	.p2align 4,,7
-L547:
-L544:
+L546:
+L543:
 	leal -8(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -4647,12 +4386,12 @@ _begin__t6vector2ZiZt24__default_alloc_template2b0i0:
 	movl 8(%ebp),%edx
 	movl (%edx),%ecx
 	movl %ecx,%eax
+	jmp L544
 	jmp L545
-	jmp L546
-	jmp L545
+	jmp L544
 	.p2align 4,,7
-L546:
 L545:
+L544:
 	movl %ebp,%esp
 	popl %ebp
 	ret
@@ -4670,16 +4409,16 @@ _push_back__t6vector2ZiZt24__default_alloc_template2b0i0RCi:
 	movl 12(%ebp),%ebx
 	movl 4(%esi),%eax
 	cmpl 8(%esi),%eax
-	je L538
+	je L537
 	pushl %ebx
 	movl 4(%esi),%eax
 	pushl %eax
 	call _construct__H2ZiZi_PX01RCX11_v
 	addl $8,%esp
 	addl $4,4(%esi)
-	jmp L539
+	jmp L538
 	.p2align 4,,7
-L538:
+L537:
 	pushl %ebx
 	pushl %esi
 	call _end__t6vector2ZiZt24__default_alloc_template2b0i0
@@ -4689,12 +4428,12 @@ L538:
 	pushl %esi
 	call _insert_aux__t6vector2ZiZt24__default_alloc_template2b0i0PiRCi
 	addl $12,%esp
-L539:
-	jmp L542
-	jmp L537
+L538:
+	jmp L541
+	jmp L536
 	.p2align 4,,7
-L542:
-L537:
+L541:
+L536:
 	leal -8(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -4712,12 +4451,12 @@ _end__t6vector2ZiZt24__default_alloc_template2b0i0:
 	movl 8(%ebp),%edx
 	movl 4(%edx),%ecx
 	movl %ecx,%eax
+	jmp L539
 	jmp L540
-	jmp L541
-	jmp L540
+	jmp L539
 	.p2align 4,,7
-L541:
 L540:
+L539:
 	movl %ebp,%esp
 	popl %ebp
 	ret
@@ -4746,12 +4485,12 @@ _size__Ct6vector2ZiZt24__default_alloc_template2b0i0:
 	movl %edx,%ecx
 	sarl $2,%ecx
 	movl %ecx,%eax
-	jmp L531
-	jmp L536
-	jmp L531
+	jmp L530
+	jmp L535
+	jmp L530
 	.p2align 4,,7
-L536:
-L531:
+L535:
+L530:
 	leal -8(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -4769,12 +4508,12 @@ _end__Ct6vector2ZiZt24__default_alloc_template2b0i0:
 	movl 8(%ebp),%edx
 	movl 4(%edx),%ecx
 	movl %ecx,%eax
+	jmp L533
 	jmp L534
-	jmp L535
-	jmp L534
+	jmp L533
 	.p2align 4,,7
-L535:
 L534:
+L533:
 	movl %ebp,%esp
 	popl %ebp
 	ret
@@ -4789,12 +4528,12 @@ _begin__Ct6vector2ZiZt24__default_alloc_template2b0i0:
 	movl 8(%ebp),%edx
 	movl (%edx),%ecx
 	movl %ecx,%eax
+	jmp L531
 	jmp L532
-	jmp L533
-	jmp L532
+	jmp L531
 	.p2align 4,,7
-L533:
 L532:
+L531:
 	movl %ebp,%esp
 	popl %ebp
 	ret
@@ -4811,7 +4550,7 @@ _pop__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0:
 	pushl %ebx
 	call _pop_back__t5deque3ZiZt24__default_alloc_template2b0i0Ui0
 	addl $4,%esp
-L514:
+L513:
 	movl -4(%ebp),%ebx
 	movl %ebp,%esp
 	popl %ebp
@@ -4828,20 +4567,20 @@ _pop_back__t5deque3ZiZt24__default_alloc_template2b0i0Ui0:
 	movl 8(%ebp),%ebx
 	movl 16(%ebx),%eax
 	cmpl 20(%ebx),%eax
-	je L516
+	je L515
 	addl $-4,16(%ebx)
 	movl 16(%ebx),%eax
 	pushl %eax
 	call _destroy__H1Zi_PX01_v
 	addl $4,%esp
-	jmp L518
+	jmp L517
 	.p2align 4,,7
-L516:
+L515:
 	pushl %ebx
 	call _pop_back_aux__t5deque3ZiZt24__default_alloc_template2b0i0Ui0
 	addl $4,%esp
-L518:
-L515:
+L517:
+L514:
 	movl -4(%ebp),%ebx
 	movl %ebp,%esp
 	popl %ebp
@@ -4855,7 +4594,7 @@ _destroy__H1Zi_PX01_v:
 	pushl %ebp
 	movl %esp,%ebp
 	movl 8(%ebp),%eax
-L517:
+L516:
 	movl %ebp,%esp
 	popl %ebp
 	ret
@@ -4874,8 +4613,8 @@ _top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0:
 	addl $4,%esp
 	movl %eax,%edx
 	movl %edx,%eax
-	jmp L508
-L508:
+	jmp L507
+L507:
 	movl -4(%ebp),%ebx
 	movl %ebp,%esp
 	popl %ebp
@@ -4908,8 +4647,8 @@ _back__t5deque3ZiZt24__default_alloc_template2b0i0Ui0:
 	addl $4,%esp
 	movl %eax,%edx
 	movl %edx,%eax
-	jmp L509
-L509:
+	jmp L508
+L508:
 	movl -20(%ebp),%ebx
 	movl %ebp,%esp
 	popl %ebp
@@ -4925,8 +4664,8 @@ ___ml__Ct16__deque_iterator4ZiZRiZPiUi0:
 	movl 8(%ebp),%edx
 	movl (%edx),%ecx
 	movl %ecx,%eax
-	jmp L513
-L513:
+	jmp L512
+L512:
 	movl %ebp,%esp
 	popl %ebp
 	ret
@@ -4942,7 +4681,7 @@ ___mm__t16__deque_iterator4ZiZRiZPiUi0:
 	movl 8(%ebp),%ebx
 	movl (%ebx),%eax
 	cmpl 4(%ebx),%eax
-	jne L511
+	jne L510
 	movl 12(%ebx),%eax
 	addl $-4,%eax
 	pushl %eax
@@ -4951,11 +4690,11 @@ ___mm__t16__deque_iterator4ZiZRiZPiUi0:
 	addl $8,%esp
 	movl 8(%ebx),%eax
 	movl %eax,(%ebx)
-L511:
+L510:
 	addl $-4,(%ebx)
 	movl %ebx,%eax
-	jmp L510
-L510:
+	jmp L509
+L509:
 	movl -4(%ebp),%ebx
 	movl %ebp,%esp
 	popl %ebp
@@ -4981,7 +4720,7 @@ _set_node__t16__deque_iterator4ZiZRiZPiUi0PPi:
 	movl 4(%esi),%ecx
 	addl %edx,%ecx
 	movl %ecx,8(%esi)
-L512:
+L511:
 	leal -8(%ebp),%esp
 	popl %ebx
 	popl %esi
@@ -5379,41 +5118,6 @@ L461:
 	movl %ebp,%esp
 	popl %ebp
 	ret
-.section	.text$_$_t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0,"x"
-	.linkonce discard
-	.align 4
-.globl __$_t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	.def	__$_t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0;	.scl	2;	.type	32;	.endef
-__$_t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0:
-	pushl %ebp
-	movl %esp,%ebp
-	pushl %esi
-	pushl %ebx
-	movl 8(%ebp),%esi
-	movl 12(%ebp),%ebx
-L559:
-	pushl $2
-	pushl %esi
-	call __$_t5deque3ZiZt24__default_alloc_template2b0i0Ui0
-	addl $8,%esp
-	movl %ebx,%eax
-	andl $1,%eax
-	testl %eax,%eax
-	je L561
-	pushl %esi
-	call ___builtin_delete
-	addl $4,%esp
-	jmp L561
-	.p2align 4,,7
-L560:
-L561:
-L558:
-	leal -8(%ebp),%esp
-	popl %ebx
-	popl %esi
-	movl %ebp,%esp
-	popl %ebp
-	ret
 .section	.text$__deque_buf_size__FUiUi,"x"
 	.linkonce discard
 	.align 4
@@ -5733,7 +5437,8 @@ _vars:
 	.def	_initial_map_size__t5deque3ZiZt24__default_alloc_template2b0i0Ui0;	.scl	3;	.type	32;	.endef
 	.def	_buffer_size__t5deque3ZiZt24__default_alloc_template2b0i0Ui0;	.scl	3;	.type	32;	.endef
 	.def	___get_eh_context;	.scl	3;	.type	32;	.endef
-	.def	__$_t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0;	.scl	3;	.type	32;	.endef
+	.def	___ls__7ostreamPFR7ostream_R7ostream;	.scl	3;	.type	32;	.endef
+	.def	_endl__FR7ostream;	.scl	2;	.type	32;	.endef
 	.def	_begin__t6vector2ZiZt24__default_alloc_template2b0i0;	.scl	3;	.type	32;	.endef
 	.def	___vc__t6vector2ZiZt24__default_alloc_template2b0i0Ui;	.scl	3;	.type	32;	.endef
 	.def	_insert_aux__t6vector2ZiZt24__default_alloc_template2b0i0PiRCi;	.scl	3;	.type	32;	.endef
@@ -5751,8 +5456,6 @@ _vars:
 	.def	___mm__t16__deque_iterator4ZiZRiZPiUi0;	.scl	3;	.type	32;	.endef
 	.def	_back__t5deque3ZiZt24__default_alloc_template2b0i0Ui0;	.scl	3;	.type	32;	.endef
 	.def	_top__t5stack2ZiZt5deque3ZiZt24__default_alloc_template2b0i0Ui0;	.scl	3;	.type	32;	.endef
-	.def	___ls__7ostreamPFR7ostream_R7ostream;	.scl	3;	.type	32;	.endef
-	.def	_endl__FR7ostream;	.scl	2;	.type	32;	.endef
 	.def	___deque_buf_size__FUiUi;	.scl	2;	.type	32;	.endef
 	.def	_buffer_size__t16__deque_iterator4ZiZRiZPiUi0;	.scl	3;	.type	32;	.endef
 	.def	___mi__Ct16__deque_iterator4ZiZRiZPiUi0RCt16__deque_iterator4ZiZRiZPiUi0;	.scl	3;	.type	32;	.endef
@@ -5784,6 +5487,7 @@ _vars:
 	.def	___ls__7ostreamUi;	.scl	3;	.type	32;	.endef
 	.def	___ls__7ostreami;	.scl	3;	.type	32;	.endef
 	.def	___ls__7ostreamPCc;	.scl	3;	.type	32;	.endef
+	.def	___ls__7ostreamc;	.scl	3;	.type	32;	.endef
 	.def	___cp_pop_exception;	.scl	3;	.type	32;	.endef
 	.def	___cp_eh_info;	.scl	3;	.type	32;	.endef
 	.def	___builtin_delete;	.scl	3;	.type	32;	.endef

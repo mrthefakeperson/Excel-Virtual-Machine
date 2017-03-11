@@ -141,10 +141,15 @@ let getSectionAddressFromCmd cmd = List.findIndex ((=) cmd) allCombinators |> ge
 let getSectionAddressFromInfix nfx =
   List.find (function Combinator_2 e -> e.Symbol = nfx | _ -> false) allCombinators
    |> getSectionAddressFromCmd
+let allTypes = [System.Type.GetType "System.Int32"; System.Type.GetType "System.String"]
+let [type_int32; type_string] = allTypes
 let rec operationsPrefix =
   allComb2Sections
-   @ [OutputLine; Push "()"; Return]
-let _PrintAddress = List.length allComb2Sections + 1
+   @ List.collect (fun e -> [OutputLine e; Push "()"; Return]) allTypes
+let _PrintAddress t = //List.length allComb2Sections + 1
+  match List.tryFindIndex ((=) t) allTypes with
+  |Some i -> List.length allComb2Sections + 1 + 3 * i
+  |None -> failwithf "can't output type: %A" t
 let (|Inline|_|) = function
   |Value nfx when List.exists (function Combinator_2 e -> e.Symbol = nfx | _ -> false) allCombinators ->
     Some [
@@ -152,7 +157,12 @@ let (|Inline|_|) = function
       NewHeap; Push "endArr"; WriteHeap; Load x; Popv x      // end the array
      ]
   |Value "ignore" -> Some [Push "not implemented"]
-  |Apply(Value "printfn", [Const "%A"]) -> Some [NewHeap; Store x; Load x; Push (string _PrintAddress); WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
+//  |Apply(Value "printfn", [Const "%A"]) -> Some [NewHeap; Store x; Load x; Push (string _PrintAddress); WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
+  |Apply(Value "printfn", [Const "%i"]) ->
+    Some [NewHeap; Store x; Load x; Push (string (_PrintAddress type_int32)); WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
+  |Apply(Value "printfn", [Const "%s"])
+  |Value "printfn" ->
+    Some [NewHeap; Store x; Load x; Push (string (_PrintAddress type_string)); WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
   |_ -> None
 let rec compile' inScope = function
   |Inline ll -> ll

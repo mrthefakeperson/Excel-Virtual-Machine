@@ -657,7 +657,7 @@ module C =
       let xprs' = List.filter (function T ";" -> false | _ -> true) xprs
       Token("sequence", List.map postProcess xprs')
     |X("==", xprs) -> Token("=", List.map postProcess xprs)
-    |X("apply", [T "printf"; X(",", [T "\"%i\\n\""; a])]) -> Token("apply", [Token("apply", [Token "printfn"; Token "\"%A\""]); a])
+    |X("apply", [T "printf"; X(",", [T "\"%i\\n\""; a])]) -> Token("apply", [Token("apply", [Token "printfn"; Token "\"%i\""]); a])
     |X(s, xprs) -> Token(s, List.map postProcess xprs)
   let parseSyntax =
     preprocess

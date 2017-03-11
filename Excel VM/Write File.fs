@@ -6,6 +6,7 @@ open System.Reflection
 open System.IO
 open Excel_Language
 open Compiler_Definitions
+open Compiler
 open Excel_Conversion
 
 //the file containing all cells except the instructions
@@ -53,15 +54,30 @@ let writeBytecode fileName cmds =
      |> Set.ofArray |> Set.toList
      |> List.mapi (fun i e -> (e, i + 5))
      |> dict
-  //change all literals to integer values
-  let convertLiteral (s:string) =
+  //change literal to integer value
+  let (|IntValue|_|) (s:string) =
     match s.ToUpper() with
-    |"TRUE" -> 1
-    |"FALSE" -> 0
-    |_ when Int32.TryParse(s, ref 0) -> int s
-    |"()" -> 0
-    |"ENDARR" -> 0
-    |_ -> failwithf "could not convert literal value: %A" s
+    |"TRUE" -> Some 1
+    |"FALSE" -> Some 0
+    |_ when Int32.TryParse(s, ref 0) -> Some (int s)
+    |"()" -> Some 0
+    |"ENDARR" -> Some -7777777       //glitches occur around this value
+                                     //todo: get rid of endArr somehow
+    |_ -> None
+  //get string literals, concatenate with '\0'
+  //  - all initial strings already exist in the code, but new strings (eg. formed with concatenation) are created on the heap
+  let stringDataBytes, getStringAddress =
+    let stringData, stringAddressPairs =
+      Array.choose (function Push (IntValue _) -> None | Push s -> Some s | _ -> None) cmds
+       |> Array.fold (fun (allStrings, allPairs) e ->
+            allStrings + e + "\000", (e, allStrings.Length)::allPairs
+           ) ("", [])
+    String.collect (fun e -> sprintf "\t.byte %i\n" (byte e)) stringData,
+     dict stringAddressPairs
+  //convert literal to int/ptr
+  let convertLiteral = function
+    |IntValue x -> x
+    |s -> getStringAddress.[s]
   
   //write all commands (todo: use larger ints than bytes)
   File.WriteAllText (fileName,
@@ -80,15 +96,15 @@ let writeBytecode fileName cmds =
       |GetHeap -> 10, 0
       |WriteHeap -> 11, 0
       |InputLine -> 12, 0
-      |OutputLine -> 13, 0
-      |Combinator_2 c ->
-        match List.tryFindIndex ((=) (Combinator_2 c)) allCombinators with
-        |Some i -> 14 + i, 0
-        |None -> failwith "unrecognized combinator"
+      |OutputLine t -> 13 + List.findIndex ((=) t) allTypes, 0
+      |Combinator_2 c -> 15 + List.findIndex ((=) (Combinator_2 c)) allCombinators, 0
      ) cmds
      |> Array.map (fun (a, b) -> sprintf "\t.long %i\n\t.long %i" a b)
      |> String.concat "\n"
-     |> fun e -> File.ReadAllText("template.txt").Replace("\t.long 7777777777777777777777", e)
+     |> fun e ->
+          File.ReadAllText("template.txt")
+           .Replace("\t.long k", e)
+           .Replace("\t.byte k", stringDataBytes)
 //     |> Array.map (fun (a, b) -> sprintf "%i, %i" a b)
 //     |> String.concat ", "
 //     |> sprintf "{%s}"

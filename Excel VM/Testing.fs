@@ -28,7 +28,7 @@ let rec test action folderName runFile n =
     printfn "%s:" name
     runFile name outName
     action outName
-    ignore (stdin.ReadLine())
+    //ignore (stdin.ReadLine())
     test action folderName runFile (n + 1)
 let verify name =
   if (File.ReadAllLines name) <> (File.ReadAllLines (name + ".ans"))
@@ -68,7 +68,7 @@ let getInstruction = fun i -> function
   |"goto", x -> GotoFwdShift (int x - i) |"gotoiftrue", x -> GotoIfTrueFwdShift (int x - i)
   |"call", _ -> Call | "return", _ -> Return
   |"getheap", _ -> GetHeap | "newheap", _ -> NewHeap | "writeheap", _ -> WriteHeap
-  |"inputline", _ -> InputLine | "outputline", _ -> OutputLine
+  |"inputline", _ -> InputLine | "outputline", _ -> OutputLine type_int32
   |name, "" when
     List.exists (function Combinator_2 c -> c.Name = name | _ -> false) allCombinators ->
     List.find (function Combinator_2 c -> c.Name = name | _ -> false) allCombinators
@@ -145,19 +145,7 @@ let testExcelFile =
   test ignore "test cases - Excel pseudo-asm" (fun file _ ->
     File.ReadAllLines file
      |> parseInstructionList
-     |> Array.mapi (fun i ->
-          function
-          |"push", x -> Push x | "pop", _ -> Pop
-          |"store", x -> Store x | "load", x -> Load x | "popv", x -> Popv x
-          |"goto", x -> GotoFwdShift (int x - i) |"gotoiftrue", x -> GotoIfTrueFwdShift (int x - i)
-          |"call", _ -> Call | "return", _ -> Return
-          |"getheap", _ -> GetHeap | "newheap", _ -> NewHeap | "writeheap", _ -> WriteHeap
-          |"inputline", _ -> InputLine | "outputline", _ -> OutputLine
-          |name, "" when
-            List.exists (function Combinator_2 c -> c.Name = name | _ -> false) allCombinators ->
-            List.find (function Combinator_2 c -> c.Name = name | _ -> false) allCombinators
-          |unknown -> failwithf "unknown: %A" unknown
-         )
+     |> Array.mapi getInstruction
      |> writeExcelFile (file + ".xlsx")
    )
 
@@ -199,9 +187,9 @@ let runSpecificTest() =       // `generate` to create outputs, `verify` to test,
   //testExcelFile 1
 
   //testParser verify 1
-  //testCompilerAST verify 6
-  //testExcelCompiler 22
-  testAsmCompiler 1
+  //testCompilerAST verify 7
+  testExcelCompiler 23
+  //testAsmCompiler 1
   //testAsmCompilerSimple 1
   printfn "done"
   ignore (stdin.ReadLine())

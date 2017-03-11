@@ -1,7 +1,7 @@
 ﻿for e in 1..10 do
-  if e % 3 = 0 then printfn "%A" "fizz"
+  if e % 3 = 0 then printfn "%s" "fizz"
   else
-    if e % 5 = 0 then printfn "%A" "buzz"
+    if e % 5 = 0 then printfn "%s" "buzz"
     else
-      if e % 15 = 0 then printfn "%A" "fizzbuzz"
-      else printfn "%A" e
+      if e % 15 = 0 then printfn "%s" "fizzbuzz"
+      else printfn "%i" e

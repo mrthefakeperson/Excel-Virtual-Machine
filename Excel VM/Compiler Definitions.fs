@@ -61,7 +61,7 @@ type PseudoAsm =
   |GetHeap     //let i = topstack; pop stack; push heap value at i to stack
   |WriteHeap   //let v = topstack; pop stack; let i = topstack; pop stack; heap at i <- v
   |InputLine
-  |OutputLine
+  |OutputLine of System.Type
   |Combinator_2 of comb2
 type C2_Add(name, symbol) =
   inherit comb2(name, symbol)
@@ -101,7 +101,7 @@ let cmdToStrPair (mapping: IDictionary<string, string>) i = function
   |GotoFwdShift x -> "goto", string(i + x) | GotoIfTrueFwdShift x -> "gotoiftrue", string(i + x)
   |Call -> "call", "" | Return -> "return", ""
   |GetHeap -> "getheap", "" | NewHeap -> "newheap", "" | WriteHeap -> "writeheap", ""
-  |InputLine -> "inputline", "" | OutputLine -> "outputline", ""
+  |InputLine -> "inputline", "" | OutputLine _ -> "outputline", ""
   |Combinator_2 c -> c.ToStrPair()
 let interpretPAsm cmds =
   let pushstack stack v = stack := v :: !stack
@@ -139,7 +139,7 @@ let interpretPAsm cmds =
     |NewHeap -> heap.Add ""; push value (string(heap.Count-1))
     |WriteHeap -> let v = top value in pop value; let i = top value in pop value; heap.[int i] <- v
     |InputLine -> push value (stdin.ReadLine())
-    |OutputLine -> push output (top value); pop value
+    |OutputLine _ -> push output (top value); pop value
     |Combinator_2 c ->
       let a = top value in pop value
       let b = top value in pop value
