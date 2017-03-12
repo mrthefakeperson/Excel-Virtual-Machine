@@ -29,19 +29,19 @@ let writeDefaultFile() =
   printfn "done"
 
 let writeExcelFile fileName cmds =
-  if File.Exists fileName then File.Delete fileName
+  if File.Exists fileName then File.Delete fileName     //consider warning the user before doing this
   if not (File.Exists defaultFileName) then writeDefaultFile()
   let back = ApplicationClass()
   let sheet = back.Workbooks.Open(defaultFileName).Worksheets.[1] :?> _Worksheet
   let set cellname txt =
-    //printfn "%A" (cellname, txt)
     sheet.Range(cellname).Value(Missing.Value) <- txt
   let cells =
     Array.filter (fun (Cell(c, _)) ->
       fst (coordinates c) = 1
      ) (makeProgram cmds)
   Seq.iter (fun (Cell(s, _) as f) -> set s (f.ToString())) cells
-  sheet.SaveAs fileName
+  try sheet._SaveAs (Directory.GetCurrentDirectory() + @"\" + fileName)
+  with _ -> sheet.SaveAs fileName
   back.Quit()
   printfn "done"
 

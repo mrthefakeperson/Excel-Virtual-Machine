@@ -185,11 +185,11 @@ let runSpecificTest() =       // `generate` to create outputs, `verify` to test,
   //testExcelInterpreter verify 1
   //testPAsm verify 1
   //testExcelFile 1
+  //testAsmCompilerSimple 1
 
   //testParser verify 1
   //testCompilerAST verify 7
   testExcelCompiler 23
   //testAsmCompiler 1
-  //testAsmCompilerSimple 1
   printfn "done"
   ignore (stdin.ReadLine())
