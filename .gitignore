@@ -190,5 +190,7 @@ ModelManifest.xml
 
 # test output files
 *.xlsx
+*.txt.xlsx
 *.s
-*.out
+*.txt.s
+out*.txt
