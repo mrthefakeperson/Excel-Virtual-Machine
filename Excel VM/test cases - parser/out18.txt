@@ -1,1 +1,0 @@
-let main = (fun _ -> (let declare(int a) = (array(50)); assign(a.[1] 4); return(a.[1]))); (main) (())

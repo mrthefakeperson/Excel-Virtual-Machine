@@ -1,1 +1,0 @@
-let k = (fun declare(int a), declare(int b) -> (return(((+) (a)) (b)))); let main = (fun _ -> (let declare(int e) = (2); (if 0 then (printf) ("aaa") else (printf) ("bbb\n"); (printf) ("%i %i\n", e, (k) (e, e))); return(0))); (main) (())
