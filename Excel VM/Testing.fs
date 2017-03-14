@@ -81,10 +81,11 @@ let testExcelInterpreter a =
       let input = File.ReadAllLines file
       Array.append input [|sprintf "goto %i" (Array.filter ((<>) "") input).Length|]
        |> parseInstructionList
-       |> Array.collect (fun (a, b) -> [|a; b|])
-       |> Array.map Literal
-       |> Array.mapi (fun i e -> Cell(numberToAlpha (i+2) + "1", e))
-    packageProgram instructions {alphaToNumber "F"..alphaToNumber "M"}
+       |> Array.mapi getInstruction
+//       |> Array.collect (fun (a, b) -> [|a; b|])
+//       |> Array.map Literal
+//       |> Array.mapi (fun i e -> Cell(numberToAlpha (i+2) + "1", e))
+    makeProgram instructions
      |> interpret 80
      |> printCells outFile
    )

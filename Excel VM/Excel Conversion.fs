@@ -7,10 +7,10 @@ open Excel_Language
 open System
 
 // size of stacks (two categories)
-[<Literal>]
+[<Literal>]   //400
 let LARGE_SIZE = 400
-[<Literal>]
-let SMALL_SIZE = 20
+[<Literal>]   //20
+let SMALL_SIZE = 75
 
 // locations of important cells
 [<Literal>]
@@ -67,7 +67,7 @@ let matchTable defaultVal =   //match the current instruction
   (List.map (fun (s, a) -> Literal s =. currentInstruction, a)) >> (conditionTable defaultVal)
 
 let instructionStack =
-  makeVerticalStack LARGE_SIZE ``instr*``
+  makeVerticalStack SMALL_SIZE ``instr*``
    ([ "call", Int 1
       "return", Int -1
      ]
@@ -80,7 +80,7 @@ let instructionStack =
      |> matchTable (self +. Int 2) )
 
 let valueStack =
-  makeVerticalStack LARGE_SIZE ``value*``
+  makeVerticalStack SMALL_SIZE ``value*``
    ([ "push", Int 1
       "pop", Int -1
       "load", Int 1
@@ -127,7 +127,7 @@ let heap =
        )
 
 let input =                           //todo: change this
-  makeVerticalStack SMALL_SIZE ``input*``
+  makeVerticalStack 7 (*_*) ``input*``
    (matchTable (Int 0) ["inputline", Int 1])
    id
 let output =
@@ -159,6 +159,48 @@ let allOutput = Cell(``allOutput*``, Reference ``output*``)
 
 open Compiler_Definitions
 open System.Collections.Generic
+
+let makeProgram cmds =
+  let vars =
+    Array.choose (function Store s -> Some s | _ -> None) cmds
+     |> Set.ofArray |> Set.toSeq
+  let varToColumnName =
+    let v2c =
+      Seq.mapi (fun i e -> (e, numberToAlpha(i + alphaToNumber "F"))) vars
+       |> dict
+    fun e -> v2c.[e]
+  let vars = Seq.map varToColumnName vars
+  let variables = Seq.map (variableStack SMALL_SIZE ``var*``) vars
+  let cmds =
+    Seq.map (function
+      |Store e -> Store (varToColumnName e)
+      |Load e -> Load (varToColumnName e)
+      |Popv e -> Popv (varToColumnName e)
+      |x -> x
+     ) cmds             //sequence of pAsm commands
+     |> Seq.mapi cmdToStrPair               //pairs of commands as string values
+     |> Seq.collect (fun (a, b) -> [a; b])  //final sequence of commands as string values (as they will be written)
+     |> Seq.mapi (fun i e ->
+          let cellCoords = coordsToS (1, 2 + i)
+          let cellContents = Literal e
+          Cell(cellCoords, cellContents)            //final sequence of commands as cells
+         )
+  let cells =
+    Seq.concat [
+      Seq.singleton seed
+      Seq.singleton allOutput
+      cmds
+      instructionStack
+      valueStack
+      heap
+      input
+      Seq.singleton output
+      Seq.concat variables
+     ]
+     |> Array.ofSeq
+  Array.sortBy (function Cell(e, _) -> coordinates e) cells
+
+(*
 let packageProgram instructions vars =
   let variables = Seq.map (numberToAlpha >> (variableStack LARGE_SIZE ``var*``)) vars
   let cells =
@@ -175,6 +217,7 @@ let packageProgram instructions vars =
      ]
      |> Array.ofSeq
   Array.sortBy (function Cell(e, _) -> coordinates e) cells
+
 let makeProgram cmds =
   let cmds = Array.append cmds [|GotoFwdShift 0|]
   let p = Array.map string [|'A'..'E'|]
@@ -193,3 +236,4 @@ let makeProgram cmds =
          (Array.map numberToAlpha [|2..1 + cmds.Length * 2|])
   let variables = {alphaToNumber "F"..mapping.Count}
   packageProgram instructions variables
+*)

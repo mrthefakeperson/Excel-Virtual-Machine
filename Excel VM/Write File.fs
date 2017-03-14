@@ -9,6 +9,32 @@ open Compiler_Definitions
 open Compiler
 open Excel_Conversion
 
+let writeExcelFile fileName cmds =
+  if File.Exists fileName then File.Delete fileName     //consider warning the user before doing this
+  // set up sheet
+  let back = ApplicationClass()
+  let sheet = back.Workbooks.Add().Worksheets.[1] :?> _Worksheet
+  back.Calculation <- XlCalculation.xlCalculationManual
+  back.CalculateBeforeSave <- false
+  back.Iteration <- true
+  back.MaxIterations <- 500
+  back.MaxChange <- 0.
+  sheet.Range(``allOutput*``).WrapText <- true
+  sheet.Range(``allOutput*``).RowHeight <- 400
+  sheet.Range(``allOutput*``).VerticalAlignment <- XlVAlign.xlVAlignTop
+  // write finished program and save
+  let set cellname txt =
+    sheet.Range(cellname).Value(Missing.Value) <- txt
+  let cells = makeProgram cmds
+  Array.iter (fun (Cell(xy, _) as cell) ->
+    set xy (cell.ToString())
+   ) cells
+  try sheet._SaveAs (Directory.GetCurrentDirectory() + @"\" + fileName)
+  with _ -> sheet.SaveAs fileName
+  back.Quit()
+  printfn "done"
+
+(*
 //the file containing all cells except the instructions
 let defaultFileName = sprintf "%s\default_file.xlsx" __SOURCE_DIRECTORY__
 let writeDefaultFile() =
@@ -47,6 +73,7 @@ let writeExcelFile fileName cmds =
   with _ -> sheet.SaveAs fileName
   back.Quit()
   printfn "done"
+*)
 
 //compile to asm
 let writeBytecode fileName cmds =

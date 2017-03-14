@@ -96,20 +96,6 @@ let rec ASTCompile' (capture, captured as cpt) = function
          )
        ]
     |_ -> failwith "iterable objects not supported yet"
-//    let loop = "$loop" + nxt()
-//    //todo: flatten name pattern, change call to loop function accordingly
-//    let name = match name with X(name, []) -> name | _ -> failwith "patterns not supported yet"
-//    match iterable with
-//    |X("..", [a; step; b]) ->
-//      Sequence [
-//        Define(loop, [name],
-//          If(Apply(Apply(Value "<=", [Value name]), [ASTCompile' cpt b]),          //todo: negative step values
-//            Sequence [ASTCompile' cpt body; Apply(Value loop, [Apply(Apply(Value "+", [Value name]), [ASTCompile' cpt step])])],
-//            Const "()"
-//           ) )
-//        Apply(Value loop, [ASTCompile' cpt a])
-//       ]
-//    |_ -> failwith "iterable objects not supported yet"
   |X("sequence", list) -> //Sequence (List.map (ASTCompile' capture) list)
     List.fold (fun (acc, (capt', capd' as cpt')) e ->
       let compiled = ASTCompile' cpt' e
@@ -230,7 +216,6 @@ let rec compile' inScope = function
   |Loop(a, b) ->
     let cond, body = compile' inScope a, compile' inScope b
     let a = cond @ [GotoIfTrueFwdShift 2; GotoFwdShift(List.length body + 3)] @ body @ [Pop]
-    //let a = cond @ [Push "False"; Equals; GotoIfTrueFwdShift(List.length body + 3)] @ body @ [Pop]
     a @ [GotoFwdShift(-(List.length a)); Push "()"]
   |Mutate(a, b) -> compile' inScope b @ [Popv a; Store a; Push "()"]
 let compile e = [GotoFwdShift (List.length operationsPrefix + 1)] @ operationsPrefix @ compile' [] e

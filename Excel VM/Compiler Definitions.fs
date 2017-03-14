@@ -95,9 +95,9 @@ let allCombinators =
    ]
 let [Add; Equals; LEq; Greater; Mod] = allCombinators
 
-let cmdToStrPair (mapping: IDictionary<string, string>) i = function
+let cmdToStrPair i = function
   |Push e -> "push", e | PushFwdShift x -> "push", string(i + x) | Pop -> "pop", ""
-  |Store e -> "store", mapping.[e] | Load e -> "load", string(alphaToNumber mapping.[e] - 5) | Popv e -> "popv", mapping.[e]
+  |Store e -> "store", e | Load e -> "load", string(alphaToNumber e - 5) | Popv e -> "popv", e
   |GotoFwdShift x -> "goto", string(i + x) | GotoIfTrueFwdShift x -> "gotoiftrue", string(i + x)
   |Call -> "call", "" | Return -> "return", ""
   |GetHeap -> "getheap", "" | NewHeap -> "newheap", "" | WriteHeap -> "writeheap", ""
