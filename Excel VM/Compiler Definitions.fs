@@ -144,7 +144,7 @@ let interpretPAsm cmds =
       let a = top value in pop value
       let b = top value in pop value
       push value (c.Interpret a b)
-  let debug = true
+  let debug = false
   push instr "0"
   while int(top instr) < Array.length cmds && List.length !stacks.[output] < 50 do
     let i = int(top instr)

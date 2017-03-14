@@ -19,8 +19,11 @@ let writeDefaultFile() =
   back.Iteration <- true
   back.MaxIterations <- 500
   back.MaxChange <- 0.
+  sheet.Range(``allOutput*``).WrapText <- true
+  sheet.Range(``allOutput*``).RowHeight <- 400
+  sheet.Range(``allOutput*``).VerticalAlignment <- XlVAlign.xlVAlignTop
   let set cellname txt =
-    //printfn "%A" (cellname, txt)
+    //printfn "%A <- %A" cellname txt
     sheet.Range(cellname).Value(Missing.Value) <- txt
   makeProgram (Array.init 25 (fun e -> Store (string e)))         // 25 variables
    |> Seq.iter (fun (Cell(s, _) as f) -> set s (f.ToString()))

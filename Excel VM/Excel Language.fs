@@ -26,12 +26,13 @@ let combString (x:Combinator)=
 type Formula=
   |Literal of string
   |Reference of cellName:string
-  |Range of topLeft:string*bottomRight:string       //////add this
+  |Range of topLeft:string*bottomRight:string
   |If of Formula*Formula*Formula
-  |Choose of Formula*Formula[]               /////////using Index(range, k) is better (Choose(,) doesn't accept ranges, or rather treats them as single objects)
+  |Choose of Formula*Formula[]
   |Index of Formula*Formula
   |Combine of Formula*Combinator*Formula
   |Concatenate of Formula[]
+  |Line_Break
    with
     member x.hasReference()=
       match x with
@@ -42,6 +43,7 @@ type Formula=
       |Index(a, b) -> a.hasReference() || b.hasReference()
       |Combine(a,_,b) -> a.hasReference() || b.hasReference()
       |Concatenate a -> Array.exists (fun (e:Formula) -> e.hasReference()) a
+      |Line_Break -> false
 and Cell =
   Cell of name:string*Formula
    with
@@ -61,6 +63,7 @@ and Cell =
             sprintf "%s(%s,%s)" (combString u) (pr a) (pr b)
           |Combine(a, u, b) -> sprintf "(%s)%s(%s)" (pr a) (combString u) (pr b)
           |Concatenate list -> sprintf "CONCATENATE(%s)" (String.concat "," (Array.map pr list))
+          |Line_Break -> sprintf "CHAR(10)"
         sprintf "=%s" (pr formula)
 let cmb c a b = Combine(a, c, b)
 let (+.), (-.), ( *. ), (/.), (%.), (<=.), (=.), (>.), (&&.), (||.) =
@@ -179,6 +182,7 @@ let interpret iterations maxChange cellNames (cells:Formula[]) =
         |S a, S b -> S (a + b)
         |x -> error x "concatenation"
        ) (S "") a
+    |Line_Break -> S "\n"
   let variables, constants =
     Array.mapi (fun i e -> i, e) cells
      |> Array.partition (fun (i, e:Formula) -> e.hasReference())

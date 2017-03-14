@@ -188,8 +188,8 @@ let runSpecificTest() =       // `generate` to create outputs, `verify` to test,
   //testAsmCompilerSimple 1
 
   //testParser verify 1
-  //testCompilerAST verify 7
-  testExcelCompiler 23
+  //testCompilerAST verify 1
+  testExcelCompiler 1
   //testAsmCompiler 1
   printfn "done"
   ignore (stdin.ReadLine())

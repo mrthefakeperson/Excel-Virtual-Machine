@@ -6,14 +6,32 @@ open Compiler_Definitions
 open Excel_Language
 open System
 
+// size of stacks (two categories)
 [<Literal>]
 let LARGE_SIZE = 400
 [<Literal>]
 let SMALL_SIZE = 20
 
+// locations of important cells
+[<Literal>]
+let ``seed*`` = "A1"
+let ``allInput*``, ``allOutput*`` = "A2", "B2"
+[<Literal>]
+let ``instr*`` = "A3"
+let instrR, instrC = coordinates ``instr*``
+[<Literal>]
+let ``value*`` = "B3"
+let valueR, valueC = coordinates ``value*``
+[<Literal>]
+let ``heap*`` = "C3"
+let heapR, heapC = coordinates ``heap*``
+let ``input*``, ``output*`` = "D3", "E3"
+[<Literal>]
+let ``var*`` = 3
+
 let name row col = sprintf "%s%i" col row
 let Int a = Literal (string a)
-let defaultTo x e = If(Reference "A1" =. Literal "2", x, e)
+let defaultTo x e = If(Reference ``seed*`` =. Int 2, x, e)
 
 let makeVerticalStack sz _name pushCondition pushValue =
   let column, row = separate _name
@@ -24,7 +42,6 @@ let makeVerticalStack sz _name pushCondition pushValue =
     yield  //topstack value
       Cell(name row column,
         blankIsZero(Index(Range(name (row+2) column, name (row+sz+1) column), Reference _name))
-  //       |> defaultTo (Int 0)
        )
     //stack size (pushCondition is the change in size)
     yield Cell(_name, (Reference _name +. pushCondition) |> defaultTo (Int 1))
@@ -38,14 +55,9 @@ let makeVerticalStack sz _name pushCondition pushValue =
          |> defaultTo (Literal "") )
    }
 
-//where each topstack is located
-let ``instr*`` = "A2"
-let ``value*``, ``heap*`` = "B2", "C2"
-let ``input*``, ``output*`` = "D2", "E2"
-
 let instr_index i = Index(Range("B1", "XFD1"), Reference ``instr*`` +. Int 1 +. Int i)     //16383 spaces in total, to XFD1
 let currentInstruction = instr_index 0
-let currentValue, valueTopstackPt = Reference ``value*``, Reference "B3"
+let currentValue, valueTopstackPt = Reference ``value*``, Reference(coordsToS (valueR + 1, valueC))
 
 let rec conditionTable defaultVal = function
   |(condFormula, action)::tl ->
@@ -87,13 +99,13 @@ let valueStack =
      |> matchTable (Int 0) )
    (fun self ->
     [ "push", instr_index 1
-      "load", Index(Range("F2", "XFD2"), instr_index 1)
-      "newheap", Reference "C3" -. Int 2    //size of heap
-      "getheap", Index(Range("C4", "C" + string(4 + LARGE_SIZE)), self +. Int 1)
+      "load", Index(Range("F" + string ``var*``, "XFD" + string ``var*``), instr_index 1)
+      "newheap", Reference(coordsToS (heapR + 1, heapC)) -. Int 2    //size of heap
+      "getheap", Index(Range(coordsToS (heapR + 2, heapC), "C" + string(heapR + 2 + LARGE_SIZE)), self +. Int 1)
      ]
      @ List.map (function
          |Combinator_2 c ->
-           c.Name, c.CreateFormula (Index(Range("B4", "B" + string(4 + LARGE_SIZE)), valueTopstackPt +. Int 1)) self
+           c.Name, c.CreateFormula (Index(Range(coordsToS (valueR + 2, valueC), "B" + string(valueR + 2 + LARGE_SIZE)), valueTopstackPt +. Int 1)) self
          |_ -> failwith "non-combinator found in the combinator list"
         ) allCombinators
      |> matchTable self )
@@ -107,21 +119,25 @@ let heap =
         else
           Cell(s,
             If((currentInstruction =. Literal "writeheap")
-                &&. (Index(Range("B4", "B" + string(4 + LARGE_SIZE)), valueTopstackPt +. Int 1) =. Int (i-2)),
-             Index(Range("B4", "B" + string(4 + LARGE_SIZE)), valueTopstackPt +. Int 2),
+                &&. (Index(Range(coordsToS(valueR + 2, valueC), "B" + string(valueR + 2 + LARGE_SIZE)), valueTopstackPt +. Int 1) =. Int (i-2)),
+             Index(Range(coordsToS(valueR + 2, valueC), "B" + string(valueR + 2 + LARGE_SIZE)), valueTopstackPt +. Int 2),
              e)
              |> defaultTo (Int 1)
            )
        )
 
-let input =
+let input =                           //todo: change this
   makeVerticalStack SMALL_SIZE ``input*``
    (matchTable (Int 0) ["inputline", Int 1])
    id
 let output =
-  makeVerticalStack LARGE_SIZE ``output*``
-   (matchTable (Int 0) ["outputline", Int 1])
-   (fun self -> matchTable self ["outputline", currentValue])
+  Cell (``output*``,
+    If(currentInstruction =. Literal "outputline",
+      Concatenate [|Reference ``output*``; Line_Break; currentValue|],
+      Reference ``output*``
+     )
+     |> defaultTo (Literal "stdout:")
+   )
 
 let variableStack sz row col =
   makeVerticalStack sz (name row col)
@@ -135,24 +151,26 @@ let variableStack sz row col =
     conditionTable self [
       // ? | store | at | ?
       If(currentInstruction =. Literal "store", instr_index 1 =. Literal col, Literal "false"),
-       Reference "B2"    //top value of valueStack
+       Reference ``value*``
      ])
 
-let seed = Cell("A1", Reference("A1") +. Literal "1")
+let seed = Cell(``seed*``, Reference ``seed*`` +. Int 1)
+let allOutput = Cell(``allOutput*``, Reference ``output*``)
 
 open Compiler_Definitions
 open System.Collections.Generic
 let packageProgram instructions vars =
-  let variables = Seq.map (numberToAlpha >> (variableStack LARGE_SIZE 2)) vars
+  let variables = Seq.map (numberToAlpha >> (variableStack LARGE_SIZE ``var*``)) vars
   let cells =
     Seq.concat [
       Seq.singleton seed
+      Seq.singleton allOutput
       instructions
       instructionStack
       valueStack
       heap
       input
-      output
+      Seq.singleton output
       Seq.concat variables
      ]
      |> Array.ofSeq
