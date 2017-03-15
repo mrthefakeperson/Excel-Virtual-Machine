@@ -40,6 +40,7 @@ module FSharp =
       |_ when stop right -> Token("()", (0,0), left), right
       |_ when fail right -> failwithf "unexpected end of context %A" right
       |Brackets state stop fail x
+      |SquareBrackets state stop fail x
       |If state stop fail x
       |Do state stop fail x
       |While state stop fail x
@@ -80,6 +81,22 @@ module FSharp =
            (fun _ -> false)    //intermediate step keywords should fail
            [] restr
       let restr = Token("()", t.Indentation, true, [parsed])::restr
+      Some (parse state stop fail left restr)
+    |_ -> None
+  and (|SquareBrackets|_|) state stop fail = function
+    |left:Token list, (T "[" as t)::restr ->
+      let indent =
+        match left with
+        |p::_ when fst p.Indentation = fst t.Indentation -> p.Indentation
+        |_ -> t.Indentation
+      let parsed, T "]"::restr =
+        match restr with
+        |T "]"::_ -> Token("[]", t.Indentation, true, []), restr
+        |_ ->
+          parse state (function T "]"::_ -> true | t'::_ when snd indent > snd t'.Indentation -> true | _ -> false)
+           (fun _ -> false)
+           [] restr
+      let restr = Token("[]", t.Indentation, true, [parsed])::restr
       Some (parse state stop fail left restr)
     |_ -> None
   and (|If|_|) state stop fail = function
@@ -429,6 +446,8 @@ module C =
      >> List.map (fun e -> Token e)
      >> List.fold (fun acc e ->
           match acc, e with
+          |T "{"::_::T "struct"::_, T "}"     // find a better way to do this
+          |T "{"::T "struct"::_, T "}" -> e::acc
           |T "{"::rest, T "}" -> Token ";"::rest
           |_ -> e::acc
          ) []
@@ -441,7 +460,7 @@ module C =
     |Global
     |FunctionArgs
     |Local
-    |LocalImd    //keywords must appear at the beginning of a statement; LocalImd doesn't include them
+    |LocalImd    // keywords must appear at the beginning of a statement; LocalImd doesn't include them
   let rec parse state stop fail left right =
     //printfn "%A" (left, right)
     match state with
@@ -450,7 +469,7 @@ module C =
       |_ when stop right -> Token("sequence", List.rev left), right
       |_ when fail right -> failwithf "tokens are incomplete: %A" (left, right)
       |DatatypeGlobal state stop fail x
-      //|Struct
+      |Struct state stop fail x
       |Apply state stop fail x
       |Index state stop fail x
       |Brackets state stop fail x
@@ -504,17 +523,44 @@ module C =
   and (|DatatypeGlobal|_|) state stop fail = function
     |left, DatatypeName(datatypeName, restr) ->
       let identifierName, restr =
-        parse Global (function T(";" | "{")::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
+        parse Global (function T(";" | "{" | ",")::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
       let parsed, restr =
-        match identifierName with
-        |T _ | X("assign", [_; _]) | X(",", _) | X("dot", [_; X("[]", _)]) ->
-          Token("declare", [Token datatypeName; identifierName]), restr.Tail
-        |X("sequence", [X("apply", [identifierName; args])]) ->
+        match identifierName.Clean() with     // int (a);     is that valid?
+        |T _ ->           // remember that `nothing` initializes to an empty struct
+          Token("let", [Token("declare", [Token datatypeName; identifierName]); Token "nothing"]), restr
+        |X("assign", [identifierName; value]) ->
+          Token("let", [Token("declare", [Token datatypeName; identifierName]); value]), restr
+        |X("dot", [identifierName; X("[]", arraySize)]) ->    // declared type should be a pointer type
+          Token("let", [Token("declare", [Token datatypeName; identifierName]); Token("array", arraySize)]), restr
+//        |T _ | X("sequence", [T _]) | X("assign", [_; _]) | X(",", _) | X("dot", [_; X("[]", _)]) ->
+//          Token("declare", [Token datatypeName; identifierName]), restr
+        |X("apply", [identifierName; args]) ->
           let X("sequence", []), functionBody::restr =
             parse Local (function X("{}", _)::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
           Token("declare function", [Token datatypeName; identifierName; args; functionBody]), restr
         |o -> failwithf "expression following data type declaration is invalid %O" o
+      let restr =       // for declarations with `,`
+        match restr with
+        |T ","::restr -> Token ";"::Token datatypeName::restr
+        |T ";"::restr | restr -> restr
       Some (parse Global stop fail left (parsed::restr))
+    |_ -> None
+  and (|Struct|_|) state stop fail = function
+    |T "struct"::restl, right ->
+      let structureTag, restr =
+        match right with
+        |T "{"::restr -> "anonymous structure", restr   // gets shadowed, but that's fine since it's never used
+        |T s::T "{"::restr -> s, restr
+        |ex -> failwithf "not a valid struct declaration: %A" ex
+      listOfDatatypeNames := structureTag:: !listOfDatatypeNames
+      let memberList, T "}"::restr =   // validation needed: only declarations allowed
+        parse Local (function T "}"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
+      let restr =
+        match restr with
+        |T ";"::restr -> restr
+        |restr -> Token structureTag::restr
+      let parsed = Token("struct", [Token structureTag; memberList])
+      Some (parse state stop fail restl (parsed::restr))
     |_ -> None
   and (|DatatypeFunction|_|) state stop fail = function           //todo: array parameters
     |left, DatatypeName(datatypeName, declaredName::restr) ->
@@ -533,16 +579,20 @@ module C =
   and (|DatatypeLocal|_|) state stop fail = function
     |left, DatatypeName(datatypeName, restr) ->
       let parsed, restr =
-        parse LocalImd (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
+        parse LocalImd (function T(";" | ",")::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
       let parsed =
         match parsed.Clean() with
         |X("assign", [T declaredName as t; value]) ->
           Token("let", [Token("declare", [Token datatypeName; t]); value])
         |T declaredName as t ->
           Token("let", [Token("declare", [Token datatypeName; t]); Token "nothing"])
-        |X("dot", [T declaredName as t; X("[]", a)]) ->
+        |X("dot", [T declaredName as t; X("[]", a)]) ->   // declared type should be a pointer type
           Token("let", [Token("declare", [Token datatypeName; t]); Token("array", a)])
         |e -> failwithf "could not recognize declaration: %A" e
+      let restr =     // for declarations with `,`
+        match restr with
+        |T ","::restr -> Token ";"::Token datatypeName::restr
+        |_ -> restr
       Some (parse LocalImd stop fail left (parsed::restr))
     |_ -> None
   and (|Brackets|_|) state stop fail = function

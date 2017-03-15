@@ -1,0 +1,9 @@
+﻿C
+int a, b[50];
+struct x{
+  int k[4];
+  int l;
+  int m = 2;
+  int n = 7, o, p = 3;
+} q, r, s;
+

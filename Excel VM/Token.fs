@@ -51,6 +51,7 @@ type Token(name:string, row_col, functionApplication:bool, dependants:Token list
     |"fun", [a; b] -> sprintf "fun %s -> (%s)" (a.ToStringExpr()) (b.ToStringExpr())
     |"pattern", [a; b] -> sprintf "| %s -> %s" (a.ToStringExpr()) (b.ToStringExpr())
     |",", members -> List.map (fun (e:Token) -> e.ToStringExpr()) members |> String.concat ", "
+    |"struct", [a; m] -> sprintf "struct %s = {%s}" (a.ToStringExpr()) (m.ToStringExpr())
     |_, [] -> name
     |_ -> name + "(" + (String.concat " " (List.map (fun (e:Token) -> e.ToStringExpr()) dependants)) + ")"
   member x.Clean() =
