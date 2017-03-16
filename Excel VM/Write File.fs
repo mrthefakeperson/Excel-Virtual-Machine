@@ -34,47 +34,6 @@ let writeExcelFile fileName cmds =
   back.Quit()
   printfn "done"
 
-(*
-//the file containing all cells except the instructions
-let defaultFileName = sprintf "%s\default_file.xlsx" __SOURCE_DIRECTORY__
-let writeDefaultFile() =
-  let back = ApplicationClass()
-  let sheet = back.Workbooks.Add().Worksheets.[1] :?> _Worksheet
-  back.Calculation <- XlCalculation.xlCalculationManual
-  back.CalculateBeforeSave <- false
-  back.Iteration <- true
-  back.MaxIterations <- 500
-  back.MaxChange <- 0.
-  sheet.Range(``allOutput*``).WrapText <- true
-  sheet.Range(``allOutput*``).RowHeight <- 400
-  sheet.Range(``allOutput*``).VerticalAlignment <- XlVAlign.xlVAlignTop
-  let set cellname txt =
-    //printfn "%A <- %A" cellname txt
-    sheet.Range(cellname).Value(Missing.Value) <- txt
-  makeProgram (Array.init 25 (fun e -> Store (string e)))         // 25 variables
-   |> Seq.iter (fun (Cell(s, _) as f) -> set s (f.ToString()))
-  sheet.SaveAs defaultFileName
-  back.Quit()
-  printfn "done"
-
-let writeExcelFile fileName cmds =
-  if File.Exists fileName then File.Delete fileName     //consider warning the user before doing this
-  if not (File.Exists defaultFileName) then writeDefaultFile()
-  let back = ApplicationClass()
-  let sheet = back.Workbooks.Open(defaultFileName).Worksheets.[1] :?> _Worksheet
-  let set cellname txt =
-    sheet.Range(cellname).Value(Missing.Value) <- txt
-  let cells =
-    Array.filter (fun (Cell(c, _)) ->
-      fst (coordinates c) = 1
-     ) (makeProgram cmds)
-  Seq.iter (fun (Cell(s, _) as f) -> set s (f.ToString())) cells
-  try sheet._SaveAs (Directory.GetCurrentDirectory() + @"\" + fileName)
-  with _ -> sheet.SaveAs fileName
-  back.Quit()
-  printfn "done"
-*)
-
 //compile to asm
 let writeBytecode fileName cmds =
   let cmds = Array.append cmds [|Return|]
@@ -125,17 +84,14 @@ let writeBytecode fileName cmds =
       |NewHeap -> 9, 0
       |GetHeap -> 10, 0
       |WriteHeap -> 11, 0
-      |InputLine -> 12, 0
+      |InputLine t -> 12, 0                        //todo: change this to be like the two underneath
       |OutputLine t -> 13 + List.findIndex ((=) t) allTypes, 0
       |Combinator_2 c -> 15 + List.findIndex ((=) (Combinator_2 c)) allCombinators, 0
      ) cmds
      |> Array.map (fun (a, b) -> sprintf "\t.long %i\n\t.long %i" a b)
      |> String.concat "\n"
      |> fun e ->
-          File.ReadAllText("template.txt")
+          Definitions.TEMPLATE
            .Replace("\t.long k", e)
            .Replace("\t.byte k", stringDataBytes)
-//     |> Array.map (fun (a, b) -> sprintf "%i, %i" a b)
-//     |> String.concat ", "
-//     |> sprintf "{%s}"
    )

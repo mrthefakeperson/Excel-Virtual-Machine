@@ -56,6 +56,7 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <None Include="App.config" />
+    <Compile Include="Definitions.fs" />
     <COMReference Include="Microsoft Excel 15.0 Object Library">
       <Guid>{00020813-0000-0000-c000-000000000046}</Guid>
       <VersionMajor>1</VersionMajor>
@@ -75,13 +76,11 @@
     <Compile Include="Token.fs" />
     <Compile Include="Lexer.fs" />
     <Compile Include="Parser.fs" />
+    <Compile Include="Type System.fs" />
     <Compile Include="Excel Language.fs" />
     <Compile Include="Compiler Definitions.fs" />
     <Compile Include="Compiler.fs" />
     <Compile Include="Excel Conversion.fs" />
-    <Content Include="template.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Compile Include="Write File.fs" />
     <Compile Include="Testing.fs" />
     <Compile Include="Main.fs" />
@@ -137,6 +136,7 @@
     <Content Include="test cases - parser\in19.txt" />
     <Content Include="test cases - parser\in20.txt" />
     <Content Include="test cases - parser\in21.txt" />
+    <Content Include="test cases - parser\in22.txt" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

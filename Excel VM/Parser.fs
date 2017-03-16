@@ -1,6 +1,8 @@
 ﻿namespace Parser
 open Lexer
 open Token
+// ignore all pattern match warnings for conciseness (turn this off when adding code)
+#nowarn "25"
 
 module FSharp =
   let preprocess =
@@ -425,6 +427,7 @@ module Python2 =
 //  fix: don't remove the ; upon finishing parsing?
 module C =
   let listOfDatatypeNames = ref ["int"; "long long"; "long"; "bool"]
+  let restoreDefault() = listOfDatatypeNames := ["int"; "long long"; "long"; "bool"]
   let (|BrokenDatatypeName|_|) (ll:string list) =
     let matchString (s:string) =
       let matching = s.Split ' ' |> Array.toList
@@ -499,6 +502,7 @@ module C =
       |For state stop fail x
       |Return state stop fail x
       |Assignment state stop fail x
+      |Dot state stop fail x
       |Operator state stop fail x
       |Apply state stop fail x
       |Index state stop fail x
@@ -514,6 +518,7 @@ module C =
       |Brackets state stop fail x
       //|Braces state stop fail x    ({statement;}) with one pair of braces gets parsed, don't know the purpose of this
       |Assignment state stop fail x
+      |Dot state stop fail x
       |Operator state stop fail x
       |Apply state stop fail x
       |Index state stop fail x
@@ -668,6 +673,11 @@ module C =
       let parsed = Token("assign", [a; assignment])
       Some (parse LocalImd stop fail restl (parsed::restr))
     |_ -> None
+  and (|Dot|_|) state stop fail = function
+    |a::restl, T "."::T b::restr ->     // if the next token is a symbol ( eg. `(` ) then do some error handling
+      let parsed = Token("dot", [a; Token b])
+      Some (parse state stop fail restl (parsed::restr))
+    |_ -> None
   and (|Operator|_|) state stop fail = function
     |a::restl, (T s as nfx)::restr when nfx.Priority <> -1 ->
       let operand, restr =
@@ -708,10 +718,14 @@ module C =
       Token("sequence", List.map postProcess xprs')
     |X("==", xprs) -> Token("=", List.map postProcess xprs)
     |X("apply", [T "printf"; X(",", [T "\"%i\\n\""; a])]) -> Token("apply", [Token("apply", [Token "printfn"; Token "\"%i\""]); a])
+    //|X("apply", [T "scanf"; X(",", [T "\"%i\\n\""; (* & *)a])]) -> stdin.ReadLine()
     |X(s, xprs) -> Token(s, List.map postProcess xprs)
-  let parseSyntax =
+  let parseSyntax' =
     preprocess
      >> parse Global (function [] -> true | _ -> false) (fun _ -> false) []
      >> fst
      >> postProcess
      >> function X("sequence", x) -> Token("sequence", x @ [Token("apply", [Token "main"; Token "()"])])
+  let parseSyntax e =
+    restoreDefault()
+    parseSyntax' e

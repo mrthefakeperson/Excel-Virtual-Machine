@@ -68,7 +68,7 @@ let getInstruction = fun i -> function
   |"goto", x -> GotoFwdShift (int x - i) |"gotoiftrue", x -> GotoIfTrueFwdShift (int x - i)
   |"call", _ -> Call | "return", _ -> Return
   |"getheap", _ -> GetHeap | "newheap", _ -> NewHeap | "writeheap", _ -> WriteHeap
-  |"inputline", _ -> InputLine | "outputline", _ -> OutputLine type_int32
+  |"inputline", _ -> InputLine type_int32 | "outputline", _ -> OutputLine type_int32
   |name, "" when
     List.exists (function Combinator_2 c -> c.Name = name | _ -> false) allCombinators ->
     List.find (function Combinator_2 c -> c.Name = name | _ -> false) allCombinators
@@ -82,9 +82,6 @@ let testExcelInterpreter a =
       Array.append input [|sprintf "goto %i" (Array.filter ((<>) "") input).Length|]
        |> parseInstructionList
        |> Array.mapi getInstruction
-//       |> Array.collect (fun (a, b) -> [|a; b|])
-//       |> Array.map Literal
-//       |> Array.mapi (fun i e -> Cell(numberToAlpha (i+2) + "1", e))
     makeProgram instructions
      |> interpret 80
      |> printCells outFile
@@ -104,12 +101,18 @@ let openAndParse file =
 
 let testParser a =
   test a "test cases - parser" (fun file outFile ->
-    let parsed = openAndParse file
-    let parsed = parsed.Clean()
+    let parsed = (openAndParse file).Clean()
     printfn "%A" (File.ReadAllText file)
     printfn "%A" parsed
     parsed.ToStringExpr()
      |> logPrintf outFile "%O\n"
+   )
+
+let testTypeSystem =
+  test ignore "test cases - parser" (fun file outFile ->
+    let parsed = (openAndParse file).Clean()
+    Type_System.compileObjectsToArrays parsed
+     |> fun (a, b, c) -> printfn "%A\n%A\n%O" a b (c.ToStringExpr())
    )
 
 let testCompilerAST a =
@@ -188,8 +191,9 @@ let runSpecificTest() =       // `generate` to create outputs, `verify` to test,
   //testExcelFile 1
   //testAsmCompilerSimple 1
 
-  testParser verify 1
-  //testCompilerAST verify 1
+  //testParser verify 1
+  //testTypeSystem 21                  //test this more
+  testCompilerAST verify 1           //test the new type system here
   //testExcelCompiler 1
   //testAsmCompiler 1
   printfn "done"

@@ -1,4 +1,8 @@
-﻿	.file	"pAsm.cc"
+﻿module Definitions
+
+[<Literal>]
+let TEMPLATE = """
+	.file	"pAsm.cc"
 gcc2_compiled.:
 ___gnu_compiled_cplusplus:
 	.def	___terminate;	.scl	2;	.type	32;	.endef
@@ -4708,3 +4712,4 @@ _vars:
 	.def	___cp_pop_exception;	.scl	3;	.type	32;	.endef
 	.def	___cp_eh_info;	.scl	3;	.type	32;	.endef
 	.def	___builtin_delete;	.scl	3;	.type	32;	.endef
+"""

@@ -1,0 +1,12 @@
+﻿C
+struct x{
+  int k[4];
+  int l;
+  int m = 2;
+} q, r, s;
+
+int main() {
+  x t;
+  s.l = 3;
+  t.m = s.l + 1;
+}

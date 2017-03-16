@@ -1,6 +1,7 @@
 ﻿module Token
 
-//lower is evaluated earlier
+// symbol table for infix operators
+// lower is evaluated earlier
 let infixOrder = [|
   ["*"; "/"; "%"]
   ["+"; "-"]
@@ -8,6 +9,8 @@ let infixOrder = [|
   ["&&"]
   ["||"]
  |]
+
+// class definition for tokens
 type Token(name:string, row_col, functionApplication:bool, dependants:Token list) =
   let row, col = row_col
   let priority =
@@ -58,9 +61,24 @@ type Token(name:string, row_col, functionApplication:bool, dependants:Token list
     match name, dependants with
     |("sequence" | "()"), [a] -> a.Clean()
     |_, dependants -> Token(name, row_col, functionApplication, List.map (fun (e:Token) -> e.Clean()) dependants)
+
+// accessor patterns
 let (|T|_|) (x:Token) =
   if x.Single
    then Some x.Name
    else None
 let (|A|_|) (x:Token) = if x.CanApply then Some A else None
 let (|X|) (t:Token) = X(t.Name, t.Dependants)
+
+// datatype / variable classifier patterns
+let (|Inner|_|) c = function
+  |T "\"\"" -> Some ""
+  |T s when s.Length >= 2 && s.[0] = c && s.[s.Length-1] = c -> Some s.[1..s.Length-2]
+  |_ -> None
+let (|Var|Cnst|Other|) = function               //todo: non-numeric constants
+  |Inner '"' s -> Cnst s        //cases like "\" should not have made it through the lexer
+  |Inner ''' s -> Cnst s        //cases like 'dd' are the lexer's job
+  |T "()" -> Cnst "()"
+  |T ("true" | "false" as s) -> Cnst s
+  |T s -> if s <> "" && '0' <= s.[0] && s.[0] <= '9' then Cnst s else Var s
+  |_ -> Other

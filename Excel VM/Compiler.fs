@@ -1,4 +1,4 @@
-﻿//todo: variables leaving scope should be popped
+﻿//todo: investigate the one variable which doesn't get popped completely by program end
 module Compiler
 open Token
 open System.Collections.Generic
@@ -8,17 +8,6 @@ let nxt' x () =
   incr x
   string !x
 let nxt = nxt' (ref 0)
-let (|Inner|_|) c = function
-  |T "\"\"" -> Some ""
-  |T s when s.Length >= 2 && s.[0] = c && s.[s.Length-1] = c -> Some s.[1..s.Length-2]
-  |_ -> None
-let (|Var|Cnst|Other|) = function               //todo: non-numeric constants
-  |Inner '"' s -> Cnst s        //cases like "\" should not have made it through the lexer
-  |Inner ''' s -> Cnst s        //cases like 'dd' are the lexer's job
-  |T "()" -> Cnst "()"
-  |T ("true" | "false" as s) -> Cnst s
-  |T s -> if s <> "" && '0' <= s.[0] && s.[0] <= '9' then Cnst s else Var s
-  |_ -> Other
 let rec ASTCompile' (capture, captured as cpt) = function
   |X("return", xl) ->
     match xl with
@@ -143,7 +132,6 @@ let (|Inline|_|) = function
       NewHeap; Push "endArr"; WriteHeap; Load x; Popv x      // end the array
      ]
   |Value "ignore" -> Some [Push "not implemented"]
-//  |Apply(Value "printfn", [Const "%A"]) -> Some [NewHeap; Store x; Load x; Push (string _PrintAddress); WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
   |Apply(Value "printfn", [Const "%i"]) ->
     Some [NewHeap; Store x; Load x; Push (string (_PrintAddress type_int32)); WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
   |Apply(Value "printfn", [Const "%s"])
