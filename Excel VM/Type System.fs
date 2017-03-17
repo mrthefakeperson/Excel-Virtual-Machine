@@ -74,4 +74,4 @@ let restoreDefault() =
   varTypes.Clear()
 let compileObjectsToArrays x =
   restoreDefault()
-  objectTypes, varTypes, compileObjects x
+  compileObjects x

@@ -28,8 +28,10 @@ let ruleset =
         pl <- pl+1
       s <- s+string ss.[pl]
       pl <- pl+1
-    if String.forall (fun e -> List.exists ((=) e) (['a'..'z'] @ ['A'..'Z'] @ ['"'; '''; '\\'])) s
-     && (s.[s.Length-1] <> '"' || s = "\"")
+    let isString s =
+      String.forall (fun e -> List.exists ((=) e) (['a'..'z'] @ ['A'..'Z'] @ ['"'; '''; '\\'])) s
+       && (s.[s.Length-1] <> '"' || s = "\"")
+    if isString s || (s.Length > 1 && s.[0] = '-' && isString s.[1..])
      then Some AlphabeticString
      else None
   let (|Numeric|_|) (ss:string) =
@@ -53,7 +55,7 @@ let ruleset =
     //|"\"",AlphabeticString
     |(AlphabeticString | Numeric),(AlphabeticString | Numeric)
     |"\'",_ | _,"\'"
-    |"-",Numeric
+    |"-",(Numeric | AlphabeticString)
     |Numeric,"."
     |"~",Symbolic -> true
     |_ when charIDs.[int a.[0]] = 0 || charIDs.[int b.[0]] = 0 -> false

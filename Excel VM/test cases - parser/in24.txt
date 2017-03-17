@@ -1,0 +1,8 @@
+﻿C
+int f(int &x)
+{
+  bool k = !true;
+  bool *p = *(1+&1);
+  f(*x,y,&z);
+  !q[7];
+}

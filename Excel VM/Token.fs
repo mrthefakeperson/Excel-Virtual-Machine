@@ -9,6 +9,8 @@ let infixOrder = [|
   ["&&"]
   ["||"]
  |]
+// symbol table for prefix operators
+let prefixes = ["-"; "!"; "&"; "*"; "++"; "--"]     // languages really need individualized versions of this
 
 // class definition for tokens
 type Token(name:string, row_col, functionApplication:bool, dependants:Token list) =
@@ -69,6 +71,14 @@ let (|T|_|) (x:Token) =
    else None
 let (|A|_|) (x:Token) = if x.CanApply then Some A else None
 let (|X|) (t:Token) = X(t.Name, t.Dependants)
+
+// prefix classifier patterns
+let (|Pref|_|) = function     // is a prefix -> Pref (symbol with ~ prepended)
+  |T s as t when List.exists ((=) s) prefixes -> Some(Token ("~" + s, t.Indentation, true, []))
+  |_ -> None
+let (|Pref'|_|) = function     // is a prefix with ~ prepended -> Pref' (itself)
+  |T s as t when s.Length > 1 && s.[0] = '~' && List.exists ((=) s.[1..]) prefixes -> Some t
+  |_ -> None
 
 // datatype / variable classifier patterns
 let (|Inner|_|) c = function

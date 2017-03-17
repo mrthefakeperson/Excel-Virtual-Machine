@@ -1,16 +1,17 @@
 ﻿namespace Parser
 open Lexer
 open Token
-// ignore all pattern match warnings for conciseness (turn this off when adding code)
+// ignore all pattern match warnings (turn this off when adding code)
 #nowarn "25"
 
 module FSharp =
   let preprocess =
     List.fold (fun ((r,c),acc) (e:string) ->
-      if e.[0] = '\n' then        (r+1,e.Replace("\n", "").Length),acc
-      else if ruleset " " e then  (r,c+e.Length),acc
-      else if e = "." then        (r,c+e.Length),Token(e, (r,c), false, [])::acc
-      else                        (r,c+e.Length),Token(e, (r,c))::acc
+      if e.[0] = '\n' then        (r+1,e.Replace("\n", "").Length), acc
+      else if ruleset " " e then  (r,c+e.Length), acc
+      else if e = "." || List.exists ((=) e) prefixes then
+                                  (r,c+e.Length), Token(e, (r,c), false, [])::acc
+      else                        (r,c+e.Length), Token(e, (r,c))::acc
      ) ((1,0),[])
      >> snd >> List.rev
      >> List.fold (fun (earliestInRow, acc) e ->
@@ -22,6 +23,11 @@ module FSharp =
             (earliestInRow, e::acc)
          ) ((-1, 0), [])
      >> snd >> List.rev
+     >> List.map (function
+          |T s as t when s.Length > 1 && s.[0] = '-' && ruleset s.[1..] "1" ->
+            Token("apply", t.Indentation, true, [Token "~-"; Token s.[1..]])
+          |x -> x
+         )
 
   let (|ConsqLR|_|) = function
     |(T _ as a)::_, (T _ as b)::_ when a.IndentedLess b -> Some ConsqLR
@@ -53,6 +59,7 @@ module FSharp =
       |Match state stop fail x
       |Function state stop fail x
       |Dot state stop fail x
+      |Prefix state stop fail x
       |Infix state stop fail x
       |Tuple state stop fail x           //more testing needed
       |Apply state stop fail x
@@ -222,6 +229,22 @@ module FSharp =
       Some (parse state stop fail restl (parsed::restr))
     //fix priority
     |left, a::(T "." as t)::restr -> Some (parse state stop fail (t::a::left) restr)
+    |_ -> None
+  and (|Prefix|_|) state stop fail = function
+    |Pref a::restl, right ->     // todo: check relative indentation of prefix operator and its token
+      let b, restr =
+        match right with            // dANGER >:(   (untested)
+        |T s::(T "."::_ as restr) ->    // special case
+          let (T "()" | X("sequence", [])), b::restr =
+            parse state (function T _::_ -> false | _ -> true) (fun e -> stop e || fail e) [] right
+          b, restr
+        |T s as b::restr when ruleset s "1" -> b, restr
+        |_ ->
+          let (T "()" | X("sequence", [])), b::restr =
+            parse state (function T _::_ -> false | _ -> true) (fun e -> stop e || fail e) [] right
+          b, restr
+      let parsed = Token("apply", a.Indentation, true, [a; b])
+      Some (parse state stop fail restl (parsed::restr))
     |_ -> None
   and (|Infix|_|) state stop fail = function
     |left:Token list, (T _ as nfx)::restr when nfx.Priority > -1 ->
@@ -452,6 +475,12 @@ module C =
           |T "{"::_::T "struct"::_, T "}"     // find a better way to do this
           |T "{"::T "struct"::_, T "}" -> e::acc
           |T "{"::rest, T "}" -> Token ";"::rest
+          |acc, T s
+            when List.exists (fun (e:string) -> s.Length > e.Length && e = s.[s.Length-e.Length..]) prefixes ->
+            let matchedPrefix =
+              List.find (fun (e:string) -> s.Length > e.Length && e = s.[s.Length-e.Length..]) prefixes
+            let i = s.Length-matchedPrefix.Length
+            Token s.[i..]::Token s.[..i-1]::acc
           |_ -> e::acc
          ) []
      >> List.rev
@@ -503,6 +532,7 @@ module C =
       |Return state stop fail x
       |Assignment state stop fail x
       |Dot state stop fail x
+      |Prefix state stop fail x
       |Operator state stop fail x
       |Apply state stop fail x
       |Index state stop fail x
@@ -519,6 +549,7 @@ module C =
       //|Braces state stop fail x    ({statement;}) with one pair of braces gets parsed, don't know the purpose of this
       |Assignment state stop fail x
       |Dot state stop fail x
+      |Prefix state stop fail x
       |Operator state stop fail x
       |Apply state stop fail x
       |Index state stop fail x
@@ -568,6 +599,9 @@ module C =
       Some (parse state stop fail restl (parsed::restr))
     |_ -> None
   and (|DatatypeFunction|_|) state stop fail = function           //todo: array parameters
+    |left, DatatypeName(datatypeName, Pref(T s)::declaredName::restr) ->
+      let parsed = Token("declare", [Token(datatypeName + s.[1..]); declaredName])
+      Some (parse FunctionArgs stop fail left (parsed::restr))
     |left, DatatypeName(datatypeName, declaredName::restr) ->
       let parsed = Token("declare", [Token datatypeName; declaredName])
       Some (parse FunctionArgs stop fail left (parsed::restr))
@@ -591,8 +625,14 @@ module C =
           Token("let", [Token("declare", [Token datatypeName; t]); value])
         |T declaredName as t ->
           Token("let", [Token("declare", [Token datatypeName; t]); Token "nothing"])
-        |X("dot", [T declaredName as t; X("[]", a)]) ->   // declared type should be a pointer type
+        |X("dot", [T declaredName as t; X("[]", a)]) ->   // todo: declared type should be a pointer type
           Token("let", [Token("declare", [Token datatypeName; t]); Token("array", a)])
+        |X("assign", [X("apply", [Pref'(T "~*"); T _ as t]); value]) ->
+          Token("let", [Token("declare", [Token(datatypeName + "*"); t]); value])
+        |X("apply", [Pref'(T "~*"); T _ as t]) ->
+          Token("let", [Token("declare", [Token(datatypeName + "*"); t]); Token "nothing"])
+        |X("dot", [X("apply", [Pref'(T "~*"); T _ as t]); X("[]", a)]) ->  // todo: declared type should be a pointer to a pointer type
+          Token("let", [Token("declare", [Token(datatypeName + "*"); t]); Token("array", a)])
         |e -> failwithf "could not recognize declaration: %A" e
       let restr =     // for declarations with `,`
         match restr with
@@ -676,6 +716,22 @@ module C =
   and (|Dot|_|) state stop fail = function
     |a::restl, T "."::T b::restr ->     // if the next token is a symbol ( eg. `(` ) then do some error handling
       let parsed = Token("dot", [a; Token b])
+      Some (parse state stop fail restl (parsed::restr))
+    |_ -> None
+  and (|Prefix|_|) state stop fail = function
+    |Pref a::restl, right ->     // todo: check relative indentation of prefix operator and its token
+      let b, restr =
+        match right with            // dANGER >:(   (untested)
+        |T s::(T "["::_ as restr) ->    //special case
+          let (T "()" | X("sequence", [])), b::restr =
+            parse state (function T _::_ -> false | _ -> true) (fun e -> stop e || fail e) [] right
+          b, restr
+        |T s as b::restr when ruleset s "1" -> b, restr
+        |_ ->
+          let (T "()" | X("sequence", [])), b::restr =
+            parse state (function T _::_ -> false | _ -> true) (fun e -> stop e || fail e) [] right
+          b, restr
+      let parsed = Token("apply", a.Indentation, true, [a; b])
       Some (parse state stop fail restl (parsed::restr))
     |_ -> None
   and (|Operator|_|) state stop fail = function

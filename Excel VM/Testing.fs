@@ -87,7 +87,7 @@ let testExcelInterpreter a =
      |> printCells outFile
    )
 
-let openAndParse file =
+let openAndPartiallyParse file =
   let txt = File.ReadAllLines file
   let parseSyntax, txt =
     match txt.[0] with
@@ -98,10 +98,14 @@ let openAndParse file =
   txt
    |> groupByRuleset
    |> parseSyntax
+let openAndParse =
+  openAndPartiallyParse
+   >> fun e -> e.Clean()
+   >> Type_System.compileObjectsToArrays
 
 let testParser a =
   test a "test cases - parser" (fun file outFile ->
-    let parsed = (openAndParse file).Clean()
+    let parsed = (openAndPartiallyParse file).Clean()
     printfn "%A" (File.ReadAllText file)
     printfn "%A" parsed
     parsed.ToStringExpr()
@@ -112,7 +116,7 @@ let testTypeSystem =
   test ignore "test cases - parser" (fun file outFile ->
     let parsed = (openAndParse file).Clean()
     Type_System.compileObjectsToArrays parsed
-     |> fun (a, b, c) -> printfn "%A\n%A\n%O" a b (c.ToStringExpr())
+     |> fun e -> printfn "%O" (e.ToStringExpr())
    )
 
 let testCompilerAST a =
@@ -190,10 +194,10 @@ let runSpecificTest() =       // `generate` to create outputs, `verify` to test,
   //testPAsm verify 1
   //testExcelFile 1
   //testAsmCompilerSimple 1
+  //testTypeSystem 21
 
-  //testParser verify 1
-  //testTypeSystem 21                  //test this more
-  testCompilerAST verify 1           //test the new type system here
+  testParser verify 1
+  testCompilerAST verify 1
   //testExcelCompiler 1
   //testAsmCompiler 1
   printfn "done"

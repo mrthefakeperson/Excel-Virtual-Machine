@@ -1,0 +1,1 @@
+let f = (fun declare(int& x) -> (let declare(bool k) = ((~!) (true)); let declare(bool* p) = ((~*) (((+) (1)) ((~&) (1)))); (f) ((~*) (x), y, (~&) (z)); (~!) (q.[7]))); (main) (())
