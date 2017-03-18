@@ -1,0 +1,1 @@
+let f = (fun declare(int x) -> (let declare(int a) = (1); let declare(int* b) = ((~&) (a)); assign(a 2); assign((~*) (b) 3))); (main) (())

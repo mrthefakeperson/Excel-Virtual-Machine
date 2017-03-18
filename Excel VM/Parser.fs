@@ -522,8 +522,10 @@ module C =
       match left, right with
       |_ when stop right -> Token("sequence", List.rev left), right
       |_ when fail right -> failwithf "tokens are incomplete: %A" (left, right)
-      |T ";"::T _::restl, right    //single value as a statement is meaningless
-      |T ";"::restl, right -> parse Local stop fail restl right        //handles a(b); after a(b) has been parsed
+//      |T ";"::T _::restl, right    //single value as a statement is meaningless
+//      |T ";"::restl, right -> parse Local stop fail restl right        //handles a(b); after a(b) has been parsed
+      |T ";"::_, a::restr -> parse Local stop fail (a::left) restr
+      |DatatypeLocal state stop fail x
       |Brackets state stop fail x
       |Braces state stop fail x
       |If state stop fail x
@@ -536,15 +538,15 @@ module C =
       |Operator state stop fail x
       |Apply state stop fail x
       |Index state stop fail x
-      |DatatypeLocal state stop fail x         //do this better: preprocess all datatypes into one string
       |Transfer state stop fail x     -> x
       |_ -> failwithf "unknown: %A" (left, right)
     |LocalImd ->
       match left, right with
       |_ when stop right -> Token("sequence", List.rev left), right
       |_ when fail right -> failwithf "tokens are incomplete: %A" (left, right)
-      |T ";"::T _::restl, right    //single value as a statement is meaningless !!! unless it is `break` or `return` !!!
-      |T ";"::restl, right -> parse Local stop fail restl right        //handles a(b); after a(b) has been parsed
+//      |T ";"::T _::restl, right    //single value as a statement is meaningless !!! unless it is `break` or `return` !!!
+//      |T ";"::restl, right -> parse Local stop fail restl right        //handles a(b); after a(b) has been parsed
+      |T ";"::_, a::restr -> parse Local stop fail (a::left) restr
       |Brackets state stop fail x
       //|Braces state stop fail x    ({statement;}) with one pair of braces gets parsed, don't know the purpose of this
       |Assignment state stop fail x
@@ -616,9 +618,10 @@ module C =
       Some (parse state stop fail restl (parsed::restr))
     |_ -> None
   and (|DatatypeLocal|_|) state stop fail = function
-    |left, DatatypeName(datatypeName, restr) ->
+    |DatatypeName(datatypeName, restl), right ->
+    //|left, DatatypeName(datatypeName, restr) ->
       let parsed, restr =
-        parse LocalImd (function T(";" | ",")::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
+        parse LocalImd (function T(";" | ",")::_ -> true | _ -> false) (fun e -> stop e || fail e) [] right
       let parsed =
         match parsed.Clean() with
         |X("assign", [T declaredName as t; value]) ->
@@ -638,7 +641,7 @@ module C =
         match restr with
         |T ","::restr -> Token ";"::Token datatypeName::restr
         |_ -> restr
-      Some (parse LocalImd stop fail left (parsed::restr))
+      Some (parse LocalImd stop fail restl (parsed::restr))
     |_ -> None
   and (|Brackets|_|) state stop fail = function
     |T "("::restl, right ->
@@ -774,7 +777,9 @@ module C =
       Token("sequence", List.map postProcess xprs')
     |X("==", xprs) -> Token("=", List.map postProcess xprs)
     |X("apply", [T "printf"; X(",", [T "\"%i\\n\""; a])]) -> Token("apply", [Token("apply", [Token "printfn"; Token "\"%i\""]); a])
-    //|X("apply", [T "scanf"; X(",", [T "\"%i\\n\""; (* & *)a])]) -> stdin.ReadLine()
+    |X("apply", [T "printf"; X(",", [T "\"%s\\n\""; a])]) -> Token("apply", [Token("apply", [Token "printfn"; Token "\"%s\""]); a])
+    |X("apply", [T "scanf"; X(",", [T "\"%i\""; a])]) -> Token("assign", [a; Token("scan", [Token "%i"])])
+    |X("apply", [T "scanf"; X(",", [T "\"%s\""; a])]) -> Token("assign", [a; Token("scan", [Token "%s"])])
     |X(s, xprs) -> Token(s, List.map postProcess xprs)
   let parseSyntax' =
     preprocess

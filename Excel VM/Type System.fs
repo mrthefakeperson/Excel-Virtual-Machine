@@ -75,3 +75,63 @@ let restoreDefault() =
 let compileObjectsToArrays x =
   restoreDefault()
   compileObjects x
+
+
+type LabelledToken = LT of string*LabelledToken list*int
+let compilePointersToArrays x =
+  let acc = ref -1
+  let nxt() =
+    incr acc
+    !acc
+  // give each variable within its own scope a unique ID (int)
+  let rec labelTokens labels = function
+    |T s when Map.containsKey s labels -> LT(s, [], labels.[s])
+    |X("sequence", nodes) ->
+      let nodes' =
+        List.fold (fun (accLabels, acc) -> function
+          |X("let", [(T varName | X("declare", [_; T varName]) as a); b]) ->
+            let x = nxt()
+            let newLabels = Map.add varName x accLabels
+            let newNode = LT("let", [labelTokens newLabels a; labelTokens newLabels b], -1)
+            (newLabels, newNode::acc)
+          |x -> (accLabels, labelTokens accLabels x::acc)
+         ) (labels, []) nodes
+         |> snd
+         |> List.rev
+      LT("sequence", nodes', -1)
+    |X(s, dep) -> LT(s, List.map (labelTokens labels) dep, -1)
+  let k = labelTokens Map.empty x
+  //printfn "labelled: %A" k
+  // find all the var IDs which get their reference taken
+  let hasReference = Array.create (nxt()) false
+  let rec findAllDerefs = function
+    |LT("apply", [LT("~&", [], _); LT(s, [], a)], _) when a <> -1 ->
+      hasReference.[a] <- true
+    |LT(_, ll, _) -> List.iter findAllDerefs ll
+  findAllDerefs k
+  //printfn "hasDerefs: %A" hasDereference
+  // map dereferenced vars to arrays
+  let (|IsDeref|_|) = function
+    |LT(s, [], x) -> if x <> -1 && hasReference.[x] then Some s else None
+    |_ -> None
+  let rec mapDerefs = function
+    |IsDeref a -> Token("dot", [Token a; Token("[]", [Token "0"])])   // a -> a.[0]
+    |LT("apply", [LT("~&", [], _); IsDeref a], _) -> Token a   // &a -> a
+    |LT("sequence", nodes, _) ->
+      let nodes' =
+        List.collect (function
+          |LT("let", [(IsDeref a | LT("declare", [_; IsDeref a], _)); b], _) ->
+            [ Token("let", [Token a; Token("array", [Token "1"])])
+              Token("assign", [Token("dot", [Token a; Token("[]", [Token "0"])]); mapDerefs b]) ]
+          |x -> [mapDerefs x]
+         ) nodes
+      Token("sequence", nodes')
+    |LT(s, dep, _) -> Token(s, List.map mapDerefs dep)
+  let yld = mapDerefs k
+  //printfn "yield: %A" yld
+  yld
+
+
+let applyTypeSystem:Token->Token =
+  compileObjectsToArrays
+   >> compilePointersToArrays

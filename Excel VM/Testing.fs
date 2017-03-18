@@ -101,7 +101,7 @@ let openAndPartiallyParse file =
 let openAndParse =
   openAndPartiallyParse
    >> fun e -> e.Clean()
-   >> Type_System.compileObjectsToArrays
+   >> Type_System.applyTypeSystem
 
 let testParser a =
   test a "test cases - parser" (fun file outFile ->
@@ -115,8 +115,7 @@ let testParser a =
 let testTypeSystem =
   test ignore "test cases - parser" (fun file outFile ->
     let parsed = (openAndParse file).Clean()
-    Type_System.compileObjectsToArrays parsed
-     |> fun e -> printfn "%O" (e.ToStringExpr())
+    printfn "%O" (parsed.ToStringExpr())
    )
 
 let testCompilerAST a =
@@ -194,10 +193,10 @@ let runSpecificTest() =       // `generate` to create outputs, `verify` to test,
   //testPAsm verify 1
   //testExcelFile 1
   //testAsmCompilerSimple 1
-  //testTypeSystem 21
+  testTypeSystem 25
 
-  testParser verify 1
-  testCompilerAST verify 1
+  //testParser verify 1
+  //testCompilerAST verify 1
   //testExcelCompiler 1
   //testAsmCompiler 1
   printfn "done"

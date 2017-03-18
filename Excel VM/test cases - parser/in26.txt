@@ -1,0 +1,7 @@
+﻿C
+int main()
+{
+  int x, y;
+  scanf("%i", &x);
+  scanf("%s", &y);
+}
