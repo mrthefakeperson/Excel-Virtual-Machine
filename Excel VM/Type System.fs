@@ -110,7 +110,7 @@ let compilePointersToArrays x =
     |LT(_, ll, _) -> List.iter findAllDerefs ll
   findAllDerefs k
   //printfn "hasDerefs: %A" hasDereference
-  // map dereferenced vars to arrays
+  // map referenced vars to arrays
   let (|IsDeref|_|) = function
     |LT(s, [], x) -> if x <> -1 && hasReference.[x] then Some s else None
     |_ -> None
@@ -131,7 +131,12 @@ let compilePointersToArrays x =
   //printfn "yield: %A" yld
   yld
 
+let rec processDerefs = function
+  |X("apply", [T "~*"; x]) -> Token("deref", [x])
+  |X(s, dep) -> Token(s, List.map processDerefs dep)
+
 
 let applyTypeSystem:Token->Token =
   compileObjectsToArrays
    >> compilePointersToArrays
+   >> processDerefs

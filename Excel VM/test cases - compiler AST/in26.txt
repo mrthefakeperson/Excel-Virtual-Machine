@@ -1,0 +1,16 @@
+﻿C
+int main(int x)
+{
+  int a = 1;
+  int *b = &a;
+  printf("%i\n", a);
+  printf("%i\n", *b);
+  a = 2;
+  printf("%i\n", a);
+  printf("%i\n", *b);
+  *b = 3;
+  printf("%i\n", a);
+  printf("%i\n", *b);
+  return 0;
+}
+

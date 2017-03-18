@@ -62,12 +62,14 @@ let rec ASTCompile' (capture, captured as cpt) = function
   |X("dot", [a; b]) ->
     match b with
     |X("[]", [i]) -> Get(ASTCompile' cpt a, ASTCompile' cpt i)
-    |_ -> failwith "todo: objects"
+    |_ -> failwith "should never happen"
   |X("assign", [a; b]) ->
     match a with
     |X(name, []) -> Mutate(name, ASTCompile' cpt b)
     |X("dot", [a; X("[]", [i])]) ->
       Assign(ASTCompile' cpt a, ASTCompile' cpt i, ASTCompile' cpt b)
+    |X("deref", [_]) ->
+      Assign(ASTCompile' cpt a, Const "0", ASTCompile' cpt b)
     |_ -> failwith "todo: unpacking"
   |X("if", [cond; aff; neg]) ->
     If(ASTCompile' cpt cond, ASTCompile' cpt aff, ASTCompile' cpt neg)
@@ -85,7 +87,8 @@ let rec ASTCompile' (capture, captured as cpt) = function
          )
        ]
     |_ -> failwith "iterable objects not supported yet"
-  |X("sequence", list) -> //Sequence (List.map (ASTCompile' capture) list)
+  |X("deref", [x]) -> Get(ASTCompile' cpt x, Const "0")
+  |X("sequence", list) ->
     List.fold (fun (acc, (capt', capd' as cpt')) e ->
       let compiled = ASTCompile' cpt' e
       let cpt' =
@@ -125,7 +128,7 @@ let _PrintAddress t = //List.length allComb2Sections + 1
   match List.tryFindIndex ((=) t) allTypes with
   |Some i -> List.length allComb2Sections + 1 + 3 * i
   |None -> failwithf "can't output type: %A" t
-let (|Inline|_|) = function
+let rec (|Inline|_|) = function
   |Value nfx when List.exists (function Combinator_2 e -> e.Symbol = nfx | _ -> false) allCombinators ->
     Some [
       NewHeap; Store x; Load x; Push (string(getSectionAddressFromInfix nfx)); WriteHeap  // store address
@@ -138,7 +141,7 @@ let (|Inline|_|) = function
   |Value "printfn" ->
     Some [NewHeap; Store x; Load x; Push (string (_PrintAddress type_string)); WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
   |_ -> None
-let rec compile' inScope = function
+and compile' inScope = function
   |Inline ll -> ll
   |Sequence ll ->
     let x = (List.collect (fun e -> Pop :: List.rev (compile' inScope e)) (List.rev ll)).Tail
