@@ -778,8 +778,8 @@ module C =
     |X("==", xprs) -> Token("=", List.map postProcess xprs)
     |X("apply", [T "printf"; X(",", [T "\"%i\\n\""; a])]) -> Token("apply", [Token("apply", [Token "printfn"; Token "\"%i\""]); a])
     |X("apply", [T "printf"; X(",", [T "\"%s\\n\""; a])]) -> Token("apply", [Token("apply", [Token "printfn"; Token "\"%s\""]); a])
-    |X("apply", [T "scanf"; X(",", [T "\"%i\""; a])]) -> Token("assign", [a; Token("scan", [Token "%i"])])
-    |X("apply", [T "scanf"; X(",", [T "\"%s\""; a])]) -> Token("assign", [a; Token("scan", [Token "%s"])])
+    |X("apply", [T "scanf"; X(",", [T "\"%i\""; a])]) -> Token("assign", [a; Token("apply", [Token "scan"; Token "%i"])])
+    |X("apply", [T "scanf"; X(",", [T "\"%s\""; a])]) -> Token("assign", [a; Token("apply", [Token "scan"; Token "%s"])])
     |X(s, xprs) -> Token(s, List.map postProcess xprs)
   let parseSyntax' =
     preprocess

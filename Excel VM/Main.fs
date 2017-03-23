@@ -8,6 +8,19 @@ let sep (fileNameWithExtension:string) =
   match fileNameWithExtension.LastIndexOf '.' with
   | -1 -> fileNameWithExtension, ""
   |pl -> fileNameWithExtension.[..pl-1], fileNameWithExtension.[pl+1..] 
+let openAndParse file =
+  let txt = File.ReadAllText file
+  let _, extension = sep file
+  let parseSyntax =
+    match extension with
+    |"fs" | "fsx" -> Parser.FSharp.parseSyntax
+    |"py" -> Parser.Python2.parseSyntax
+    |_ -> Parser.C.parseSyntax
+  txt
+   |> Lexer.groupByRuleset
+   |> parseSyntax
+   |> fun e -> e.Clean()
+   |> Type_System.applyTypeSystem
 [<EntryPoint>]
 let main argv =
   match argv with
@@ -17,22 +30,12 @@ let main argv =
     let fileName, extension = sep fileNameWithExtension
     let parsed = openAndParse fileNameWithExtension
     parsed.Clean()
-     |> ASTCompile
+     |> ASTCompile |> debug
      |> compile
      |> Array.ofList
      |> writeExcelFile (fileName + ".xlsx")
   |[|fileNameWithExtension|] ->
     let fileName, extension = sep fileNameWithExtension
-    let openAndParse file =
-      let txt = File.ReadAllText file
-      let parseSyntax =
-        match extension with
-        |"fs" | "fsx" -> Parser.FSharp.parseSyntax
-        |"py" -> Parser.Python2.parseSyntax
-        |_ -> Parser.C.parseSyntax
-      txt
-       |> Lexer.groupByRuleset
-       |> parseSyntax
     let parsed = openAndParse fileNameWithExtension
     parsed.Clean()
      |> ASTCompile

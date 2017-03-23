@@ -30,6 +30,7 @@ type Formula=
   |If of Formula*Formula*Formula
   |Choose of Formula*Formula[]
   |Index of Formula*Formula
+  |IndexStr of Formula*Formula
   |Combine of Formula*Combinator*Formula
   |Concatenate of Formula[]
   |Line_Break
@@ -40,7 +41,8 @@ type Formula=
       |Reference _ | Range _ -> true
       |If(a,b,c) -> a.hasReference() || b.hasReference() || c.hasReference()
       |Choose(a,b) -> a.hasReference() || Array.exists (fun (e:Formula) -> e.hasReference()) b
-      |Index(a, b) -> a.hasReference() || b.hasReference()
+      |Index(a, b)
+      |IndexStr(a, b)
       |Combine(a,_,b) -> a.hasReference() || b.hasReference()
       |Concatenate a -> Array.exists (fun (e:Formula) -> e.hasReference()) a
       |Line_Break -> false
@@ -59,6 +61,7 @@ and Cell =
           |Choose(n,list) ->
             sprintf "CHOOSE(%s,%s)" (pr n) (String.concat "," (Array.map pr list))
           |Index(list, k) -> sprintf "INDEX(%s,%s)" (pr list) (pr k)
+          |IndexStr(s, i) -> sprintf "MID(%s,%s,1)" (pr s) (pr i)
           |Combine(a, (Combinator.Mod | Combinator.And | Combinator.Or as u), b) ->
             sprintf "%s(%s,%s)" (combString u) (pr a) (pr b)
           |Combine(a, u, b) -> sprintf "(%s)%s(%s)" (pr a) (combString u) (pr b)
@@ -66,9 +69,9 @@ and Cell =
           |Line_Break -> sprintf "CHAR(10)"
         sprintf "=%s" (pr formula)
 let cmb c a b = Combine(a, c, b)
-let (+.), (-.), ( *. ), (/.), (%.), (<=.), (=.), (>.), (&&.), (||.) =
+let (+.), (-.), ( *. ), (/.), (%.), (<=.), (=.), (<>.), (>.), (&&.), (||.) =
   cmb Combinator.Plus, cmb Combinator.Minus, cmb Combinator.Mul, cmb Combinator.Div, cmb Combinator.Mod,
-  cmb Combinator.LessOrEqual, cmb Combinator.Equal, cmb Combinator.Greater,
+  cmb Combinator.LessOrEqual, cmb Combinator.Equal, cmb Combinator.Unequal, cmb Combinator.Greater,
   cmb Combinator.And, cmb Combinator.Or
 
 let alphaList =
@@ -175,6 +178,10 @@ let interpret iterations maxChange cellNames (cells:Formula[]) =
         |(r1, c1), (r2, c2), N i when r1 = r2 -> evaluateCell (Reference(coordsToS (r1, c1+int i-1)))
         |_ -> evaluateCell (Choose(k, getRange range))
       |_ -> evaluateCell (Choose(k, getRange range))
+    |IndexStr(s, i) ->
+      match evaluateCell s, evaluateCell i with
+      |S s, N i -> S (string s.[int i])     // indexing with float is not the best
+      |_ -> failwith "index string"
     |Combine(a,comb,b) -> combOp comb (evaluateCell a) (evaluateCell b)
     |Concatenate a ->
       Array.fold (fun acc e ->

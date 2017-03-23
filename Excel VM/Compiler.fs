@@ -140,6 +140,9 @@ let rec (|Inline|_|) = function
   |Apply(Value "printfn", [Const "%s"])
   |Value "printfn" ->
     Some [NewHeap; Store x; Load x; Push (string (_PrintAddress type_string)); WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
+  |Apply(Value "scan", [Const s | Value s]) ->
+    Some [NewHeap; Store x; Load x; Input s; WriteHeap; Load x; Popv x]
+  |Value "nothing" -> Some [Push "nothing"]     // void; change this later so that assigning `nothing` does nothing
   |_ -> None
 and compile' inScope = function
   |Inline ll -> ll

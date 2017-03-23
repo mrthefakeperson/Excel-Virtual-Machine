@@ -68,7 +68,7 @@ let getInstruction = fun i -> function
   |"goto", x -> GotoFwdShift (int x - i) |"gotoiftrue", x -> GotoIfTrueFwdShift (int x - i)
   |"call", _ -> Call | "return", _ -> Return
   |"getheap", _ -> GetHeap | "newheap", _ -> NewHeap | "writeheap", _ -> WriteHeap
-  |"inputline", _ -> InputLine type_int32 | "outputline", _ -> OutputLine type_int32
+  |"inputline", _ -> Input "%i" | "outputline", _ -> OutputLine type_int32
   |name, "" when
     List.exists (function Combinator_2 c -> c.Name = name | _ -> false) allCombinators ->
     List.find (function Combinator_2 c -> c.Name = name | _ -> false) allCombinators
@@ -193,11 +193,11 @@ let runSpecificTest() =       // `generate` to create outputs, `verify` to test,
   //testPAsm verify 1
   //testExcelFile 1
   //testAsmCompilerSimple 1
-  //testTypeSystem 25
+  //testTypeSystem 26
 
-  //testParser verify 1
-  //testCompilerAST verify 1
-  testExcelCompiler 26
-  //testAsmCompiler 1
+  testParser verify 1
+  testCompilerAST verify 1
+  //testExcelCompiler 27
+  //testAsmCompiler 27
   printfn "done"
   ignore (stdin.ReadLine())

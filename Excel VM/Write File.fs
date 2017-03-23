@@ -20,7 +20,7 @@ let writeExcelFile fileName cmds =
   back.MaxIterations <- 500
   back.MaxChange <- 0.
   sheet.Range(``allOutput*``).WrapText <- true
-  sheet.Range(``allOutput*``).RowHeight <- 400
+  sheet.Range(``allOutput*``).RowHeight <- 200
   sheet.Range(``allOutput*``).VerticalAlignment <- XlVAlign.xlVAlignTop
   // write finished program and save
   let set cellname txt =
@@ -55,6 +55,7 @@ let writeBytecode fileName cmds =
     |_ -> None
   //get string literals, concatenate with '\0'
   //  - all initial strings already exist in the code, but new strings (eg. formed with concatenation) are created on the heap
+  //  - printing from heap is currently a work in progress
   let stringDataBytes, getStringAddress =
     let stringData, stringAddressPairs =
       Array.choose (function Push (IntValue _) -> None | Push s -> Some s | _ -> None) cmds
@@ -69,6 +70,7 @@ let writeBytecode fileName cmds =
     |s -> getStringAddress.[s]
   
   //write all commands (todo: use larger ints than bytes)
+  let inputFormatList = ["%i"; "%s"; " "]
   File.WriteAllText (fileName,
     Array.mapi (fun i -> function
       |Push x -> 0, convertLiteral x
@@ -84,9 +86,9 @@ let writeBytecode fileName cmds =
       |NewHeap -> 9, 0
       |GetHeap -> 10, 0
       |WriteHeap -> 11, 0
-      |InputLine t -> 12, 0                        //todo: change this to be like the two underneath
-      |OutputLine t -> 13 + List.findIndex ((=) t) allTypes, 0
-      |Combinator_2 c -> 15 + List.findIndex ((=) (Combinator_2 c)) allCombinators, 0
+      |Input t -> 12 + List.findIndex ((=) t) inputFormatList, 0
+      |OutputLine t -> 14 + List.findIndex ((=) t) allTypes, 0
+      |Combinator_2 c -> 16 + List.findIndex ((=) (Combinator_2 c)) allCombinators, 0
      ) cmds
      |> Array.map (fun (a, b) -> sprintf "\t.long %i\n\t.long %i" a b)
      |> String.concat "\n"
