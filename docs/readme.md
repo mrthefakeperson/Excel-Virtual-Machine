@@ -10,3 +10,4 @@ The compiled Excel file can be executed by triggering iterative calculation (pre
 By default, 500 iterations are made each time. To ensure accuracy, do not disturb the spreadsheet before it is finished recalculating.
 
 
+Download the latest version [here](Excel_VM.zip).
