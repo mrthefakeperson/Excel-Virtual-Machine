@@ -14,5 +14,5 @@ By default, 500 iterations are made each time. To ensure accuracy, do not distur
 
 # Links
 
-blog post: 
-latest version: 
+blog post: https://mrthefakeperson.github.io/Excel-Virtual-Machine
+latest version: [download](https://mrthefakeperson.github.io/Excel-Virtual-Machine/Excel VM.zip)
