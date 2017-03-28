@@ -1,6 +1,6 @@
 ﻿//todo: investigate the one variable which doesn't get popped completely by program end
 module ASM_Compiler
-open Excel_Language
+open Excel_Language.Definitions
 open AST_Compiler
 
 [<AbstractClass>]     //combinator class

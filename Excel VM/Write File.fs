@@ -1,5 +1,5 @@
 ﻿namespace Write_File
-open Excel_Language
+open Excel_Language.Definitions
 open ASM_Compiler
 
 module Definitions =

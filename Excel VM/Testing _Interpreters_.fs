@@ -1,5 +1,5 @@
 ﻿namespace Testing
-open Excel_Language
+open Excel_Language.Definitions
 open ASM_Compiler
 open System
 

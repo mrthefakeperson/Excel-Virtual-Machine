@@ -2,9 +2,9 @@
 open Parser
 open Lexer
 open AST_Compiler
-open Excel_Language
+open Excel_Language.Definitions
 open ASM_Compiler
-open Excel_Conversion
+open Excel_Language.Define_VM
 open Write_File.ASM
 open Write_File.Excel
 open Interpreters
@@ -197,9 +197,9 @@ module IntegrationTests =
     //testAsmCompilerSimple 1
     //testTypeSystem 26
 
-    //testParser verify 1
-    //testCompilerAST verify 1
-    testExcelCompiler 1
+    testParser verify 1
+    testCompilerAST verify 1
+    //testExcelCompiler 1
     //testAsmCompiler 27
     printfn "done"
     ignore (stdin.ReadLine())
