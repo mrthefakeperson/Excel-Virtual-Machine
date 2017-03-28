@@ -1,5 +1,7 @@
-﻿open Compiler
-open Write_File
+﻿open AST_Compiler
+open ASM_Compiler
+open Write_File.ASM
+open Write_File.Excel
 open Testing
 open System.IO
 open System.Diagnostics
@@ -24,13 +26,13 @@ let openAndParse file =
 [<EntryPoint>]
 let main argv =
   match argv with
-  |[|"test"|] -> runSpecificTest()
+  |[|"test"|] -> IntegrationTests.runSpecificTest()
   |[|"help"|] -> printfn "first argument should be the input file; -outputExcelFile outputs an Excel file"
   |[|fileNameWithExtension; "-outputExcelFile"|] ->
     let fileName, extension = sep fileNameWithExtension
     let parsed = openAndParse fileNameWithExtension
     parsed.Clean()
-     |> ASTCompile |> debug
+     |> ASTCompile
      |> compile
      |> Array.ofList
      |> writeExcelFile (fileName + ".xlsx")

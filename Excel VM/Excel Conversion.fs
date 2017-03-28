@@ -1,8 +1,9 @@
 ﻿//more arithmetic
 
 module Excel_Conversion
-open Compiler_Definitions
 open Excel_Language
+open ASM_Compiler
+open Write_File.Definitions
 open System
 
 // size of stacks (two categories)
@@ -206,9 +207,6 @@ let variableStack sz row col =
 
 let seed = Cell(``seed*``, Reference ``seed*`` +. Int 1)
 let allOutput = Cell(``allOutput*``, Reference ``output*``)
-
-open Compiler_Definitions
-open System.Collections.Generic
 
 let makeProgram cmds =
   let vars =

@@ -75,13 +75,18 @@
     </COMReference>
     <Compile Include="Token.fs" />
     <Compile Include="Lexer.fs" />
-    <Compile Include="Parser.fs" />
+    <Compile Include="Parser_Fs.fs" />
+    <Compile Include="Parser_C.fs" />
+    <Compile Include="Parser_Py2.fs" />
     <Compile Include="Type System.fs" />
+    <Compile Include="AST Compiler.fs" />
     <Compile Include="Excel Language.fs" />
-    <Compile Include="Compiler Definitions.fs" />
-    <Compile Include="Compiler.fs" />
-    <Compile Include="Excel Conversion.fs" />
+    <Compile Include="ASM Compiler.fs" />
     <Compile Include="Write File.fs" />
+    <Compile Include="Excel Conversion.fs" />
+    <Compile Include="Write File Excel.fs" />
+    <Compile Include="Write File ASM.fs" />
+    <Compile Include="Testing _Interpreters_.fs" />
     <Compile Include="Testing.fs" />
     <Compile Include="Main.fs" />
     <Content Include="test cases - compiler AST\in1.txt" />
