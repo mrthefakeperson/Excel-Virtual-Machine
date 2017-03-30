@@ -28,7 +28,21 @@ module C =
     |BrokenDatatypeName(hd, tl)
     |hd::tl -> hd::tokenizeDatatypes tl
   let preprocess =
-    List.filter (ruleset " " >> not)
+    List.fold (fun (acc:string list) (e:string) ->
+      match acc, e with
+      |a::rest, s when a.[0] = '#' && s.[0] = '\n' -> e::acc
+      |a::rest, s when a.[0] = '#' -> a + s::rest
+      |_ -> e::acc
+     ) []
+     >> List.rev
+     >> List.collect (function       // preprocessor commands
+          |e when e.[0] = '#' ->
+            match e.Replace(" ", "") with
+            |"#include<stdio.h>" -> []
+            |_ -> failwith "preprocessor commands are not supported yet"
+          |e -> [e]
+         )
+     >> List.filter (ruleset " " >> not)
      >> tokenizeDatatypes
      >> List.map (fun e -> Token e)
      >> List.fold (fun acc e ->
@@ -48,7 +62,6 @@ module C =
   let (|DatatypeName|_|) = function
     |T s::rest when List.exists ((=) s) !listOfDatatypeNames -> Some(s, rest)
     |_ -> None
-  //todo: preprocessor commands
   type State =
     |Global
     |FunctionArgs

@@ -1,6 +1,6 @@
 ﻿namespace Testing
-open Parser
 open Lexer
+open Parser
 open AST_Compiler
 open Excel_Language.Definitions
 open ASM_Compiler
@@ -9,7 +9,6 @@ open Write_File.ASM
 open Write_File.Excel
 open Interpreters
 open System
-open System.Diagnostics
 open System.IO
 
 module IntegrationTests =
@@ -189,17 +188,3 @@ module IntegrationTests =
          |> Array.ofList
       writeBytecode (file + ".s") cmds
      )
-
-  let runSpecificTest() =       // `generate` to create outputs, `verify` to test, `ignore` to print
-    //testExcelInterpreter verify 1
-    //testPAsm verify 1
-    //testExcelFile 1
-    //testAsmCompilerSimple 1
-    //testTypeSystem 26
-
-    testParser verify 1
-    testCompilerAST verify 1
-    //testExcelCompiler 1
-    //testAsmCompiler 27
-    printfn "done"
-    ignore (stdin.ReadLine())

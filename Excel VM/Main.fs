@@ -2,7 +2,7 @@
 open ASM_Compiler
 open Write_File.ASM
 open Write_File.Excel
-open Testing
+open Testing.IntegrationTests
 open System.IO
 open System.Diagnostics
 
@@ -26,7 +26,19 @@ let openAndParse file =
 [<EntryPoint>]
 let main argv =
   match argv with
-  |[|"test"|] -> IntegrationTests.runSpecificTest()
+  |[|"test"|] ->       // `generate` to create outputs, `verify` to test, `ignore` to print
+    //testExcelInterpreter verify 1
+    //testPAsm verify 1
+    //testExcelFile 1
+    //testAsmCompilerSimple 1
+    //testTypeSystem 26
+
+    testParser verify 1
+    testCompilerAST verify 1
+    //testExcelCompiler 1
+    //testAsmCompiler 27
+    printfn "done"
+    ignore (stdin.ReadLine())
   |[|"help"|] -> printfn "first argument should be the input file; -outputExcelFile outputs an Excel file"
   |[|fileNameWithExtension; "-outputExcelFile"|] ->
     let fileName, extension = sep fileNameWithExtension
