@@ -1,4 +1,6 @@
-﻿module Type_System
+﻿// todo: structs get deepcopied, pointers don't
+
+module Type_System
 open Parser.Token
 open System.Collections.Generic
 

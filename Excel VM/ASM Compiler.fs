@@ -29,7 +29,7 @@ type PseudoAsm =
   |GetHeap     //let i = topstack; pop stack; push heap value at i to stack
   |WriteHeap   //let v = topstack; pop stack; let i = topstack; pop stack; heap at i <- v
   |Input of string
-  |OutputLine of System.Type
+  |Output of System.Type
   |Combinator_2 of comb2
 type C2_Add(name, symbol) =
   inherit comb2(name, symbol)
@@ -82,7 +82,7 @@ let allTypes = [System.Type.GetType "System.Int32"; System.Type.GetType "System.
 let [type_int32; type_string] = allTypes
 let rec operationsPrefix =
   allComb2Sections
-   @ List.collect (fun e -> [OutputLine e; Push "()"; Return]) allTypes
+   @ List.collect (fun e -> [Output e; Push "()"; Return]) allTypes
 let _PrintAddress t = //List.length allComb2Sections + 1
   match List.tryFindIndex ((=) t) allTypes with
   |Some i -> List.length allComb2Sections + 1 + 3 * i
@@ -94,10 +94,15 @@ let rec (|Inline|_|) = function
       NewHeap; Push "endArr"; WriteHeap; Load x; Popv x      // end the array
      ]
   |Value "ignore" -> Some [Push "not implemented"]
-  |Apply(Value "printfn", [Const "%i"]) ->
+//  |Apply(Value "printfn", [Const "%i"]) ->
+//    Some [NewHeap; Store x; Load x; Push (string (_PrintAddress type_int32)); WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
+//  |Apply(Value "printfn", [Const "%s"])
+//  |Value "printfn" ->
+//    Some [NewHeap; Store x; Load x; Push (string (_PrintAddress type_string)); WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
+  |Apply(Value "printf", [Const "%i"]) ->
     Some [NewHeap; Store x; Load x; Push (string (_PrintAddress type_int32)); WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
-  |Apply(Value "printfn", [Const "%s"])
-  |Value "printfn" ->
+  |Apply(Value "printf", [Const "%s"])
+  |Value "printf" ->
     Some [NewHeap; Store x; Load x; Push (string (_PrintAddress type_string)); WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
   |Apply(Value "scan", [Const s | Value s]) ->
     Some [NewHeap; Store x; Load x; Input s; WriteHeap; Load x; Popv x]

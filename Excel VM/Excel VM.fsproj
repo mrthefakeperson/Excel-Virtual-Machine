@@ -75,6 +75,7 @@
     </COMReference>
     <Compile Include="Token.fs" />
     <Compile Include="Lexer.fs" />
+    <Compile Include="String Formatting.fs" />
     <Compile Include="Parser_Fs.fs" />
     <Compile Include="Parser_C.fs" />
     <Compile Include="Parser_Py2.fs" />

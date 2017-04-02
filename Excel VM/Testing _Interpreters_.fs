@@ -40,7 +40,7 @@ module Interpreters =
       |NewHeap -> heap.Add ""; push value (string(heap.Count-1))
       |WriteHeap -> let v = top value in pop value; let i = top value in pop value; heap.[int i] <- v
       |Input _ -> push value (stdin.ReadLine())
-      |OutputLine _ -> push output (top value); pop value
+      |Output _ -> push output (top value); pop value
       |Combinator_2 c ->
         let a = top value in pop value
         let b = top value in pop value
@@ -66,7 +66,7 @@ module Interpreters =
       let pt = int(top instr)
       pop instr; push instr (string(pt+1))
       if debug then ignore (stdin.ReadLine())
-    List.iter (printfn "%A") (List.rev !stacks.[output])
+    List.iter (printf "%s") (List.rev !stacks.[output])
     !stacks.[value], heap, List.rev !stacks.[output]
 
   type Interpreted =                //dynamic typing, except for errors

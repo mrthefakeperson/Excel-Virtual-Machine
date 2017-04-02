@@ -9,5 +9,5 @@ module Definitions =
     |GotoFwdShift x -> "goto", string(i + x) | GotoIfTrueFwdShift x -> "gotoiftrue", string(i + x)
     |Call -> "call", "" | Return -> "return", ""
     |GetHeap -> "getheap", "" | NewHeap -> "newheap", "" | WriteHeap -> "writeheap", ""
-    |Input s -> "input", s | OutputLine _ -> "outputline", ""
+    |Input s -> "input", s | Output _ -> "output", ""
     |Combinator_2 c -> c.ToStrPair()

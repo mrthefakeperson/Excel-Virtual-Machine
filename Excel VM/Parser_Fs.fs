@@ -322,3 +322,4 @@ module FSharp =
     preprocess
      >> parse Normal (function [] -> true | _ -> false) (fun _ -> false) []
      >> fst
+     >> String_Formatting.processStringFormatting

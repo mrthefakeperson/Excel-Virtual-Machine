@@ -100,7 +100,7 @@ module Define_VM =
         "newheap", Int 1
         "writeheap", Int -2
         "inputline", Int 1
-        "outputline", Int -1
+        "output", Int -1
         "gotoiftrue", Int -1
         "input", If(Reference ``inputMachine*``, Int 1, Int 0)
        ]
@@ -183,11 +183,11 @@ module Define_VM =
 
   let output =
     Cell (``output*``,
-      If(currentInstruction =. Literal "outputline",
-        Concatenate [|Reference ``output*``; Line_Break; currentValue|],
+      If(currentInstruction =. Literal "output",
+        Concatenate [|Reference ``output*``; currentValue|],
         Reference ``output*``
        )
-       |> defaultTo (Literal "stdout:")
+       |> defaultTo (Literal "stdout:\n")
      )
 
   let variableStack sz row col =

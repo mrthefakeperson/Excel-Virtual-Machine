@@ -135,31 +135,3 @@ module Lexer =
 // " \"string with \\\"quote\\\"\" " -> [" "; ""string with \"quote\"""; " "]
 // "(*)"
 // "//fddf\nfdfd//\n"
-
-module StringExpressions =
-  let buildString builder = String (List.toArray (List.rev builder))
-  let escapeSequences (s:string) =
-    let charList = List.ofArray (s.ToCharArray())
-    let rec parseCharList builder = function
-      |[] -> buildString builder
-      |'\\'::c::tl ->
-        let k =
-          match c with
-          |'\\' -> '\\'
-          |'"' -> '"'
-          |_ -> failwith "escape sequence not recognized"
-        parseCharList (k::builder) tl
-      |c::tl -> parseCharList (c::builder) tl
-    parseCharList [] charList
-
-  let separateFormatSymbols (s:string) =
-    let charList = List.ofArray (s.ToCharArray())
-    // todo: more complex format rules, eg. "%5.4[1-9]"
-    let rec parseCharList builder = function
-      |[] -> List.rev (List.map buildString (List.filter ((<>) []) builder))
-      |'%'::c::tl ->
-        let formatStringBuilder = [c; '%']
-        parseCharList ([]::formatStringBuilder::builder) tl
-      |['%'] -> failwith "incomplete format"
-      |c::tl -> parseCharList ((c::builder.Head)::builder.Tail) tl
-    parseCharList [[]] charList

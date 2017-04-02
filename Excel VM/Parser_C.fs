@@ -358,17 +358,20 @@ module C =
       let xprs' = List.filter (function T ";" -> false | _ -> true) xprs
       Token("sequence", List.map postProcess xprs')
     |X("==", xprs) -> Token("=", List.map postProcess xprs)
-    |X("apply", [T "printf"; X(",", [T "\"%i\\n\""; a])]) -> Token("apply", [Token("apply", [Token "printfn"; Token "\"%i\""]); a])
-    |X("apply", [T "printf"; X(",", [T "\"%s\\n\""; a])]) -> Token("apply", [Token("apply", [Token "printfn"; Token "\"%s\""]); a])
-    |X("apply", [T "scanf"; X(",", [T "\"%i\""; a])]) -> Token("assign", [a; Token("apply", [Token "scan"; Token "%i"])])
-    |X("apply", [T "scanf"; X(",", [T "\"%s\""; a])]) -> Token("assign", [a; Token("apply", [Token "scan"; Token "%s"])])
+    |X("apply", [T ("printf" | "sprintf" | "scanf") as formatFunction; X(",", format::args)]) ->
+      List.fold (fun acc e ->
+        Token("apply", [acc; e])
+       ) (Token("apply", [formatFunction; format])) args
+//    |X("apply", [T "printf"; X(",", [T "\"%i\\n\""; a])]) -> Token("apply", [Token("apply", [Token "printfn"; Token "\"%i\""]); a])
+//    |X("apply", [T "printf"; X(",", [T "\"%s\\n\""; a])]) -> Token("apply", [Token("apply", [Token "printfn"; Token "\"%s\""]); a])
+//    |X("apply", [T "scanf"; X(",", [T "\"%i\""; a])]) -> Token("assign", [a; Token("apply", [Token "scan"; Token "%i"])])
+//    |X("apply", [T "scanf"; X(",", [T "\"%s\""; a])]) -> Token("assign", [a; Token("apply", [Token "scan"; Token "%s"])])
     |X(s, xprs) -> Token(s, List.map postProcess xprs)
-  let parseSyntax' =
-    preprocess
-     >> parse Global (function [] -> true | _ -> false) (fun _ -> false) []
-     >> fst
-     >> postProcess
-     >> function X("sequence", x) -> Token("sequence", x @ [Token("apply", [Token "main"; Token "()"])])
   let parseSyntax e =
     restoreDefault()
-    parseSyntax' e
+    preprocess e
+     |> parse Global (function [] -> true | _ -> false) (fun _ -> false) []
+     |> fst
+     |> postProcess
+     |> function X("sequence", x) -> Token("sequence", x @ [Token("apply", [Token "main"; Token "()"])])
+     |> String_Formatting.processStringFormatting

@@ -69,7 +69,7 @@ module IntegrationTests =
     |"goto", x -> GotoFwdShift (int x - i) |"gotoiftrue", x -> GotoIfTrueFwdShift (int x - i)
     |"call", _ -> Call | "return", _ -> Return
     |"getheap", _ -> GetHeap | "newheap", _ -> NewHeap | "writeheap", _ -> WriteHeap
-    |"inputline", _ -> Input "%i" | "outputline", _ -> OutputLine type_int32
+    |"inputline", _ -> Input "%i" | "output", _ -> Output type_int32
     |name, "" when
       List.exists (function Combinator_2 c -> c.Name = name | _ -> false) allCombinators ->
       List.find (function Combinator_2 c -> c.Name = name | _ -> false) allCombinators

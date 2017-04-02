@@ -1,1 +1,3 @@
-for e in ..(1 1 30) do (((printfn) ("%A")) (77)); for e in ..(1 2 30) do (((printfn) ("%A")) (154))
+for e in ..(1 1 30) do ((fun _1 -> (((printf) ("%A")) (_1); (printf) ("
+"))) (77)); for e in ..(1 2 30) do ((fun _1 -> (((printf) ("%A")) (_1); (printf) ("
+"))) (154))

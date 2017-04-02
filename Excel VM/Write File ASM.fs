@@ -57,7 +57,7 @@ module ASM =
         |GetHeap -> 10, 0
         |WriteHeap -> 11, 0
         |Input t -> 12 + List.findIndex ((=) t) inputFormatList, 0
-        |OutputLine t -> 14 + List.findIndex ((=) t) allTypes, 0
+        |Output t -> 14 + List.findIndex ((=) t) allTypes, 0
         |Combinator_2 c -> 16 + List.findIndex ((=) (Combinator_2 c)) allCombinators, 0
        ) cmds
        |> Array.map (fun (a, b) -> sprintf "\t.long %i\n\t.long %i" a b)

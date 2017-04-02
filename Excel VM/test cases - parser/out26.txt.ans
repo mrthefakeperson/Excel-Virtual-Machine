@@ -1,1 +1,1 @@
-let main = (fun _ -> (let declare(int x) = (nothing); let declare(int y) = (nothing); assign((~&) (x) (scan) (%i)); assign((~&) (y) (scan) (%s)))); (main) (())
+let main = (fun _ -> (let declare(int x) = (nothing); let declare(int y) = (nothing); (fun _1 -> (((scanf) ("%i")) (_1))) ((~&) (x)); (fun _1 -> (((scanf) ("%s")) (_1))) ((~&) (y)))); (main) (())

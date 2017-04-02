@@ -1,1 +1,4 @@
-let rec ((gcd) (a)) (b) = ((if ((>) (a)) (b) then ((gcd) (b)) (a) else (if ((=) (a)) (0) then b else ((gcd) (((%) (b)) (a))) (a)))); ((printfn) ("%A")) (((gcd) (15)) (25)); ((printfn) ("%A")) (((gcd) (14)) (7)); ((printfn) ("%A")) (((gcd) (1001)) (2))
+let rec ((gcd) (a)) (b) = ((if ((>) (a)) (b) then ((gcd) (b)) (a) else (if ((=) (a)) (0) then b else ((gcd) (((%) (b)) (a))) (a)))); (fun _1 -> (((printf) ("%A")) (_1); (printf) ("
+"))) (((gcd) (15)) (25)); (fun _1 -> (((printf) ("%A")) (_1); (printf) ("
+"))) (((gcd) (14)) (7)); (fun _1 -> (((printf) ("%A")) (_1); (printf) ("
+"))) (((gcd) (1001)) (2))
