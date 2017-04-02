@@ -1,6 +1,6 @@
 ﻿namespace Testing
-open Lexer
 open Parser
+open Parser.Lexer
 open AST_Compiler
 open Excel_Language.Definitions
 open ASM_Compiler
@@ -97,7 +97,6 @@ module IntegrationTests =
       |"C" -> C.parseSyntax, String.concat "\n" txt.[1..]
       |_ -> FSharp.parseSyntax, String.concat "\n" txt
     txt
-     |> groupByRuleset
      |> parseSyntax
   let openAndParse =
     openAndPartiallyParse

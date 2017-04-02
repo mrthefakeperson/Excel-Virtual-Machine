@@ -1,5 +1,6 @@
 ﻿namespace Parser
 open Lexer
+open Lexer.CommonClassifiers
 open Token
 // ignore all pattern match warnings (turn this off when adding code)
 #nowarn "25"
@@ -27,22 +28,35 @@ module C =
     |[] -> []
     |BrokenDatatypeName(hd, tl)
     |hd::tl -> hd::tokenizeDatatypes tl
-  let preprocess =
-    List.fold (fun (acc:string list) (e:string) ->
-      match acc, e with
-      |a::rest, s when a.[0] = '#' && s.[0] = '\n' -> e::acc
-      |a::rest, s when a.[0] = '#' -> a + s::rest
-      |_ -> e::acc
-     ) []
-     >> List.rev
+  let preprocess:string -> Token list =
+    let isComment (s:string) =
+      (isPrefix "//" s && isSuffix "\n" s)
+       || (s.Length >= 4 && isPrefix "(*" s && isSuffix "*)" s)
+       || (isPrefix "#" s && isSuffix "\n" s)
+    let mainRules =
+      singleLineCommentRules "#"
+       @ singleLineCommentRules "//"
+       @ delimitedCommentRules "/*" "*/"
+       @ createSymbol "=="
+       @ createSymbol "!="
+       @ createSymbol "<="
+       @ createSymbol ">="
+       @ createSymbol "++"
+       @ createSymbol "--"
+       @ commonRules
+    List.ofSeq
+     >> List.map string
+     >> tokenize mainRules
      >> List.collect (function       // preprocessor commands
           |e when e.[0] = '#' ->
             match e.Replace(" ", "") with
-            |"#include<stdio.h>" -> []
+            |"#include<stdio.h>\n" -> []
             |_ -> failwith "preprocessor commands are not supported yet"
           |e -> [e]
          )
-     >> List.filter (ruleset " " >> not)
+     >> List.filter        // strip whitespace, strip comments
+         (negate
+           (isWhitespace >>|| isDelimitedString "//" "\n" >>|| isDelimitedString "/*" "*/"))
      >> tokenizeDatatypes
      >> List.map (fun e -> Token e)
      >> List.fold (fun acc e ->
@@ -303,7 +317,7 @@ module C =
           let (T "()" | X("sequence", [])), b::restr =
             parse state (function T _::_ -> false | _ -> true) (fun e -> stop e || fail e) [] right
           b, restr
-        |T s as b::restr when ruleset s "1" -> b, restr
+        |T s as b::restr when (isNumeric >>|| isVariable) s -> b, restr
         |_ ->
           let (T "()" | X("sequence", [])), b::restr =
             parse state (function T _::_ -> false | _ -> true) (fun e -> stop e || fail e) [] right

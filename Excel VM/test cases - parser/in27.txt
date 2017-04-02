@@ -1,0 +1,11 @@
+﻿C
+int f(int &x)  // comment 1
+{
+  bool k = !true; /*
+  comment 2
+  */
+  bool *p = *(1+&1);
+  f(*x,/* comment 3 */y,&z);
+  !q[7];
+}
+

@@ -1,4 +1,5 @@
-﻿open AST_Compiler
+﻿open Parser    // test hyphen rules: 5-4, 5 -4, 5 - 4
+open AST_Compiler
 open ASM_Compiler
 open Write_File.ASM
 open Write_File.Excel
@@ -19,7 +20,6 @@ let openAndParse file =
     |"py" -> Parser.Python2.parseSyntax
     |_ -> Parser.C.parseSyntax
   txt
-   |> Lexer.groupByRuleset
    |> parseSyntax
    |> fun e -> e.Clean()
    |> Type_System.applyTypeSystem

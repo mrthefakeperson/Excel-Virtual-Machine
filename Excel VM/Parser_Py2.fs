@@ -5,7 +5,7 @@ open Token
 #nowarn "25"
 
 module Python2 =
-  let preprocess: string list->Token list list =
+  let preprocess: string->Token list list =
     FSharp.preprocess
      >> fun e -> printfn "%A" e; e
      >> List.fold (fun acc e ->

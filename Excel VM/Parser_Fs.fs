@@ -1,11 +1,39 @@
 ﻿namespace Parser
 open Lexer
+open Lexer.CommonClassifiers
 open Token
 // ignore all pattern match warnings (turn this off when adding code)
 #nowarn "25"
 
 module FSharp =
-  let preprocess =
+  let preprocess:string->Token list =
+    let mainRules =     // todo: stick infixes together
+      singleLineCommentRules "//"
+       @ delimitedCommentRules "(*" "*)"
+       @ createSymbol "->"
+       @ createSymbol ".."
+       @ commonRules
+    let rec fixHyphens = function
+      |a::"-"::b::tl when isWhitespace a && (isNumeric >>|| isVariable) b ->
+        a::"-" + b::fixHyphens tl
+      |hd::tl -> hd::fixHyphens tl
+      |[] -> []
+    List.ofSeq
+     >> List.map string
+     >> tokenize mainRules
+     >> fixHyphens
+     >> List.fold (fun ((r, c), acc) -> function
+          |"\n" -> (r + 1, 0), acc
+          |" " -> (r, c + 1), acc
+          |e when e = "\r" || isDelimitedString "//" "\n" e
+           || isDelimitedString "(*" "*)" e -> (r, c), acc
+          |"\t" -> failwith "tabs not allowed"
+          |e when e = "." || List.exists ((=) e) prefixes ->
+            (r, c + e.Length), Token(e, (r, c), false, [])::acc
+          |e -> (r, c + e.Length), Token(e, (r, c))::acc
+         ) ((1, 0), [])
+     >> snd >> List.rev
+     (*
     List.fold (fun ((r,c),acc) (e:string) ->
       if e.[0] = '\n' then        (r+1,e.Replace("\n", "").Length), acc
       else if ruleset " " e then  (r,c+e.Length), acc
@@ -14,6 +42,7 @@ module FSharp =
       else                        (r,c+e.Length), Token(e, (r,c))::acc
      ) ((1,0),[])
      >> snd >> List.rev
+      *)
      >> List.fold (fun (earliestInRow, acc) e ->
           if e.Name = "fun" && fst e.Indentation = fst earliestInRow then
             (earliestInRow, Token("fun", earliestInRow)::acc)
@@ -24,7 +53,7 @@ module FSharp =
          ) ((-1, 0), [])
      >> snd >> List.rev
      >> List.map (function
-          |T s as t when s.Length > 1 && s.[0] = '-' && ruleset s.[1..] "1" ->
+          |T s as t when s.Length > 1 && s.[0] = '-' && (isVariable >>|| isNumeric) s.[1..] ->
             Token("apply", t.Indentation, true, [Token "~-"; Token s.[1..]])
           |x -> x
          )
@@ -238,7 +267,7 @@ module FSharp =
           let (T "()" | X("sequence", [])), b::restr =
             parse state (function T _::_ -> false | _ -> true) (fun e -> stop e || fail e) [] right
           b, restr
-        |T s as b::restr when ruleset s "1" -> b, restr
+        |T s as b::restr when (isVariable >>|| isNumeric) s -> b, restr
         |_ ->
           let (T "()" | X("sequence", [])), b::restr =
             parse state (function T _::_ -> false | _ -> true) (fun e -> stop e || fail e) [] right
