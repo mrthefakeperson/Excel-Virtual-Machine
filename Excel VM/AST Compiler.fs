@@ -1,5 +1,5 @@
 ﻿module AST_Compiler
-open Token
+open Parser.Token
 
 type AST =
   |Sequence of AST list

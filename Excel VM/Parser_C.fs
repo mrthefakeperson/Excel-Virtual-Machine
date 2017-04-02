@@ -1,7 +1,7 @@
 ﻿namespace Parser
+open Token
 open Lexer
 open Lexer.CommonClassifiers
-open Token
 // ignore all pattern match warnings (turn this off when adding code)
 #nowarn "25"
 
@@ -64,12 +64,6 @@ module C =
           |T "{"::_::T "struct"::_, T "}"     // find a better way to do this
           |T "{"::T "struct"::_, T "}" -> e::acc
           |T "{"::rest, T "}" -> Token ";"::rest
-          |acc, T s
-            when List.exists (fun (e:string) -> s.Length > e.Length && e = s.[s.Length-e.Length..]) prefixes ->
-            let matchedPrefix =
-              List.find (fun (e:string) -> s.Length > e.Length && e = s.[s.Length-e.Length..]) prefixes
-            let i = s.Length-matchedPrefix.Length
-            Token s.[i..]::Token s.[..i-1]::acc
           |_ -> e::acc
          ) []
      >> List.rev

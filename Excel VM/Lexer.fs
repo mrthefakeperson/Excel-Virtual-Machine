@@ -77,7 +77,7 @@ module Lexer =
               |None -> None
               |Some (p, s) -> Some (b::p, s)
           let ss = List.ofSeq s |> List.map string
-          let rec groupSymbols ll =
+          let rec groupSymbols ll =     // symbols will not overwrite previous symbols, even if they match due to the way the matching list is constructed (one char per index, meaning prefixes with previously formed symbols will never be matched)
             match tryGetPrefix (ss, ll), ll with
             |Some (p, s), _ -> String.concat "" p::groupSymbols s
             |None, [] -> []

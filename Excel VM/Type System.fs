@@ -1,5 +1,5 @@
 ﻿module Type_System
-open Token
+open Parser.Token
 open System.Collections.Generic
 
 // dict: name_of_member -> (index, initial_value [option])

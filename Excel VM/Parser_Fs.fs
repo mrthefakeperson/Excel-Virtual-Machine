@@ -1,7 +1,8 @@
 ﻿namespace Parser
+open Token
+open Symbols
 open Lexer
 open Lexer.CommonClassifiers
-open Token
 // ignore all pattern match warnings (turn this off when adding code)
 #nowarn "25"
 
@@ -13,7 +14,7 @@ module FSharp =
        @ createSymbol "->"
        @ createSymbol ".."
        @ commonRules
-    let rec fixHyphens = function
+    let rec fixHyphens = function    // "-"::b::tl is handled because Infix doesn't match it
       |a::"-"::b::tl when isWhitespace a && (isNumeric >>|| isVariable) b ->
         a::"-" + b::fixHyphens tl
       |hd::tl -> hd::fixHyphens tl
@@ -33,16 +34,6 @@ module FSharp =
           |e -> (r, c + e.Length), Token(e, (r, c))::acc
          ) ((1, 0), [])
      >> snd >> List.rev
-     (*
-    List.fold (fun ((r,c),acc) (e:string) ->
-      if e.[0] = '\n' then        (r+1,e.Replace("\n", "").Length), acc
-      else if ruleset " " e then  (r,c+e.Length), acc
-      else if e = "." || List.exists ((=) e) prefixes then
-                                  (r,c+e.Length), Token(e, (r,c), false, [])::acc
-      else                        (r,c+e.Length), Token(e, (r,c))::acc
-     ) ((1,0),[])
-     >> snd >> List.rev
-      *)
      >> List.fold (fun (earliestInRow, acc) e ->
           if e.Name = "fun" && fst e.Indentation = fst earliestInRow then
             (earliestInRow, Token("fun", earliestInRow)::acc)

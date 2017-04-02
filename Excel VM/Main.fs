@@ -1,4 +1,5 @@
 ﻿open Parser    // test hyphen rules: 5-4, 5 -4, 5 - 4
+open Parser.Token
 open AST_Compiler
 open ASM_Compiler
 open Write_File.ASM
