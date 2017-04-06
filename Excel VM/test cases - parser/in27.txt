@@ -1,4 +1,5 @@
 ﻿C
+#include <stdio.h>
 int f(int &x)  // comment 1
 {
   bool k = !true; /*

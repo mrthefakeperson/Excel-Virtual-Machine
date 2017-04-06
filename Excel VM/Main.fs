@@ -35,8 +35,8 @@ let main argv =
     //testTypeSystem 26
 
     testParser verify 1
-    testCompilerAST verify 1
-    testExcelCompiler 1
+    //testCompilerAST verify 1
+    //testExcelCompiler 1
     //testAsmCompiler 27
     printfn "done"
     ignore (stdin.ReadLine())

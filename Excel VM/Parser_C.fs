@@ -11,8 +11,12 @@ open Lexer.CommonClassifiers
 //       => if (cond) then (return v)...failed, incomplete without a terminating ;
 //  fix: don't remove the ; upon finishing parsing?
 module C =
-  let listOfDatatypeNames = ref ["int"; "long long"; "long"; "bool"]
-  let restoreDefault() = listOfDatatypeNames := ["int"; "long long"; "long"; "bool"]
+  let listOfDatatypeNamesDefault = [
+    "int"; "long long"; "long"; "bool"; "char"; "unsigned"; "unsigned int";
+    "unsigned long int"; "unsigned long long int"; "long int"; "long long int"
+   ]
+  let listOfDatatypeNames = ref listOfDatatypeNamesDefault
+  let restoreDefault() = listOfDatatypeNames := listOfDatatypeNamesDefault
   let (|BrokenDatatypeName|_|) (ll:string list) =
     let matchString (s:string) =
       let matching = s.Split ' ' |> Array.toList
@@ -37,12 +41,8 @@ module C =
       singleLineCommentRules "#"
        @ singleLineCommentRules "//"
        @ delimitedCommentRules "/*" "*/"
-       @ createSymbol "=="
-       @ createSymbol "!="
-       @ createSymbol "<="
-       @ createSymbol ">="
-       @ createSymbol "++"
-       @ createSymbol "--"
+       @ createSymbol "==" @ createSymbol "!=" @ createSymbol "<=" @ createSymbol ">="
+       @ createSymbol "++" @ createSymbol "--"
        @ commonRules
     List.ofSeq
      >> List.map string
@@ -152,8 +152,6 @@ module C =
           Token("let", [Token("declare", [Token datatypeName; identifierName]); value]), restr
         |X("dot", [identifierName; X("[]", arraySize)]) ->    // declared type should be a pointer type
           Token("let", [Token("declare", [Token datatypeName; identifierName]); Token("array", arraySize)]), restr
-//        |T _ | X("sequence", [T _]) | X("assign", [_; _]) | X(",", _) | X("dot", [_; X("[]", _)]) ->
-//          Token("declare", [Token datatypeName; identifierName]), restr
         |X("apply", [identifierName; args]) ->
           let X("sequence", []), functionBody::restr =
             parse Local (function X("{}", _)::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
@@ -201,7 +199,6 @@ module C =
     |_ -> None
   and (|DatatypeLocal|_|) state stop fail = function
     |DatatypeName(datatypeName, restl), right ->
-    //|left, DatatypeName(datatypeName, restr) ->
       let parsed, restr =
         parse LocalImd (function T(";" | ",")::_ -> true | _ -> false) (fun e -> stop e || fail e) [] right
       let parsed =
@@ -275,7 +272,7 @@ module C =
     |T "for"::restl, T "("::restr ->
       let decl, T ";"::restr =
         parse Local (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
-      let X("declare", [datatypeName; name]) = decl
+      //let X("declare", [datatypeName; name]) = decl
       let cond, T ";"::restr =
         parse Local (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
       let incr, T ")"::restr =
@@ -362,10 +359,6 @@ module C =
       List.fold (fun acc e ->
         Token("apply", [acc; e])
        ) (Token("apply", [formatFunction; format])) args
-//    |X("apply", [T "printf"; X(",", [T "\"%i\\n\""; a])]) -> Token("apply", [Token("apply", [Token "printfn"; Token "\"%i\""]); a])
-//    |X("apply", [T "printf"; X(",", [T "\"%s\\n\""; a])]) -> Token("apply", [Token("apply", [Token "printfn"; Token "\"%s\""]); a])
-//    |X("apply", [T "scanf"; X(",", [T "\"%i\""; a])]) -> Token("assign", [a; Token("apply", [Token "scan"; Token "%i"])])
-//    |X("apply", [T "scanf"; X(",", [T "\"%s\""; a])]) -> Token("assign", [a; Token("apply", [Token "scan"; Token "%s"])])
     |X(s, xprs) -> Token(s, List.map postProcess xprs)
   let parseSyntax e =
     restoreDefault()
