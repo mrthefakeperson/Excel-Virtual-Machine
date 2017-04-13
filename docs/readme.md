@@ -14,10 +14,4 @@ By default, 500 iterations are made each time. To ensure accuracy, do not distur
 
 Download the latest version [here](https://github.com/mrthefakeperson/Excel-Virtual-Machine/files/901329/Excel_VM.zip).
 
-# Examples
-
-..for now, are included in the download. They'll be here shortly.
-
-# Try It
-
-coming soon
+# [Examples / Try It Online](onlineCompiler.html)

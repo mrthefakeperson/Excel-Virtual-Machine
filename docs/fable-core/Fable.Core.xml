@@ -1,0 +1,631 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+<assembly><name>Fable.Core</name></assembly>
+<members>
+<member name="T:Fable.AST.ExtendedNumberKind">
+<summary>
+ Numbers that are not represented with JS native number type
+</summary>
+</member>
+<member name="T:Fable.AST.Position">
+<summary>
+ Each Position object consists of a line number (1-indexed) and a column number (0-indexed):
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.ExportAllDeclaration">
+<summary>
+ An export batch declaration, e.g., export * from &quot;mod&quot;;.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.ExportDefaultDeclaration">
+<summary>
+ An export default declaration, e.g., export default function () {}; or export default 1;.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.ExportNamedDeclaration">
+<summary>
+ An export named declaration, e.g., export {foo, bar};, export {foo} from &quot;mod&quot;; or export var foo = 1;.
+ Note: Having declaration populated with non-empty specifiers or non-null source results in an invalid state.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.ExportSpecifier">
+<summary>
+ An exported variable binding, e.g., {foo} in export {foo} or {bar as foo} in export {bar as foo}.
+ The exported field refers to the name exported in the module.
+ The local field refers to the binding into the local module scope.
+ If it is a basic named export, such as in export {foo}, both exported and local are equivalent Identifier nodes;
+ in this case an Identifier node representing foo. If it is an aliased export, such as in export {bar as foo},
+ the exported field is an Identifier node representing foo, and the local field is an Identifier node representing bar.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.ImportDeclaration">
+<summary>
+ e.g., import foo from &quot;mod&quot;;.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.ImportNamespaceSpecifier">
+<summary>
+ A namespace import specifier, e.g., * as foo in import * as foo from &quot;mod&quot;.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.ImportDefaultSpecifier">
+<summary>
+ A default import specifier, e.g., foo in import foo from &quot;mod&quot;.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.ImportSpecifier">
+<summary>
+ An imported variable binding, e.g., {foo} in import {foo} from &quot;mod&quot; or {foo as bar} in import {foo as bar} from &quot;mod&quot;.
+ The imported field refers to the name of the export imported from the module.
+ The local field refers to the binding imported into the local module scope.
+ If it is a basic named import, such as in import {foo} from &quot;mod&quot;, both imported and local are equivalent Identifier nodes; in this case an Identifier node representing foo.
+ If it is an aliased import, such as in import {foo as bar} from &quot;mod&quot;, the imported field is an Identifier node representing foo, and the local field is an Identifier node representing bar.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.ModuleSpecifier">
+<summary>
+ A specifier in an import or export declaration.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.ClassExpression">
+<summary>
+ Anonymous class: e.g., var myClass = class { }
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.ClassProperty">
+<summary>
+ ES Class Fields &amp; Static Properties
+ https://github.com/jeffmo/es-class-fields-and-static-properties
+ e.g, class MyClass { static myStaticProp = 5; myProp /* = 10 */; }
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.SequenceExpression">
+<summary>
+ A comma-separated sequence of expressions.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.CallExpression">
+<summary>
+ A function or method call expression.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.ConditionalExpression">
+<summary>
+ A conditional expression, i.e., a ternary ?/: expression.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.MemberExpression">
+<summary>
+ If computed is true, the node corresponds to a computed (a[b]) member expression and property is an Expression.
+ If computed is false, the node corresponds to a static (a.b) member expression and property is an Identifier.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.SpreadProperty">
+<summary>
+ e.g., var z = { x: 1, ...y } // Copy all properties from y
+</summary>
+</member>
+<member name="P:Fable.AST.Babel.YieldExpression.delegate">
+<summary>
+ Delegates to another generator? (yield*)
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.DoExpression">
+<summary>
+ e.g., x = do { var t = f(); t * t + 1 };
+ http://wiki.ecmascript.org/doku.php?id=strawman:do_expressions
+ Doesn&apos;t seem to work well with block-scoped variables (let, const)
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.ArrowFunctionExpression">
+<summary>
+ A fat arrow function expression, e.g., let foo = (bar) =&gt; { /* body */ }.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.Super">
+<summary>
+ A super pseudo-expression.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.FunctionDeclaration">
+<summary>
+ A function declaration. Note that id cannot be null.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.ForOfStatement">
+<summary>
+ When passing a VariableDeclaration, the bound value must go through
+ the `right` parameter instead of `init` property in VariableDeclarator
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.ForInStatement">
+<summary>
+ When passing a VariableDeclaration, the bound value must go through
+ the `right` parameter instead of `init` property in VariableDeclarator
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.TryStatement">
+<summary>
+ If handler is null then finalizer must be a BlockStatement.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.CatchClause">
+<summary>
+ A catch clause following a try block.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.SwitchCase">
+<summary>
+ A case (if test is an Expression) or default (if test === null) clause in the body of a switch statement.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.ContinueStatement">
+<summary>
+ Contineu can optionally take a label of a loop to continuue
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.BreakStatement">
+<summary>
+ Break can optionally take a label of a loop to break
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.LabeledStatement">
+<summary>
+ Statement (typically loop) prefixed with a label (for continuue and break)
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.EmptyStatement">
+<summary>
+ An empty statement, i.e., a solitary semicolon.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.BlockStatement">
+<summary>
+ A block statement, i.e., a sequence of statements surrounded by braces.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.ExpressionStatement">
+<summary>
+ An expression statement, i.e., a statement consisting of a single expression.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.Program">
+<summary>
+ A complete program source tree.
+ Parsers must specify sourceType as &quot;module&quot; if the source has been parsed as an ES6 module.
+ Otherwise, sourceType must be &quot;script&quot;.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.Directive">
+<summary>
+ e.g. &quot;use strict&quot;;
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.Identifier">
+<summary>
+ Note that an identifier may be an expression or a destructuring pattern.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.MacroExpression">
+<summary>
+ Not in Babel specs, disguised as StringLiteral
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.EmptyExpression">
+<summary>
+ Placeholder, doesn&apos;t belong to Babel specs
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.ModuleDeclaration">
+<summary>
+ A module import or export declaration.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.Declaration">
+<summary>
+ Note that declarations are considered statements; this is because declarations can appear in any statement context.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.Expression">
+<summary>
+ Since the left-hand side of an assignment may be any expression in general, an expression can also be a pattern.
+</summary>
+</member>
+<member name="T:Fable.AST.Babel.Node">
+<summary>
+ The type field is a string representing the AST variant type.
+ Each subtype of Node is documented below with the specific string of its type field.
+ You can use this field to determine which interface a node implements.
+ The loc field represents the source location information of the node.
+ If the node contains no information about the source location, the field is null;
+ otherwise it is an object consisting of a start position (the position of the first character of the parsed source region)
+ and an end position (the position of the first character after the parsed source region):
+</summary>
+</member>
+<member name="P:Fable.AST.Fable.ApplyInfo.lambdaArgArity">
+<summary>
+ If the method accepts a lambda as first argument, indicates its arity
+</summary>
+</member>
+<member name="P:Fable.AST.Fable.ApplyInfo.ownerFullName">
+<summary>
+ Sometimes Fable.Type may differ from original F# name (e.g. System.Object -&gt; Fable.Any).
+ This field keeps the original name.
+</summary>
+</member>
+<member name="T:Fable.AST.Fable.Declaration.EntityDeclaration">
+<summary>
+ Module members are also declared as variables, so they need
+ a private name that doesn&apos;t conflict with enclosing scope (see #130)
+</summary>
+</member>
+<member name="M:Fable.AST.Fable.Entity.TryGetFullDecorator(System.String)">
+<summary>
+ Finds decorator by full name
+</summary>
+</member>
+<member name="M:Fable.AST.Fable.Entity.TryGetDecorator(System.String)">
+<summary>
+ Finds decorator by name
+</summary>
+</member>
+<member name="T:Fable.AST.Fable.ValueKind.Lambda">
+<summary>
+ isArrow: Arrow functions capture the enclosing `this` in JS
+</summary>
+</member>
+<member name="M:Fable.AST.Fable.Util.compareConcreteAndGenericTypes(Microsoft.FSharp.Collections.FSharpList{Fable.AST.Fable.Type},Microsoft.FSharp.Collections.FSharpList{Fable.AST.Fable.Type})">
+<summary>
+ Helper when we need to compare the types of the arguments applied to a method
+ (concrete) with the declared argument types for that method (may be generic)
+ (e.g. when resolving a TraitCall)
+</summary>
+</member>
+<member name="M:Fable.AST.Fable.Util.makeApply(Microsoft.FSharp.Core.FSharpOption{Fable.AST.SourceLocation},Fable.AST.Fable.Type,Fable.AST.Fable.Expr,Microsoft.FSharp.Collections.FSharpList{Fable.AST.Fable.Expr})">
+<summary>
+ Checks if an F# let binding is being applied and
+ applies arguments as for a curried function
+</summary>
+</member>
+<member name="M:Fable.AST.Fable.Util.tryImported``1(System.Lazy{System.String},``0)">
+<summary>
+ Ignores relative imports (e.g. `[&lt;Import(&quot;foo&quot;,&quot;./lib.js&quot;)&gt;]`)
+</summary>
+</member>
+<member name="T:Fable.Core.Applicable">
+<summary>
+ DO NOT USE: Internal type for Fable dynamic operations
+</summary>
+</member>
+<member name="T:Fable.Core.EmitAttribute">
+<summary>
+ Function calls will be replaced by inlined JS code.
+ More info: http://fable.io/docs/interacting.html#Import-attribute
+</summary>
+</member>
+<member name="T:Fable.Core.EraseAttribute">
+<summary>
+ Used for erased union types and to ignore modules in JS compilation.
+ More info: http://fable.io/docs/interacting.html#Erase-attribute
+</summary>
+</member>
+<member name="T:Fable.Core.GlobalAttribute">
+<summary>
+ The module, type, function... is globally accessible in JS.
+ More info: http://fable.io/docs/interacting.html#Import-attribute
+</summary>
+</member>
+<member name="T:Fable.Core.ImportAttribute">
+<summary>
+ References to the module, type, function... will be replaced by import statements.
+ Use `[&lt;Import(&quot;default&quot;, &quot;my-package&quot;)&gt;] to import the default member.
+ Use `[&lt;Import(&quot;*&quot;, &quot;my-package&quot;)&gt;] to import the whole package.
+ More info: http://fable.io/docs/interacting.html#Import-attribute
+</summary>
+</member>
+<member name="T:Fable.Core.KeyValueListAttribute">
+<summary>
+ Compile union case lists as JS object literals.
+ More info: http://fable.io/docs/interacting.html#KeyValueList-attribute
+</summary>
+</member>
+<member name="T:Fable.Core.MutatingUpdateAttribute">
+<summary>
+ [EXPERIMENTAL] Record updates will be compiled as mutations: { x with a = 5 }
+ Fable will fail if the original value is used after being updated or passed to a function.
+ More info: http://fable.io/docs/interacting.html#MutatingUpdate-attribute
+</summary>
+</member>
+<member name="T:Fable.Core.PassGenericsAttribute">
+<summary>
+ When this is attached to a method, Fable will add the generic info
+ as an extra argument to every call, making it possible to access
+ a type &apos;T with `typeof&lt;&apos;T&gt;` within the method body
+</summary>
+</member>
+<member name="T:Fable.Core.PojoAttribute">
+<summary>
+ Compile a record as a JS object literals.
+ More info: http://fable.io/docs/interacting.html
+</summary>
+</member>
+<member name="T:Fable.Core.StringEnumAttribute">
+<summary>
+ Compile union types as string literals.
+ More info: http://fable.io/docs/interacting.html#StringEnum-attribute
+</summary>
+</member>
+<member name="T:Fable.Core.U2`2">
+<summary>
+ Erased union type to represent one of two possible values.
+ More info: http://fable.io/docs/interacting.html#Erase-attribute
+</summary>
+</member>
+<member name="T:Fable.Core.U3`3">
+<summary>
+ Erased union type to represent one of three possible values.
+ More info: http://fable.io/docs/interacting.html#Erase-attribute
+</summary>
+</member>
+<member name="T:Fable.Core.U4`4">
+<summary>
+ Erased union type to represent one of four possible values.
+ More info: http://fable.io/docs/interacting.html#Erase-attribute
+</summary>
+</member>
+<member name="T:Fable.Core.U5`5">
+<summary>
+ Erased union type to represent one of five possible values.
+ More info: http://fable.io/docs/interacting.html#Erase-attribute
+</summary>
+</member>
+<member name="T:Fable.Core.U6`6">
+<summary>
+ Erased union type to represent one of six possible values.
+ More info: http://fable.io/docs/interacting.html#Erase-attribute
+</summary>
+</member>
+<member name="M:Fable.Core.Exceptions.jsNative``1">
+<summary>
+ Used to indicate that a member is only implemented in native Javascript
+</summary>
+</member>
+<member name="T:Fable.Core.JsInterop.JsFunc6`7">
+<summary>
+ Same as `System.Func&lt;&apos;Arg1,&apos;Arg2,&apos;Arg3,&apos;Arg4,&apos;Arg5,&apos;Arg6,&apos;Out&gt;`
+</summary>
+</member>
+<member name="T:Fable.Core.JsInterop.JsFunc5`6">
+<summary>
+ Same as `System.Func&lt;&apos;Arg1,&apos;Arg2,&apos;Arg3,&apos;Arg4,&apos;Arg5,&apos;Out&gt;`
+</summary>
+</member>
+<member name="T:Fable.Core.JsInterop.JsFunc4`5">
+<summary>
+ Same as `System.Func&lt;&apos;Arg1,&apos;Arg2,&apos;Arg3,&apos;Arg4,&apos;Out&gt;`
+</summary>
+</member>
+<member name="T:Fable.Core.JsInterop.JsFunc3`4">
+<summary>
+ Same as `System.Func&lt;&apos;Arg1,&apos;Arg2,&apos;Arg3,&apos;Out&gt;`
+</summary>
+</member>
+<member name="T:Fable.Core.JsInterop.JsFunc2`3">
+<summary>
+ Same as `System.Func&lt;&apos;Arg1,&apos;Arg2,&apos;Out&gt;`
+</summary>
+</member>
+<member name="T:Fable.Core.JsInterop.JsFunc1`2">
+<summary>
+ Same as `System.Func&lt;&apos;Arg1,&apos;Out&gt;`
+</summary>
+</member>
+<member name="T:Fable.Core.JsInterop.JsFunc0`1">
+<summary>
+ Same as `System.Func&lt;unit,&apos;Out&gt;`
+</summary>
+</member>
+<member name="T:Fable.Core.JsInterop.JsFunc">
+<summary>
+ Use it to cast dynamic functions coming from JS. If you know the argument
+ and return types, use `System.Func&lt;&gt;` instead. If you need a constructor
+ (must be applied with `new` keyword), use `JsConstructor`.
+
+ ## Sample
+     let f: JsFunc = import &quot;myFunction&quot; &quot;./myLib&quot;
+     f.Invoke(5, &quot;bar&quot;)
+</summary>
+</member>
+<member name="T:Fable.Core.JsInterop.JsConstructor`7">
+<summary>
+ Use it when importing a constructor from a JS library.
+</summary>
+</member>
+<member name="T:Fable.Core.JsInterop.JsConstructor`6">
+<summary>
+ Use it when importing a constructor from a JS library.
+</summary>
+</member>
+<member name="T:Fable.Core.JsInterop.JsConstructor`5">
+<summary>
+ Use it when importing a constructor from a JS library.
+</summary>
+</member>
+<member name="T:Fable.Core.JsInterop.JsConstructor`4">
+<summary>
+ Use it when importing a constructor from a JS library.
+</summary>
+</member>
+<member name="T:Fable.Core.JsInterop.JsConstructor`3">
+<summary>
+ Use it when importing a constructor from a JS library.
+</summary>
+</member>
+<member name="T:Fable.Core.JsInterop.JsConstructor`2">
+<summary>
+ Use it when importing a constructor from a JS library.
+</summary>
+</member>
+<member name="T:Fable.Core.JsInterop.JsConstructor`1">
+<summary>
+ Use it when importing a constructor from a JS library.
+</summary>
+</member>
+<member name="T:Fable.Core.JsInterop.JsConstructor">
+<summary>
+ Use it when importing a constructor from a JS library.
+</summary>
+</member>
+<member name="M:Fable.Core.JsInterop.jsThis``1">
+<summary>
+ Compiles to JS `this` keyword. Can only be used within a delegate.
+
+ ## Sample
+     let fn = JsFunc2(fun x y -&gt; jsThis?add(x, y))
+</summary>
+</member>
+<member name="M:Fable.Core.JsInterop.inflate``1(System.Object)">
+<summary>
+ Converts a plain JS object (POJO) to an instance of the specified type.
+ This is only intended if you&apos;re using a custom serialization method
+ (that must produce same objects as `toJson`) instead of `ofJson`.
+</summary>
+</member>
+<member name="M:Fable.Core.JsInterop.ofJsonWithTypeInfo``1(System.String)">
+<summary>
+ Instantiate F# objects from JSON containing $type info
+</summary>
+</member>
+<member name="M:Fable.Core.JsInterop.toJsonWithTypeInfo``1(``0)">
+<summary>
+ Serialize F# objects to JSON adding $type info
+</summary>
+</member>
+<member name="M:Fable.Core.JsInterop.ofJson``1(System.String)">
+<summary>
+ Instantiate F# objects from JSON
+</summary>
+</member>
+<member name="M:Fable.Core.JsInterop.toJson``1(``0)">
+<summary>
+ Serialize F# objects to JSON
+</summary>
+</member>
+<member name="M:Fable.Core.JsInterop.toPlainJsObj``1(``0)">
+<summary>
+ Convert F# unions, records and classes into plain JS objects
+ DEPRECATED: Use a Pojo record or union
+</summary>
+</member>
+<member name="M:Fable.Core.JsInterop.importAll``1(System.String)">
+<summary>
+ F#: let myLib = importAll&lt;obj&gt; &quot;myLib&quot;
+ JS: import * as myLib from &quot;myLib&quot;
+</summary>
+</member>
+<member name="M:Fable.Core.JsInterop.importDefault``1(System.String)">
+<summary>
+ F#: let defaultMember = importDefault&lt;unit-&gt;obj&gt; &quot;myModule&quot;
+ JS: import defaultMember from &quot;myModule&quot;
+</summary>
+</member>
+<member name="M:Fable.Core.JsInterop.importMember``1(System.String)">
+<summary>
+ F#: let myMember = importMember&lt;string&gt; &quot;myModule&quot;
+ JS: import { myMember } from &quot;myModule&quot;
+ Note the import must be immediately assigned to a value in a let binding
+</summary>
+</member>
+<member name="M:Fable.Core.JsInterop.import``1(System.String,System.String)">
+<summary>
+ Works like `ImportAttribute` (same semantics as ES6 imports).
+ You can use &quot;*&quot; or &quot;default&quot; selectors.
+</summary>
+</member>
+<member name="M:Fable.Core.JsInterop.createEmpty``1">
+<summary>
+ Create an empty JS object: {}
+</summary>
+</member>
+<member name="M:Fable.Core.JsInterop.createObj``1(``0)">
+<summary>
+ Create a literal JS object from a collection of key-value tuples.
+ E.g. `createObj [ &quot;a&quot; ==&gt; 5 ]` in JS becomes `{ a: 5 }`
+</summary>
+</member>
+<member name="M:Fable.Core.JsInterop.createNew(System.Object,System.Object)">
+<summary>
+ Destructure and apply a tuple to an arbitrary value with `new` keyword.
+ E.g. `createNew myCons (arg1, arg2)` in JS becomes `new myCons(arg1, arg2)`
+</summary>
+</member>
+<member name="M:Fable.Core.JsInterop.op_EqualsEqualsGreater(System.String,System.Object)">
+<summary>
+ Upcast the right operand to obj and create a key-value tuple.
+ Mostly convenient when used with `createObj`.
+ E.g. `createObj [ &quot;a&quot; ==&gt; 5 ]` in JS becomes `{ a: 5 }`
+</summary>
+</member>
+<member name="M:Fable.Core.JsInterop.op_Dollar(System.Object,System.Object)">
+<summary>
+ Destructure and apply a tuple to an arbitrary value.
+ E.g. `myFn $ (arg1, arg2)` in JS becomes `myFn(arg1, arg2)`
+</summary>
+</member>
+<member name="M:Fable.Core.JsInterop.op_DynamicAssignment(System.Object,System.Object,System.Object)">
+<summary>
+ Dynamically assign a value to a property of an arbitrary object.
+ `myObj?propA &lt;- 5` in JS becomes `myObj.propA = 5`
+ `myObj?(propA) &lt;- 5` in JS becomes `myObj[propA] = 5`
+</summary>
+</member>
+<member name="M:Fable.Core.JsInterop.op_Dynamic(System.Object,System.Object)">
+<summary>
+ Dynamically access a property of an arbitrary object.
+ `myObj?propA` in JS becomes `myObj.propA`
+ `myObj?(propA)` in JS becomes `myObj[propA]`
+</summary>
+</member>
+<member name="M:Fable.Core.JsInterop.op_BangBang``2(``0)">
+<summary>
+ Has same effect as `unbox` (dynamic casting erased in compiled JS code).
+ The casted type can be defined on the call site: `!!myObj?bar(5): float`
+</summary>
+</member>
+<member name="P:Fable.Naming.genericPlaceholderRegex">
+<summary>
+ Matches placeholders for generics in an Emit macro
+ like `React.createElement($&apos;T, $0, $1)`
+</summary>
+</member>
+<member name="P:Fable.Naming.ignoredCompilerGenerated">
+<summary>
+ Methods automatically assigned by the F# compiler
+ for unions and records. Ignored by Fable.
+</summary>
+</member>
+<member name="P:Fable.Naming.ignoredInterfaces">
+<summary>
+ Interfaces automatically assigned by the F# compiler
+ to unions and records. Ignored by Fable.
+</summary>
+</member>
+<member name="P:Fable.Naming.replacedInterfaces">
+<summary>
+ Calls to methods of these interfaces will be replaced
+</summary>
+</member>
+<member name="P:Fable.Naming.targetFileExtension">
+<summary>
+ This is null to keep compatibility with Require.js
+ (which expects paths not to have extensions), in the
+ future this will probably be changed to &quot;.js&quot;
+</summary>
+</member>
+<member name="M:Fable.Path.getRelativeFileOrDirPath(System.Boolean,System.String,System.Boolean,System.String)">
+<summary>
+ Creates a relative path from one file or folder to another.
+</summary>
+</member>
+</members>
+</doc>

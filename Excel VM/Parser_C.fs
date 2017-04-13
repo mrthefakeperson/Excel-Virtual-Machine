@@ -192,8 +192,8 @@ module C =
     |a::restl, T ","::restr ->
       let parsed, restr = parse state stop fail [] restr
       let parsed =
-        match parsed.Clean() with
-        |X(",", args) -> Token(",", a::args)
+        match parsed with
+        |X("sequence", [X(",", args)]) -> Token(",", a::args)
         |_ -> Token(",", [a; parsed])
       Some (parse state stop fail restl (parsed::restr))
     |_ -> None
@@ -202,7 +202,9 @@ module C =
       let parsed, restr =
         parse LocalImd (function T(";" | ",")::_ -> true | _ -> false) (fun e -> stop e || fail e) [] right
       let parsed =
-        match parsed.Clean() with
+        let pars = match parsed with X("sequence", [pars]) -> pars
+        match pars with
+//        match parsed.Clean() with
         |X("assign", [T declaredName as t; value]) ->
           Token("let", [Token("declare", [Token datatypeName; t]); value])
         |T declaredName as t ->

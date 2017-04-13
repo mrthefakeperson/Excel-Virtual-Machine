@@ -1,0 +1,47 @@
+{
+  "name": "fable-core",
+  "version": "0.7.30",
+  "description": "Fable core lib & bindings for native JS objects, browser and node APIs",
+  "main": "Main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fable-compiler/Fable/import/core"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Alfonso Garcia-Caro"
+  },
+  "keywords": [
+    "fable",
+    "fable-compiler",
+    "fsharp",
+    "F#"
+  ],
+  "homepage": "https://github.com/fable-compiler/Fable#readme",
+  "_id": "fable-core@0.7.30",
+  "scripts": {},
+  "_shasum": "f05e27b26adc1f2c6db7e6fe346f0a0e9b4b7b68",
+  "_from": "fable-core@latest",
+  "_npmVersion": "4.1.1",
+  "_nodeVersion": "7.7.1",
+  "_npmUser": {
+    "name": "alfonsogarciacaro",
+    "email": "alfonsogarciacaro@gmail.com"
+  },
+  "dist": {
+    "shasum": "f05e27b26adc1f2c6db7e6fe346f0a0e9b4b7b68",
+    "tarball": "https://registry.npmjs.org/fable-core/-/fable-core-0.7.30.tgz"
+  },
+  "maintainers": [
+    {
+      "name": "alfonsogarciacaro",
+      "email": "alfonso.garcia-caro@hotmail.com"
+    }
+  ],
+  "_npmOperationalInternal": {
+    "host": "packages-12-west.internal.npmjs.com",
+    "tmp": "tmp/fable-core-0.7.30.tgz_1490732786863_0.06428152741864324"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/fable-core/-/fable-core-0.7.30.tgz"
+}
