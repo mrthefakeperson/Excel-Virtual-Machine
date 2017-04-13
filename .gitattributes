@@ -61,3 +61,7 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+#ignore 3rd party libraries
+docs/fable-core/* linguist-vendored
+docs/scripts/* linguist-vendored
