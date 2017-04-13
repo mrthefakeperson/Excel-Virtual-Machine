@@ -138,7 +138,7 @@ let rec processDerefs = function
   |X(s, dep) -> Token(s, List.map processDerefs dep)
 
 
-let applyTypeSystem:Token->Token =
+let applyTypeSystem:Token -> Token =
   compileObjectsToArrays
    >> compilePointersToArrays
    >> processDerefs

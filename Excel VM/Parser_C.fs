@@ -192,7 +192,7 @@ module C =
     |a::restl, T ","::restr ->
       let parsed, restr = parse state stop fail [] restr
       let parsed =
-        match parsed with
+        match parsed.Clean() with
         |X(",", args) -> Token(",", a::args)
         |_ -> Token(",", [a; parsed])
       Some (parse state stop fail restl (parsed::restr))

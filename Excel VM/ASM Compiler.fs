@@ -31,6 +31,7 @@ type PseudoAsm =
   |Input of string
   |Output of System.Type
   |Combinator_2 of comb2
+                     // todo: try object expressions here instead
 type C2_Add(name, symbol) =
   inherit comb2(name, symbol)
   override x.Interpret a b = string (int a + int b)
@@ -104,8 +105,8 @@ let rec (|Inline|_|) = function
   |Apply(Value "printf", [Const "%s"])
   |Value "printf" ->
     Some [NewHeap; Store x; Load x; Push (string (_PrintAddress type_string)); WriteHeap; NewHeap; Push "endArr"; WriteHeap; Load x; Popv x]
-  |Apply(Value "scan", [Const s | Value s]) ->
-    Some [NewHeap; Store x; Load x; Input s; WriteHeap; Load x; Popv x]
+  |Apply(Value "scan", [Const s | Value s]) -> Some [Input s]
+//    Some [NewHeap; Store x; Load x; Input s; WriteHeap; Load x; Popv x]
   |Value "nothing" -> Some [Push "nothing"]     // void; change this later so that assigning `nothing` does nothing
   |_ -> None
 and compile' inScope = function

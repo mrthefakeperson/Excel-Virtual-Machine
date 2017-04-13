@@ -36,15 +36,25 @@ module String_Formatting =
       |c::tl -> parseCharList ((c::builder.Head)::builder.Tail) tl
     parseCharList [[]] charList
     
-  let buildFormatFunction =
-    let rec buildFormatFunction arg ret makeFormat nonFormat = function
+  let buildFormatFunction makeFormat nonFormat =
+    let rec buildFormatFunction arg ret = function
       |fmt::tl when isFormatString fmt ->
         let argName = Token (sprintf "_%i" arg)
         Token("fun", [argName;
-          buildFormatFunction (arg + 1) (makeFormat (sprintf "\"%s\"" fmt) argName::ret) makeFormat nonFormat tl])
-      |s::tl -> buildFormatFunction arg (nonFormat (sprintf "\"%s\"" s)::ret) makeFormat nonFormat tl
-      |[] -> Token("sequence", List.rev ret)  // |> fun e -> printfn "%A" e; e
+          buildFormatFunction (arg + 1) (makeFormat (sprintf "\"%s\"" fmt) argName::ret) tl])
+      |s::tl -> buildFormatFunction arg (nonFormat (sprintf "\"%s\"" s)::ret) tl
+      |[] -> Token("sequence", List.rev ret)
     buildFormatFunction 1 []
+      // below: incompatible with F#able
+//  let buildFormatFunction =
+//    let rec buildFormatFunction arg ret makeFormat nonFormat = function
+//      |fmt::tl when isFormatString fmt ->
+//        let argName = Token (sprintf "_%i" arg)
+//        Token("fun", [argName;
+//          buildFormatFunction (arg + 1) (makeFormat (sprintf "\"%s\"" fmt) argName::ret) makeFormat nonFormat tl])
+//      |s::tl -> buildFormatFunction arg (nonFormat (sprintf "\"%s\"" s)::ret) makeFormat nonFormat tl
+//      |[] -> Token("sequence", List.rev ret)  // |> fun e -> printfn "%A" e; e
+//    buildFormatFunction 1 []
   let rec mapFormatting = function
     |X("apply", [T "printfn"; T (StringContents format)]) ->
       mapFormatting (Token("apply", [Token "printf"; Token(sprintf "\"%s\\n\"" format)]))
@@ -60,8 +70,12 @@ module String_Formatting =
 //      |X("sequence", list) -> Token("concatenate", list)
 
   let rec processScan = function
-    |X("apply", [T "scanf"; X(",", [T "\"%i\""; a])]) -> Token("assign", [a; Token("apply", [Token "scan"; Token "%i"])])
-    |X("apply", [T "scanf"; X(",", [T "\"%s\""; a])]) -> Token("assign", [a; Token("apply", [Token "scan"; Token "%s"])])
+    |X("apply", [X("apply", [T "scanf"; T "\"%i\""]); a]) ->
+      Token("assign", [Token("dot", [a; Token("[]", [Token "0"])]); Token("apply", [Token "scan"; Token "%i"])])
+    |X("apply", [X("apply", [T "scanf"; T "\"%s\""]); a]) ->
+      Token("assign", [Token("dot", [a; Token("[]", [Token "0"])]); Token("apply", [Token "scan"; Token "%s"])])
+//    |X("apply", [T "scanf"; X(",", [T "\"%i\""; a])]) -> Token("assign", [a; Token("apply", [Token "scan"; Token "%i"])])
+//    |X("apply", [T "scanf"; X(",", [T "\"%s\""; a])]) -> Token("assign", [a; Token("apply", [Token "scan"; Token "%s"])])
     |X(s, ll) -> Token(s, List.map processScan ll)
 
   let rec processEscapeSequences = function
