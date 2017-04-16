@@ -34,7 +34,7 @@ let main argv =
     //testAsmCompilerSimple 1
     //testTypeSystem 26
 
-    testParser verify 1
+    testParser generate 1
     testCompilerAST verify 1
     //testExcelCompiler 1
     //testAsmCompiler 27

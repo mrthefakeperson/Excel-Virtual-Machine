@@ -1,4 +1,5 @@
 ﻿// todo: structs get deepcopied, pointers don't
+// todo: recursive structs
 
 module Type_System
 open Parser.Token
@@ -11,9 +12,8 @@ type memberMapping = IDictionary<string, int*Token option>
 let noObject:memberMapping = dict []
 // hashtable: name_of_type -> mapping_for_type_members
 let objectTypes = Dictionary<string, memberMapping>()
-let compileObjectType = function
+let compileObjectDeclarations = function
   |X("struct", [T name; memberList]) ->
-    printfn "%A" memberList
     match memberList with
     |X("sequence", members) ->
       let mapMembers =
@@ -26,14 +26,14 @@ let compileObjectType = function
           |_ -> failwith "wrong member format"
          ) members
          |> dict
-      objectTypes.[name] <- mapMembers
+      objectTypes.["struct " + name] <- mapMembers
     |_ -> failwith "wrong struct format"
   |_ -> failwith "should never happen"
 // hashtable: variable_name -> stack of member mappings for the variable
 let varTypes = Dictionary<string, memberMapping list>()
 let rec compileObjects = function
   |X("struct", _) as x ->
-    compileObjectType x
+    compileObjectDeclarations x
     Token "()"
   |X("dot", [T a; T b]) ->  //  consider: (new object(?)).k;      does (T b) come in a sequence?
     Token("dot", [Token a; Token("[]", [Token(string(fst varTypes.[a].Head.[b]))])])

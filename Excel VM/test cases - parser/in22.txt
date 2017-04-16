@@ -6,7 +6,7 @@ struct x{
 } q, r, s;
 
 int main() {
-  x t;
+  struct x t;
   s.l = 3;
   t.m = s.l + 1;
 }

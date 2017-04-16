@@ -11,32 +11,22 @@ open Lexer.CommonClassifiers
 //       => if (cond) then (return v)...failed, incomplete without a terminating ;
 //  fix: don't remove the ; upon finishing parsing?
 module C =
-  let listOfDatatypeNamesDefault = [
-    "int"; "long long"; "long"; "bool"; "char"; "unsigned"; "unsigned int";
-    "unsigned long int"; "unsigned long long int"; "long int"; "long long int"
-   ]
-  let listOfDatatypeNames = ref listOfDatatypeNamesDefault
-  let restoreDefault() = listOfDatatypeNames := listOfDatatypeNamesDefault
-  let (|BrokenDatatypeName|_|) (ll:string list) =
-    let matchString (s:string) =
-      let matching = s.Split ' ' |> Array.toList
-      let rec findMatch = function
-        |[], x -> Some (s, x)
-        |a::resta, b::restb when a = b -> findMatch (resta, restb)
-        |_ -> None
-      findMatch (matching, ll)
-    List.map matchString !listOfDatatypeNames
-     |> List.tryFind (function Some _ -> true | None -> false)
-     |> function Some yld -> yld | None -> None
-  let rec tokenizeDatatypes = function
-    |[] -> []
-    |BrokenDatatypeName(hd, tl)
-    |hd::tl -> hd::tokenizeDatatypes tl
+//  let (|BrokenDatatypeName|_|) (ll:string list) =
+//    let matchString (s:string) =    // match a string with a part of the tokenized string list
+//      let matching = s.Split ' ' |> Array.toList
+//      let rec findMatch = function
+//        |[], x -> Some (s, x)
+//        |a::resta, b::restb when a = b -> findMatch (resta, restb)
+//        |_ -> None
+//      findMatch (matching, ll)
+//    List.map matchString !listOfDatatypeNames
+//     |> List.tryFind (function Some _ -> true | None -> false)
+//     |> function Some yld -> yld | None -> None
+//  let rec tokenizeDatatypes = function
+//    |[] -> []
+//    |BrokenDatatypeName(hd, tl)
+//    |hd::tl -> hd::tokenizeDatatypes tl
   let preprocess:string -> Token list =
-    let isComment (s:string) =
-      (isPrefix "//" s && isSuffix "\n" s)
-       || (s.Length >= 4 && isPrefix "(*" s && isSuffix "*)" s)
-       || (isPrefix "#" s && isSuffix "\n" s)
     let mainRules =
       singleLineCommentRules "#"
        @ singleLineCommentRules "//"
@@ -57,7 +47,7 @@ module C =
      >> List.filter        // strip whitespace, strip comments
          (negate
            (isWhitespace >>|| isDelimitedString "//" "\n" >>|| isDelimitedString "/*" "*/"))
-     >> tokenizeDatatypes
+//     >> tokenizeDatatypes
      >> List.map (fun e -> Token e)
      >> List.fold (fun acc e ->
           match acc, e with
@@ -67,9 +57,16 @@ module C =
           |_ -> e::acc
          ) []
      >> List.rev
-  let (|DatatypeName|_|) = function
-    |T s::rest when List.exists ((=) s) !listOfDatatypeNames -> Some(s, rest)
-    |_ -> None
+  let listOfDatatypeNamesDefault =    // can be simplified if all datatypes are 1 or 2 tokens
+    List.sortBy (fun (e:string) -> (e.Split ' ').Length) [
+      "int"; "long long"; "long"; "bool"; "char"; "unsigned"; "unsigned int";
+      "unsigned long int"; "unsigned long long int"; "long int"; "long long int"
+     ]
+  let listOfDatatypeNames = ref listOfDatatypeNamesDefault
+  let restoreDefault() = listOfDatatypeNames := listOfDatatypeNamesDefault
+//  let (|DatatypeName|_|) = function
+//    |T s::rest when List.exists ((=) s) !listOfDatatypeNames -> Some(s, rest)
+//    |_ -> None
   type State =
     |Global
     |FunctionArgs
@@ -140,6 +137,16 @@ module C =
       |CommaFunction state stop fail x
       |Transfer state stop fail x     -> x
       |_ -> failwithf "unknown: %A" (left, right)
+  // match a string with a part of the tokenized string list
+  and matchString tokens stringToStringList (s:string) =
+    let rec findMatch = function
+      |[], x -> Some (s, x)
+      |a::resta, T b::restb when a = b -> findMatch (resta, restb)
+      |_ -> None
+    findMatch (``stringToStringList`` s, tokens)
+  // matches if the tokens at the top of the right stack make one of the known datatypes
+  and (|DatatypeName|_|) right =
+    List.tryPick (matchString right (fun e -> List.ofArray (e.Split ' '))) !listOfDatatypeNames
   and (|DatatypeGlobal|_|) state stop fail = function
     |left, DatatypeName(datatypeName, restr) ->
       let identifierName, restr =
@@ -159,7 +166,7 @@ module C =
         |o -> failwithf "expression following data type declaration is invalid %O" o
       let restr =       // for declarations with `,`
         match restr with
-        |T ","::restr -> Token ";"::Token datatypeName::restr
+        |T ","::restr -> Token ";"::List.ofArray (datatypeName.Split ' ' |> Array.map (fun e -> Token e)) @ restr
         |T ";"::restr | restr -> restr
       Some (parse Global stop fail left (parsed::restr))
     |_ -> None
@@ -167,16 +174,17 @@ module C =
     |T "struct"::restl, right ->
       let structureTag, restr =
         match right with
-        |T "{"::restr -> "anonymous structure", restr   // gets shadowed, but that's fine since it's never used
+        |T "{"::restr -> "anonymousStruct", restr   // gets shadowed, but that's fine since it's never used
         |T s::T "{"::restr -> s, restr
         |ex -> failwithf "not a valid struct declaration: %A" ex
-      listOfDatatypeNames := structureTag:: !listOfDatatypeNames
+      listOfDatatypeNames := "struct " + structureTag:: !listOfDatatypeNames
+      printfn "datatype names: %A" !listOfDatatypeNames
       let memberList, T "}"::restr =   // validation needed: only declarations allowed
         parse Local (function T "}"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
       let restr =
         match restr with
         |T ";"::restr -> restr
-        |restr -> Token structureTag::restr
+        |restr -> Token "struct"::Token structureTag::restr
       let parsed = Token("struct", [Token structureTag; memberList])
       Some (parse state stop fail restl (parsed::restr))
     |_ -> None
@@ -197,8 +205,10 @@ module C =
         |_ -> Token(",", [a; parsed])
       Some (parse state stop fail restl (parsed::restr))
     |_ -> None
+  and (|DatatypeNameL|_|) left =
+    List.tryPick (matchString left (fun e -> List.rev <| List.ofArray (e.Split ' '))) !listOfDatatypeNames
   and (|DatatypeLocal|_|) state stop fail = function
-    |DatatypeName(datatypeName, restl), right ->
+    |DatatypeNameL(datatypeName, restl), right ->
       let parsed, restr =
         parse LocalImd (function T(";" | ",")::_ -> true | _ -> false) (fun e -> stop e || fail e) [] right
       let parsed =
@@ -370,3 +380,4 @@ module C =
      |> postProcess
      |> function X("sequence", x) -> Token("sequence", x @ [Token("apply", [Token "main"; Token "()"])])
      |> String_Formatting.processStringFormatting
+     |> fun e -> printfn "%A" e; e
