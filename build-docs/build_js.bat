@@ -1,0 +1,1 @@
+fable -m amd AttachToPage.fsx -o ../docs/scripts --plugins Fable.Plugins.XLVMExternalCalls.dll

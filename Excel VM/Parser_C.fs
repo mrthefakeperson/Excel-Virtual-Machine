@@ -11,21 +11,6 @@ open Lexer.CommonClassifiers
 //       => if (cond) then (return v)...failed, incomplete without a terminating ;
 //  fix: don't remove the ; upon finishing parsing?
 module C =
-//  let (|BrokenDatatypeName|_|) (ll:string list) =
-//    let matchString (s:string) =    // match a string with a part of the tokenized string list
-//      let matching = s.Split ' ' |> Array.toList
-//      let rec findMatch = function
-//        |[], x -> Some (s, x)
-//        |a::resta, b::restb when a = b -> findMatch (resta, restb)
-//        |_ -> None
-//      findMatch (matching, ll)
-//    List.map matchString !listOfDatatypeNames
-//     |> List.tryFind (function Some _ -> true | None -> false)
-//     |> function Some yld -> yld | None -> None
-//  let rec tokenizeDatatypes = function
-//    |[] -> []
-//    |BrokenDatatypeName(hd, tl)
-//    |hd::tl -> hd::tokenizeDatatypes tl
   let preprocess:string -> Token list =
     let mainRules =
       singleLineCommentRules "#"
@@ -47,7 +32,6 @@ module C =
      >> List.filter        // strip whitespace, strip comments
          (negate
            (isWhitespace >>|| isDelimitedString "//" "\n" >>|| isDelimitedString "/*" "*/"))
-//     >> tokenizeDatatypes
      >> List.map (fun e -> Token e)
      >> List.fold (fun acc e ->
           match acc, e with
@@ -64,9 +48,6 @@ module C =
      ]
   let listOfDatatypeNames = ref listOfDatatypeNamesDefault
   let restoreDefault() = listOfDatatypeNames := listOfDatatypeNamesDefault
-//  let (|DatatypeName|_|) = function
-//    |T s::rest when List.exists ((=) s) !listOfDatatypeNames -> Some(s, rest)
-//    |_ -> None
   type State =
     |Global
     |FunctionArgs

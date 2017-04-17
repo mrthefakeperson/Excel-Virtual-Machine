@@ -1,4 +1,4 @@
-define(["exports", "./xlvm"], function (exports, _xlvm) {
+define(["exports", "./CompileAndRun"], function (exports, _CompileAndRun) {
   "use strict";
 
   Object.defineProperty(exports, "__esModule", {
@@ -14,7 +14,7 @@ define(["exports", "./xlvm"], function (exports, _xlvm) {
     var inputCode = getById("input_code").value;
     var stdInput = getById("stdin").value;
     var stdOutput = getById("stdout");
-    var output = (0, _xlvm.compileAndRun)(inputCode)(stdInput);
+    var output = (0, _CompileAndRun.compileAndRun)(inputCode)(stdInput);
     stdOutput.textContent = output;
     return {};
   };

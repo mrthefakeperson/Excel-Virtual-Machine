@@ -18,7 +18,7 @@ module ASM =
       match s.ToUpper() with
       |"TRUE" -> Some 1
       |"FALSE" -> Some 0
-      |_ when Int32.TryParse(s, ref 0) -> Some (int s)
+      |_ when fst (Int32.TryParse s) -> Some (int s)
       |"()" -> Some 0
       |"ENDARR" -> Some -7777777       //glitches occur around this value
                                        //todo: get rid of endArr somehow

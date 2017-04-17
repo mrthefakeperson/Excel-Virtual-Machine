@@ -53,7 +53,7 @@ module Definitions =
         match x with
         Cell(_,formula) ->
           let rec pr = function
-            |Literal v when Int32.TryParse(v, ref 0) -> sprintf "%s" v
+            |Literal v when fst (Int32.TryParse v) -> sprintf "%s" v
             |Literal v -> sprintf "\"%s\"" v
             |Reference s -> s
             |Range(a, b) -> sprintf "%s:%s" a b

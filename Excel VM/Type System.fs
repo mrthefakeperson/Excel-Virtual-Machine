@@ -103,7 +103,6 @@ let compilePointersToArrays x =
       LT("sequence", nodes', -1)
     |X(s, dep) -> LT(s, List.map (labelTokens labels) dep, -1)
   let k = labelTokens Map.empty x
-  //printfn "labelled: %A" k
   // find all the var IDs which get their reference taken
   let hasReference = Array.create (nxt()) false
   let rec findAllDerefs = function
@@ -111,7 +110,6 @@ let compilePointersToArrays x =
       hasReference.[a] <- true
     |LT(_, ll, _) -> List.iter findAllDerefs ll
   findAllDerefs k
-  //printfn "hasDerefs: %A" hasDereference
   // map referenced vars to arrays
   let (|IsDeref|_|) = function
     |LT(s, [], x) -> if x <> -1 && hasReference.[x] then Some s else None
@@ -130,7 +128,6 @@ let compilePointersToArrays x =
       Token("sequence", nodes')
     |LT(s, dep, _) -> Token(s, List.map mapDerefs dep)
   let yld = mapDerefs k
-  //printfn "yield: %A" yld
   yld
 
 let rec processDerefs = function

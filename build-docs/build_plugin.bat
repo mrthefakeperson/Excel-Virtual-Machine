@@ -1,0 +1,1 @@
+fsc Fable.Plugins.XLVMExternalCalls.fsx --target:library
