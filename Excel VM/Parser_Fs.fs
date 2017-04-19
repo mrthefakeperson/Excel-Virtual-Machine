@@ -8,12 +8,14 @@ open Lexer.CommonClassifiers
 
 module FSharp =
   let preprocess:string->Token list =
-    let mainRules =     // todo: stick infixes together
-      singleLineCommentRules "//"
-       @ delimitedCommentRules "(*" "*)"
-       @ createSymbol "->"
-       @ createSymbol ".."
-       @ commonRules
+    let mainRules =
+      let isValidInfix = String.forall (string >> "!%&*+-./<=>?@^|~".Contains)
+      createSingleLineComment "//"
+       @ createDelimitedComment "(*" "*)"
+       @ createStrings
+       @ createSymbol "->" @ createSymbol ".."
+       @ [makeRule isValidInfix isValidInfix, true]   // stick infixes together
+       @ createVariablesAndNumbers
     let rec fixHyphens = function    // "-"::b::tl is handled because Infix doesn't match it
       |a::"-"::b::tl when isWhitespace a && (isNumeric >>|| isVariable) b ->
         a::"-" + b::fixHyphens tl
@@ -64,6 +66,7 @@ module FSharp =
     match state with
     |Normal ->
       match (left:Token list), (right:Token list) with
+      |[t], _ when stop right -> t, right
       |t::_, _ when stop right -> Token("sequence", t.Indentation, List.rev left), right
       |_ when stop right -> Token("()", (0,0), left), right
       |_ when fail right -> failwithf "unexpected end of context %A" right
@@ -87,6 +90,7 @@ module FSharp =
       |_, [] -> Token("()", (0,0)), []
     |Pattern ->
       match (left:Token list), (right:Token list) with
+      |[t], _ when stop right -> t, right
       |t::_, _ when stop right -> Token("sequence", t.Indentation, List.rev left), right
       |_ when stop right -> Token("()", (0,0), left), right
       |_ when fail right -> failwithf "unexpected end of context %A" right
@@ -275,11 +279,13 @@ module FSharp =
       let b,restr =
         parse state (function nfx'::_ when nfx.EvaluatedFirst nfx' -> true | k -> stop k)
          fail [] restr
-      match b.Name, b.Dependants with
-      |"sequence", parsed::r ->
+      match b with
+      |X("sequence", parsed::r) ->
         let parsed = Token("apply", a.Indentation, [Token("apply", a.Indentation, [nfx; a]); parsed])
         Some (parse state stop fail restl (parsed::r @ restr))
-      |_ -> failwith "infix failed"
+      |parsed ->
+        let parsed = Token("apply", a.Indentation, [Token("apply", a.Indentation, [nfx; a]); parsed])
+        Some (parse state stop fail restl (parsed::restr))
     |_ -> None
   and (|Tuple|_|) state stop fail = function      //testing needed
     |t::restl, T ","::restr ->

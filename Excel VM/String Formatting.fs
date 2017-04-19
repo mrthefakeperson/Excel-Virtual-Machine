@@ -74,8 +74,6 @@ module String_Formatting =
       Token("assign", [Token("dot", [a; Token("[]", [Token "0"])]); Token("apply", [Token "scan"; Token "%i"])])
     |X("apply", [X("apply", [T "scanf"; T "\"%s\""]); a]) ->
       Token("assign", [Token("dot", [a; Token("[]", [Token "0"])]); Token("apply", [Token "scan"; Token "%s"])])
-//    |X("apply", [T "scanf"; X(",", [T "\"%i\""; a])]) -> Token("assign", [a; Token("apply", [Token "scan"; Token "%i"])])
-//    |X("apply", [T "scanf"; X(",", [T "\"%s\""; a])]) -> Token("assign", [a; Token("apply", [Token "scan"; Token "%s"])])
     |X(s, ll) -> Token(s, List.map processScan ll)
 
   let rec processEscapeSequences = function

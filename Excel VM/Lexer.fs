@@ -5,70 +5,80 @@ module Lexer =
   type stringClassifier = string -> bool
   module CommonClassifiers =
     // util
-    let getOccurances charClassifier str =
-      String.collect (fun e -> if charClassifier e then string e else "") str
+    let getOccurances pred str =
+      String.collect (fun e -> if pred e then string e else "") str
        |> String.length
     let (>>||) classifierA classifierB e = classifierA e || classifierB e
     let (>>&&) classifierA classifierB e = classifierA e && classifierB e
     let inline negate f = f >> not
-    let classifierApplies classifier str = String.forall classifier str
-    let classifierAppliesFstChar classifier (str:string) = classifier str.[0]
-    let classifierAppliesFstSuffix classifier (str:string) =
-      String.forall classifier str.[1..]
-    let classifiersApplyCons hdCharClassifier tlStrClassifier str =
-      classifierAppliesFstChar hdCharClassifier str
-       && tlStrClassifier str.[1..]
+    let isPrefix (a:string) (b:string) =  // a is a prefix of b?
+      a.Length <= b.Length && a = b.[..a.Length - 1]
+    let isSuffix (a:string) (b:string) =  // a is a suffix of b?
+      a.Length <= b.Length && a = b.[b.Length - a.Length..]
+    // does str start with delim1, end with delim2, and not have the delimiters overlap characters?
+    let isDelimitedString (delim1:string) (delim2:string) (str:string) =
+      delim1.Length + delim2.Length <= str.Length && isPrefix delim1 str && isSuffix delim2 str
+//    let classifierApplies classifier str = String.forall classifier str
+    let entireString = String.forall
+//    let classifierAppliesFstChar classifier (str:string) = classifier str.[0]
+    let firstCharOfString isClassified (str:string) = isClassified str.[0]
+//    let classifierAppliesFstSuffix classifier (str:string) =
+//      String.forall classifier str.[1..]
+    let firstSuffixOfString isClassified (str:string) = entireString isClassified str.[1..]
+//    let classifiersApplyCons hdCharClassifier tlStrClassifier str =
+//      classifierAppliesFstChar hdCharClassifier str
+//       && tlStrClassifier str.[1..]
+    let firstCharIsXAndSuffixIsY isClassified pred str =
+      firstCharOfString isClassified str && pred str.[1..]
     // common classifiers (char)
-    module Chr =
-      let isNumeric = Char.IsDigit     // 0 to 9
-      let isAlphabetic = Char.IsLetter // a to z, A to Z, accented and Greek characters
-      let isUndersc = (=) '_'
-      let isDot = (=) '.'
-      let isHyphen = (=) '-'
-      let isValidForVariables = isNumeric >>|| isAlphabetic >>|| isUndersc
-      let isWhitespace = (=) ' ' >>|| (=) '\n' >>|| (=) '\t' >>|| (=) '\r'
-      let isSingleQuote = (=) '''
-      let isDoubleQuote = (=) '"'
+    let isNumeral = Char.IsDigit     // 0 to 9
+    let isAlphabetic = Char.IsLetter // a to z, A to Z, accented and Greek characters
+    let isUndersc = (=) '_'
+    let isDot = (=) '.'
+    let isHyphen = (=) '-'
+    let isValidForVariables = isNumeral >>|| isAlphabetic >>|| isUndersc
+    let isWhitespaceChar = (=) ' ' >>|| (=) '\n' >>|| (=) '\t' >>|| (=) '\r'
+    let isSingleQuote = (=) '''
+    let isDoubleQuote = (=) '"'
     // common classifiers (string)
-    let isVariableSuffix = classifierApplies Chr.isValidForVariables
+    let isVariableSuffix = entireString isValidForVariables
     let isInteger =   // first character is digit, rest are valid for variables
-      classifiersApplyCons Chr.isNumeric isVariableSuffix
+      firstCharIsXAndSuffixIsY isNumeral isVariableSuffix
     let isVariable =  // all characters are valid for variables, first is not digit
-      classifiersApplyCons (Chr.isValidForVariables >>&& negate Chr.isNumeric) isVariableSuffix
-    let isNumericSuffix = classifierApplies (Chr.isDot >>|| Chr.isValidForVariables)
+      firstCharIsXAndSuffixIsY (isValidForVariables >>&& negate isNumeral) isVariableSuffix
+    let isNumericSuffix = entireString (isDot >>|| isValidForVariables)
     let isNumeric =   // first character is digit, rest are valid for variables or are dot
-      classifiersApplyCons Chr.isNumeric isNumericSuffix
+      firstCharIsXAndSuffixIsY isNumeral isNumericSuffix
     let isFloat = isNumeric >>&& (negate isInteger)  // is numeric, but contains a dot
     // note that isFloatSuffix === isNumericSuffix
-    let isWhitespace = classifierApplies Chr.isWhitespace
-    let isAnything = classifierApplies (fun _ -> true)
+    let isWhitespace = entireString isWhitespaceChar
+    let isAnything = entireString (fun _ -> true)
     let failedToClassify message _ = failwith message
   // rules which use classifiers
   open CommonClassifiers
   type tokenizeRule =
     |StickRule of (string -> string -> bool)
+    |PriorityStickRule of (string -> string -> bool)    // gets checked first
     |SymbolRule of string
   let makeRule (c1:stringClassifier) (c2:stringClassifier) =
     StickRule (fun s1 s2 -> c1 s1 && c2 s2)
-  let isPrefix (a:string) (b:string) =  // a is a prefix of b?
-    a.Length <= b.Length && a = b.[..a.Length - 1]
-  let isSuffix (a:string) (b:string) =  // a is a suffix of b?
-    a.Length <= b.Length && a = b.[b.Length - a.Length..]
-  // does str start with delim1, end with delim2, and not have the delimiters overlap characters?
-  let isDelimitedString (delim1:string) (delim2:string) (str:string) =
-    delim1.Length + delim2.Length <= str.Length && isPrefix delim1 str && isSuffix delim2 str
   let makeSymbolRule (symbol:string) = SymbolRule symbol
   let makeDelimiterRule (symbol1:string) (symbol2:string) =
-    StickRule (fun s1 s2 ->
+    PriorityStickRule (fun s1 s2 ->
       isPrefix symbol1 s1 && not (isDelimitedString symbol1 symbol2 s1)
      )
   let tokenize (ruleset:(tokenizeRule*bool) list) (txt:string list) =
-    let ruleset =  // put a sentry at the end automatically
+    let ruleset =  // put a sentry at the end to catch match failures
       ruleset @ [makeRule (failedToClassify "could not classify") isAnything, false]
-    let txtWithSymbols, stickRules =
-      List.fold (fun (accTxt, accRules) -> function
+    let txtWithSymbols, stickRules, priorityStickRules =
+      // go through the rule set
+      List.fold (fun (accTxt, accRules, accPriorityRules) -> function
+        // stick-rules get filtered into two new lists
+        |StickRule r, b -> accTxt, (r, b)::accRules, accPriorityRules
+        |PriorityStickRule r, b -> accTxt, accRules, (r, b)::accPriorityRules
+        // symbol rules are dealt with immediately: scan for each symbol
         |SymbolRule s, _ ->
-          let rec tryGetPrefix = function   // try to match a with a prefix of b and split b
+          let rec tryGetPrefix = function   // try to match a with some prefix of b and split b
             |[], ll -> Some ([], ll)
             |_, [] -> None
             |a::_, b::_ when a <> b -> None
@@ -82,30 +92,32 @@ module Lexer =
             |Some (p, s), _ -> String.concat "" p::groupSymbols s
             |None, [] -> []
             |None, hd::tl -> hd::groupSymbols tl
-          (groupSymbols accTxt, accRules)
-        |StickRule r, b -> (accTxt, (r, b)::accRules)
-       ) (txt, []) ruleset
-    let stickRules = List.rev stickRules
-    txtWithSymbols
-     |> List.fold (fun acc next ->
-          match acc with
-          |[] -> [next]
-          |hd::tl ->
-            let _, shouldStick = Seq.find (fun (stick, _) -> stick hd next) stickRules
-            if shouldStick
-             then hd + next::tl
-             else next::acc
-         ) []
+          (groupSymbols accTxt, accRules, accPriorityRules)
+       ) (txt, [], []) ruleset
+    // priority rules go first
+    let stickRules = List.rev priorityStickRules @ List.rev stickRules
+    // make one scanning pass of the whole list of tokens, considering all stick-rules
+    List.fold (fun acc nextToken ->
+      match acc with
+      |[] -> [nextToken]
+      |lastToken::tl ->
+        // one by one, apply each stick-rule to find the first one that matches
+        let _, shouldStick = Seq.find (fun (stick, _) -> stick lastToken nextToken) stickRules
+        // the bool for each stick-rule determines if a matching pair should always or never be concatenated
+        if shouldStick
+         then lastToken + nextToken::tl
+         else nextToken::acc
+     ) [] txtWithSymbols
      |> List.rev
   module SpecialCases =
     let detectEscapeSequenceDoubleQuote =
       StickRule (fun s1 (s2:string) -> isPrefix "\"" s1 && isSuffix "\\\"" s1)
-  let singleLineCommentRules delimiter = [
+  let createSingleLineComment delimiter = [
     makeSymbolRule delimiter, true
     makeDelimiterRule delimiter "\n", true
     makeRule (isDelimitedString delimiter "\n") isAnything, false
    ]
-  let delimitedCommentRules delim1 delim2 = [
+  let createDelimitedComment delim1 delim2 = [
     makeSymbolRule delim1, true
     makeSymbolRule delim2, true
     makeDelimiterRule delim1 delim2, true
@@ -117,21 +129,13 @@ module Lexer =
     makeRule (fun e -> not (isPrefix e symbol)) (fun e -> isPrefix e symbol), false
    ]
   // don't need to check for \" due to the context in which this is used
-  let commonRules = [
+  let createStrings = [
     SpecialCases.detectEscapeSequenceDoubleQuote, true
     makeDelimiterRule "\"" "\"", true
     makeRule (isDelimitedString "\"" "\"") isAnything, false
-    makeRule isAnything isWhitespace, false
+   ]
+  let createVariablesAndNumbers = [
     makeRule isNumeric isNumericSuffix, true
     makeRule isVariable isVariableSuffix, true
     makeRule isAnything isAnything, false
    ]
-
-// "aadf 4.33f df8 _45 __r4" -> ["aadf"; " "; "4.33f"; " "; "df8"; " "; "_45"; " "; "__r4"]
-// "sd   dfdfdf4  _4_e 4_4" -> ["sd"; " "; " "; " "; "dfdfdf4"; " "; " "; "_4_e"; " "; "4_4"]
-// "sdf( df->df d->  ->fdfd ->(d) *" -> ["sdf"; "("; " "; "df"; "->"; "df"; " "; "d"; "->"; " "; " "; "->"; "fdfd"; " "; "->"; "("; "d"; ")"; " "; "*"]
-// "ddf \" fdffdssf-> df334.d 4 \"\"\" d \"" -> ["ddf"; " "; "" fdffdssf-> df334.d 4 ""; """"; " "; "d"; " "; """]
-// "outside comment (* 7inside -> comment\"\"*) outside comment" -> ["outside"; " "; "comment"; " "; "(* 7inside -> comment""*)"; " "; "outside"; " "; "comment"]
-// " \"string with \\\"quote\\\"\" " -> [" "; ""string with \"quote\"""; " "]
-// "(*)"
-// "//fddf\nfdfd//\n"

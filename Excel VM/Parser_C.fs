@@ -13,12 +13,13 @@ open Lexer.CommonClassifiers
 module C =
   let preprocess:string -> Token list =
     let mainRules =
-      singleLineCommentRules "#"
-       @ singleLineCommentRules "//"
-       @ delimitedCommentRules "/*" "*/"
+      createSingleLineComment "#"
+       @ createSingleLineComment "//"
+       @ createDelimitedComment "/*" "*/"
+       @ createStrings
        @ createSymbol "==" @ createSymbol "!=" @ createSymbol "<=" @ createSymbol ">="
        @ createSymbol "++" @ createSymbol "--"
-       @ commonRules
+       @ createVariablesAndNumbers
     List.ofSeq
      >> List.map string
      >> tokenize mainRules
