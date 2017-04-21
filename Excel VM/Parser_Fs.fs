@@ -124,7 +124,7 @@ module FSharp =
         |_ -> t.Indentation
       let parsed, T "]"::restr =
         match restr with
-        |T "]"::_ -> Token("[]", t.Indentation, true, []), restr
+        |T "]"::_ -> Token("[]", t.Indentation, true, []), restr   ////////// never actually valid
         |_ ->
           parse state (function T "]"::_ -> true | t'::_ when snd indent > snd t'.Indentation -> true | _ -> false)
            (fun _ -> false)

@@ -5,11 +5,6 @@ open Lexer.CommonClassifiers
 // ignore all pattern match warnings (turn this off when adding code)
 #nowarn "25"
 
-// currently a lot of issues with using ; as an end token
-// ex. if (cond) return v;
-//       => if (cond) (return v)     ; is used to end the return
-//       => if (cond) then (return v)...failed, incomplete without a terminating ;
-//  fix: don't remove the ; upon finishing parsing?
 module C =
   let preprocess:string -> Token list =
     let mainRules =
@@ -56,69 +51,66 @@ module C =
     |LocalImd    // keywords must appear at the beginning of a statement; LocalImd doesn't include them
   let rec parse state stop fail left right =
     //printfn "%A" (left, right)
-    match state with
-    |Global ->
-      match left, right with
-      |_ when stop right -> Token("sequence", List.rev left), right
-      |_ when fail right -> failwithf "tokens are incomplete: %A" (left, right)
-      |DatatypeGlobal state stop fail x
-      |Struct state stop fail x
-      |Apply state stop fail x
-      |Index state stop fail x
-      |Brackets state stop fail x
-      |Braces state stop fail x
-      |Assignment state stop fail x
-      |Operator state stop fail x
-      |Transfer state stop fail x     -> x
-      |_ -> failwithf "unknown: %A" (left, right)
-    |FunctionArgs ->
-      match left, right with
-      |_ when stop right -> Token("sequence", List.rev left), right
-      |_ when fail right -> failwithf "tokens are incomplete: %A" (left, right)
-      |DatatypeFunction state stop fail x
-      |CommaFunction state stop fail x
-      |Transfer state stop fail x     -> x
-      |_ -> failwithf "unknown: %A" (left, right)
-    |Local ->
-      match left, right with
-      |_ when stop right -> Token("sequence", List.rev left), right
-      |_ when fail right -> failwithf "tokens are incomplete: %A" (left, right)
-//      |T ";"::T _::restl, right    //single value as a statement is meaningless
-//      |T ";"::restl, right -> parse Local stop fail restl right        //handles a(b); after a(b) has been parsed
-      |T ";"::_, a::restr -> parse Local stop fail (a::left) restr
-      |DatatypeLocal state stop fail x
-      |Brackets state stop fail x
-      |Braces state stop fail x
-      |If state stop fail x
-      |While state stop fail x
-      |For state stop fail x
-      |Return state stop fail x
-      |Assignment state stop fail x
-      |Dot state stop fail x
-      |Prefix state stop fail x
-      |Operator state stop fail x
-      |Apply state stop fail x
-      |Index state stop fail x
-      |Transfer state stop fail x     -> x
-      |_ -> failwithf "unknown: %A" (left, right)
-    |LocalImd ->
-      match left, right with
-      |_ when stop right -> Token("sequence", List.rev left), right
-      |_ when fail right -> failwithf "tokens are incomplete: %A" (left, right)
-//      |T ";"::T _::restl, right    //single value as a statement is meaningless !!! unless it is `break` or `return` !!!
-//      |T ";"::restl, right -> parse Local stop fail restl right        //handles a(b); after a(b) has been parsed
-      |T ";"::_, a::restr -> parse Local stop fail (a::left) restr
-      |Brackets state stop fail x
-      //|Braces state stop fail x    ({statement;}) with one pair of braces gets parsed, don't know the purpose of this
-      |Assignment state stop fail x
-      |Dot state stop fail x
-      |Prefix state stop fail x
-      |Operator state stop fail x
-      |Apply state stop fail x
-      |Index state stop fail x
-      |CommaFunction state stop fail x
-      |Transfer state stop fail x     -> x
-      |_ -> failwithf "unknown: %A" (left, right)
+    match stop right, fail right, state with
+    |true, _, _ -> Token("sequence", List.rev left), right
+    |_, true, _ -> failwithf "tokens are incomplete: %A" (left, right)
+    |_ ->
+      let continueParsing x =
+        let state', left', right' = x
+        parse state' stop fail left' right'
+      match state with
+      |Global ->
+        match left, right with
+        |DatatypeGlobal state stop fail x
+        |Struct state stop fail x
+        |Apply state stop fail x
+        |Index state stop fail x
+        |Brackets state stop fail x
+        |Braces state stop fail x
+        |Assignment state stop fail x
+        |Operator state stop fail x
+        |Transfer state stop fail x     -> continueParsing x
+        |_ -> failwithf "unknown: %A" (left, right)
+      |FunctionArgs ->
+        match left, right with
+        |DatatypeFunction state stop fail x
+        |CommaFunction state stop fail x
+        |Transfer state stop fail x     -> continueParsing x
+        |_ -> failwithf "unknown: %A" (left, right)
+      |Local ->
+        match left, right with
+//        |T ";"::T _::restl, right    //single value as a statement is meaningless
+//        |T ";"::restl, right -> parse Local stop fail restl right        //handles a(b); after a(b) has been parsed
+        |T ";"::_, a::restr -> parse Local stop fail (a::left) restr
+        |DatatypeLocal state stop fail x
+        |Brackets state stop fail x
+        |Braces state stop fail x
+        |If state stop fail x
+        |While state stop fail x
+        |For state stop fail x
+        |Return state stop fail x
+        |Assignment state stop fail x
+        |Dot state stop fail x
+        |Prefix state stop fail x
+        |Operator state stop fail x
+        |Apply state stop fail x
+        |Index state stop fail x
+        |Transfer state stop fail x     -> continueParsing x
+        |_ -> failwithf "unknown: %A" (left, right)
+      |LocalImd ->
+        match left, right with
+        |T ";"::_, a::restr -> parse Local stop fail (a::left) restr
+        |Brackets state stop fail x
+        //|Braces state stop fail x    ({statement;}) with one pair of braces gets parsed, don't know the purpose of this
+        |Assignment state stop fail x
+        |Dot state stop fail x
+        |Prefix state stop fail x
+        |Operator state stop fail x
+        |Apply state stop fail x
+        |Index state stop fail x
+        |CommaFunction state stop fail x
+        |Transfer state stop fail x     -> continueParsing x
+        |_ -> failwithf "unknown: %A" (left, right)
   // match a string with a part of the tokenized string list
   and matchString tokens stringToStringList (s:string) =
     let rec findMatch = function
@@ -150,7 +142,7 @@ module C =
         match restr with
         |T ","::restr -> Token ";"::List.ofArray (datatypeName.Split ' ' |> Array.map (fun e -> Token e)) @ restr
         |T ";"::restr | restr -> restr
-      Some (parse Global stop fail left (parsed::restr))
+      Some (Global, left, parsed::restr)
     |_ -> None
   and (|Struct|_|) state stop fail = function
     |T "struct"::restl, right ->
@@ -168,15 +160,15 @@ module C =
         |T ";"::restr -> restr
         |restr -> Token "struct"::Token structureTag::restr
       let parsed = Token("struct", [Token structureTag; memberList])
-      Some (parse state stop fail restl (parsed::restr))
+      Some (state, restl, parsed::restr)
     |_ -> None
   and (|DatatypeFunction|_|) state stop fail = function           //todo: array parameters
     |left, DatatypeName(datatypeName, Pref(T s)::declaredName::restr) ->
       let parsed = Token("declare", [Token(datatypeName + s.[1..]); declaredName])
-      Some (parse FunctionArgs stop fail left (parsed::restr))
+      Some (FunctionArgs, left, parsed::restr)
     |left, DatatypeName(datatypeName, declaredName::restr) ->
       let parsed = Token("declare", [Token datatypeName; declaredName])
-      Some (parse FunctionArgs stop fail left (parsed::restr))
+      Some (FunctionArgs, left, parsed::restr)
     |_ -> None
   and (|CommaFunction|_|) state stop fail = function
     |a::restl, T ","::restr ->
@@ -185,7 +177,7 @@ module C =
         match parsed with
         |X("sequence", [X(",", args)]) -> Token(",", a::args)
         |_ -> Token(",", [a; parsed])
-      Some (parse state stop fail restl (parsed::restr))
+      Some (state, restl, parsed::restr)
     |_ -> None
   and (|DatatypeNameL|_|) left =
     List.tryPick (matchString left (fun e -> List.rev <| List.ofArray (e.Split ' '))) !listOfDatatypeNames
@@ -214,53 +206,69 @@ module C =
         match restr with
         |T ","::restr -> Token ";"::Token datatypeName::restr
         |_ -> restr
-      Some (parse LocalImd stop fail restl (parsed::restr))
+      Some (LocalImd, restl, parsed::restr)
     |_ -> None
-  and (|Brackets|_|) state stop fail = function
+  and (|NextBracketPair|) state stop fail = function
     |T "("::restl, right ->
       let parsed, T ")"::restr =
-        parse LocalImd (function T ")"::_ -> true | _ -> false) (fun _ -> false) [] right
-      let parsed = Token("()", [parsed])
-      Some (parse LocalImd stop fail restl (parsed::restr))
-    |_ -> None
-  and (|Braces|_|) state stop fail = function
+        parse LocalImd (function T ")"::_ -> true | _ -> false) ((=) []) [] right
+      parsed, restr
+    |_ -> failwith "only use this when a bracket is at the top of the left stack"
+  and (|NextBracePair|) state stop fail = function   // consider infixes: a + { ... } -> error
     |T "{"::restl, right ->
       let parsed, T "}"::restr =
         parse Local (function T "}"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] right
-      let parsed = Token("{}", [parsed])
-      Some (parse Local stop fail restl (parsed::restr))
+      parsed, restr
+    |_ -> failwith "only use this when a brace is at the top of the left stack"
+  and (|Brackets|_|) state stop fail = function
+    |(T "("::restl, _) & NextBracketPair state stop fail (parsed, restr) ->
+      let parsed = Token("()", [parsed])
+      Some (state, restl, parsed::restr)
     |_ -> None
-  and getStatementBody stop fail right =
-    match right with
-    |T "{"::_ ->
-      let X("sequence", []), X("{}", [body])::restr =
-        parse Local (function X("{}", [_])::_ -> true | _ -> false)
-         (fun e -> stop e || fail e) [] right
-      body, Token ";"::restr      //add the ; to make it consistent
-    |_ ->
-      let body, restr =
-        parse Local (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] right
-      body, restr
+  and (|Braces|_|) state stop fail = function
+    |(T "{"::restl, right) & NextBracePair state stop fail (parsed, restr) ->
+      let parsed = Token("{}", [parsed])
+      Some (state, restl, parsed::restr)
+    |_ -> None
+  and getNextStatement state stop fail = function
+    |T ";"::restr -> Token "()", restr
+    |hd::tl ->
+      let left, right = [hd], tl
+      match left, right with
+      |_ when stop right || fail right -> failwithf "tokens are incomplete: %A" (left, right)
+      |Braces state stop fail (_, [], X("{}", [x])::restr) -> x, restr
+      |If state stop fail (_, [], x::restr)
+      |While state stop fail (_, [], x::restr)
+      |For state stop fail (_, [], x::restr)     -> x, restr
+      |_ ->
+        let parsed, T ";"::restr =
+          parse state (function T ";"::_ -> true | _ -> false)
+           (fun e -> stop e || fail e) left right
+        parsed, restr
+    |[] -> failwith "invalid end of file"
   and (|If|_|) state stop fail = function
-    |T "if"::restl, (T "("::_ as right) ->
-      let X("sequence", []), X("()", [cond])::restr =
-        parse LocalImd (function X("()", _)::_ -> true | _ -> false) (fun e -> stop e || fail e) [] right
-      let aff, restr = getStatementBody stop fail restr
+    |T "if"::restl, right ->
+      let cond, restr =
+        match right with
+        |T "("::restr -> (|NextBracketPair|) LocalImd stop fail ([Token "("], restr)
+        |_ -> failwith "( expected after if"
+      let aff, restr = getNextStatement state stop fail restr
       let neg, restr =
-        match restr.Tail with
-        |T "else"::T "if"::restr -> parse Local stop fail [] (Token "if"::restr)  // todo: make this redundant (parsing statement body is buggy at the moment, when nested statements without braces are involved)
-        |T "else"::restr -> getStatementBody stop fail restr
-        |_ -> Token("sequence", []), restr
+        match restr with
+        |T "else"::restr -> getNextStatement state stop fail restr
+        |_ -> Token "()", restr
       let parsed = Token("if", [cond; aff; neg])
-      Some (parse Local stop fail restl (parsed::restr))
+      Some (Local, restl, parsed::restr)   
     |_ -> None
   and (|While|_|) state stop fail = function
     |T "while"::restl, (T "("::_ as right) ->
-      let X("sequence", []), X("()", [cond])::restr =
-        parse LocalImd (function X("()", _)::_ -> true | _ -> false) (fun e -> stop e || fail e) [] right
-      let body, restr = getStatementBody stop fail restr
+      let cond, restr =
+        match right with
+        |T "("::restr -> (|NextBracketPair|) LocalImd stop fail ([Token "("], restr)
+        |_ -> failwith "( expected after while"
+      let body, restr = getNextStatement state stop fail restr
       let parsed = Token("while", [cond; body])
-      Some (parse Local stop fail restl (parsed::restr))
+      Some (Local, restl, parsed::restr)
     |_ -> None
   and (|For|_|) state stop fail = function
     |T "for"::restl, T "("::restr ->
@@ -271,28 +279,29 @@ module C =
         parse Local (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
       let incr, T ")"::restr =
         parse Local (function T ")"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
-      let body, restr = getStatementBody stop fail restr
+      let body, restr = getNextStatement state stop fail restr
       let parsed = Token("sequence", [decl; Token("while", [cond; Token("sequence", [body; incr])])])
-      Some (parse Local stop fail restl (parsed::restr))
+      Some (Local, restl, parsed::restr)
     |_ -> None
   and (|Return|_|) state stop fail = function
     |T "return"::restl, right ->
       let returnedValue, restr =
         parse LocalImd (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] right
+      let returnedValue = match returnedValue with T "sequence" -> Token "()" | x -> x
       let parsed = Token("return", [returnedValue])
-      Some (parse Local stop fail restl (parsed::restr))
+      Some (Local, restl, parsed::restr)
     |_ -> None
   and (|Assignment|_|) state stop fail = function
     |a::restl, T "="::restr ->
       let assignment, restr =
         parse LocalImd (function T ";"::_ -> true | e -> stop e) fail [] restr     //consider: a = b }    close block w/o ;
       let parsed = Token("assign", [a; assignment])
-      Some (parse LocalImd stop fail restl (parsed::restr))
+      Some (LocalImd, restl, parsed::restr)
     |_ -> None
   and (|Dot|_|) state stop fail = function
     |a::restl, T "."::T b::restr ->     // if the next token is a symbol ( eg. `(` ) then do some error handling
       let parsed = Token("dot", [a; Token b])
-      Some (parse state stop fail restl (parsed::restr))
+      Some (state, restl, parsed::restr)
     |_ -> None
   and (|Prefix|_|) state stop fail = function
     |Pref a::restl, right ->     // todo: check relative indentation of prefix operator and its token
@@ -308,7 +317,7 @@ module C =
             parse state (function T _::_ -> false | _ -> true) (fun e -> stop e || fail e) [] right
           b, restr
       let parsed = Token("apply", a.Indentation, true, [a; b])
-      Some (parse state stop fail restl (parsed::restr))
+      Some (state, restl, parsed::restr)
     |_ -> None
   and (|Operator|_|) state stop fail = function
     |a::restl, (T s as nfx)::restr when nfx.Priority <> -1 ->
@@ -317,9 +326,10 @@ module C =
          (function T _ as x::_ when x.Priority <= nfx.Priority && x.Priority <> -1 -> true | T(";" | ",")::_ -> true | x -> stop x)
          fail [] restr
       let parsed = Token("apply", [Token("apply", [Token s; a]); operand])
-      Some (parse LocalImd stop fail restl (parsed::restr))
+      Some (LocalImd, restl, parsed::restr)
     |_ -> None
   and (|Apply|_|) state stop fail = function
+    |X(("{}" | "if" | "while" | "for"), _)::_, _ -> None   // don't apply anything to these
     |a::restl, T "("::restr ->
       let state' = match state with Global -> FunctionArgs | _ -> LocalImd
       let args, restr =
@@ -328,17 +338,17 @@ module C =
         |X("sequence", []), T ")"::restr -> Token("_", []), restr
         |e -> failwithf "arguments were not formatted correctly %A" e
       let parsed = Token("apply", [a; args])
-      Some (parse LocalImd stop fail restl (parsed::restr))
+      Some (LocalImd, restl, parsed::restr)
     |_ -> None
   and (|Index|_|) state stop fail = function
     |a::restl, T "["::restr ->
       let indexXpr, T "]"::restr =
         parse state (function T "]"::_ -> true | _ -> false) (fun _ -> false) [] restr
       let parsed = Token("dot", [a; Token("[]", [indexXpr])])
-      Some (parse state stop fail restl (parsed::restr))
+      Some (state, restl, parsed::restr)
     |_ -> None
   and (|Transfer|_|) state stop fail = function
-    |left, x::restr -> Some (parse state stop fail (x::left) restr)
+    |left, x::restr -> Some (state, x::left, restr)
     |_ -> None
 
   let rec postProcess = function
