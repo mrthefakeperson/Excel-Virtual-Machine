@@ -29,16 +29,8 @@ module C =
          (negate
            (isWhitespace >>|| isDelimitedString "//" "\n" >>|| isDelimitedString "/*" "*/"))
      >> List.map (fun e -> Token e)
-     >> List.fold (fun acc e ->
-          match acc, e with
-          |T "{"::_::T "struct"::_, T "}"     // find a better way to do this
-          |T "{"::T "struct"::_, T "}" -> e::acc
-          |T "{"::rest, T "}" -> Token ";"::rest
-          |_ -> e::acc
-         ) []
-     >> List.rev
   let listOfDatatypeNamesDefault =    // can be simplified if all datatypes are 1 or 2 tokens
-    List.sortBy (fun (e:string) -> (e.Split ' ').Length) [
+    List.sortBy (fun (e:string) -> -(e.Split ' ').Length) [
       "int"; "long long"; "long"; "bool"; "char"; "unsigned"; "unsigned int";
       "unsigned long int"; "unsigned long long int"; "long int"; "long long int"
      ]
@@ -50,7 +42,7 @@ module C =
     |Local
     |LocalImd    // keywords must appear at the beginning of a statement; LocalImd doesn't include them
   let rec parse state stop fail left right =
-    //printfn "%A" (left, right)
+//    printfn "%A" (left, right)
     match stop right, fail right, state with
     |true, _, _ -> Token("sequence", List.rev left), right
     |_, true, _ -> failwithf "tokens are incomplete: %A" (left, right)
@@ -152,9 +144,8 @@ module C =
         |T s::T "{"::restr -> s, restr
         |ex -> failwithf "not a valid struct declaration: %A" ex
       listOfDatatypeNames := "struct " + structureTag:: !listOfDatatypeNames
-      printfn "datatype names: %A" !listOfDatatypeNames
-      let memberList, T "}"::restr =   // validation needed: only declarations allowed
-        parse Local (function T "}"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
+//      printfn "datatype names: %A" !listOfDatatypeNames
+      let memberList, restr = (|NextBracePair|) Local stop fail ([Token "{"], restr)  // validation needed: only declarations allowed
       let restr =
         match restr with
         |T ";"::restr -> restr
@@ -179,16 +170,19 @@ module C =
         |_ -> Token(",", [a; parsed])
       Some (state, restl, parsed::restr)
     |_ -> None
-  and (|DatatypeNameL|_|) left =
-    List.tryPick (matchString left (fun e -> List.rev <| List.ofArray (e.Split ' '))) !listOfDatatypeNames
+  and (|DatatypeNameL|_|) = function
+    |[], _ -> None
+    |hd::restl, right ->
+      match hd::right with
+      |DatatypeName(datatypeName, restr) -> Some(restl, datatypeName, restr)
+      |_ -> None
   and (|DatatypeLocal|_|) state stop fail = function
-    |DatatypeNameL(datatypeName, restl), right ->
+    |DatatypeNameL(restl, datatypeName, right) ->
       let parsed, restr =
         parse LocalImd (function T(";" | ",")::_ -> true | _ -> false) (fun e -> stop e || fail e) [] right
       let parsed =
-        let pars = match parsed with X("sequence", [pars]) -> pars
+        let pars = match parsed with X("sequence", [pars]) -> pars | _ -> failwith "unexpected"
         match pars with
-//        match parsed.Clean() with
         |X("assign", [T declaredName as t; value]) ->
           Token("let", [Token("declare", [Token datatypeName; t]); value])
         |T declaredName as t ->
@@ -335,7 +329,7 @@ module C =
       let args, restr =
         match parse state' (function T ")"::_ -> true | _ -> false) (fun _ -> false) [] restr with
         |X("sequence", [args]), T ")"::restr -> args, restr
-        |X("sequence", []), T ")"::restr -> Token("_", []), restr
+        |X("sequence", []), T ")"::restr -> Token("()", []), restr
         |e -> failwithf "arguments were not formatted correctly %A" e
       let parsed = Token("apply", [a; args])
       Some (LocalImd, restl, parsed::restr)

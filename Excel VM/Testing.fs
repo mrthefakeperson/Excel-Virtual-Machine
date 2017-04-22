@@ -126,12 +126,13 @@ module IntegrationTests =
       let cmds =
         parsed.Clean()
          |> ASTCompile |> debug
-         |> compile
+         |> compileToASM
          |> Array.ofList
       Array.iter (printf "%A   ") cmds
-      let stack, heap, output = interpretPAsm cmds
+      let stack, heap, output = interpretPAsm false cmds
       logPrintf outFile "stack %A\n" stack
       logPrintf outFile "\noutput %A\n" output
+      printfn "heap: %A" heap
     //logPrintf outFile "heap [%s]\n" (String.concat "; " (Seq.map (sprintf "%A") heap))
     //makeProgram cmds
     // |> interpret 800
@@ -144,7 +145,7 @@ module IntegrationTests =
        |> parseInstructionList
        |> Array.mapi getInstruction
        |> Array.map (fun e -> printfn "%A" e; e)
-       |> interpretPAsm
+       |> interpretPAsm false
        |> logPrintf outFile "%A\n"
      )
 
@@ -163,7 +164,7 @@ module IntegrationTests =
       let cmds =
         parsed.Clean()
          |> ASTCompile |> debug
-         |> compile
+         |> compileToASM
          |> Array.ofList
       Array.iter (printf "%A   ") cmds
       writeExcelFile (file + ".xlsx") cmds
@@ -183,7 +184,7 @@ module IntegrationTests =
       let cmds =
         parsed.Clean()
          |> ASTCompile |> debug
-         |> compile
+         |> compileToASM
          |> Array.ofList
       writeBytecode (file + ".s") cmds
      )

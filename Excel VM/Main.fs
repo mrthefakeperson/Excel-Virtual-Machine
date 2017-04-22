@@ -34,7 +34,7 @@ let main argv =
     //testAsmCompilerSimple 1
     //testTypeSystem 26
 
-    testParser verify 1
+    //testParser verify 1
     testCompilerAST verify 1
     //testExcelCompiler 1
     //testAsmCompiler 27
@@ -46,7 +46,7 @@ let main argv =
     let parsed = openAndParse fileNameWithExtension
     parsed.Clean()
      |> ASTCompile
-     |> compile
+     |> compileToASM
      |> Array.ofList
      |> writeExcelFile (fileName + ".xlsx")
   |[|fileNameWithExtension|] ->
@@ -54,7 +54,7 @@ let main argv =
     let parsed = openAndParse fileNameWithExtension
     parsed.Clean()
      |> ASTCompile
-     |> compile
+     |> compileToASM
      |> Array.ofList
      |> writeBytecode (fileName + ".s")
     if not <| Process.Start("g++", sprintf "%s.s -o %s.exe" fileName fileName).WaitForExit 17000 then

@@ -150,10 +150,119 @@ let CParserScopeThenBracketTest() =
   |X("sequence", [X("{}", [X("sequence", [T "a"; T ";"])]); T "b"; T ";"]), [] -> ()
   |a, _ -> failwithf "failed braces then brackets test: %A" a
 [<Test>]
-let CParserEmptyStatementTest() =
+let CParserEmptyStatementTest1() =
   match parseStringC Local "if ( a ) ;" with
   |X("if", [T "a"; T "()"; T "()"]), [] -> ()
-  |a, _ -> failwithf "failed empty statement test: %A" a
+  |a, _ -> failwithf "failed empty statement test 1: %A" a
+[<Test>]
+let CParserEmptyStatementTest2() =
+  match parseStringC Local "{ }" with
+  |X("{}", [T "sequence"]), [] -> ()
+  |a, _ -> failwithf "failed empty statement test 2: %A" a
+[<Test>]
+let CParserEmptyStatementTest3() =
+  match parseStringC Local "if ( a ) { }" with
+  |X("if", [T "a"; T "sequence"; T "()"]), [] -> ()
+  |a, _ -> failwithf "failed empty statement test 3: %A" a
+[<Test>]
+let CParserFunctionDeclareTest() =
+  match parseStringC Global "int a ( int b , int c , int d ) { }" with
+  |X("declare function", [T"int";T"a"; X(",", [X("declare", [T"int";T"b"]); X("declare", [T"int";T"c"]); X("declare", [T"int";T"d"])]); X("{}", [T "sequence"])]), [] -> ()
+  |a, _ -> failwithf "failed function declaration test: %A" a
+[<Test>]
+let CParserEmptyFunctionDeclareTest() =
+  match parseStringC Global "int f ( ) { }" with
+  |X("declare function", [T"int";T"f"; T "()"; X("{}", [T "sequence"])]), [] -> ()
+  |a, _ -> failwithf "failed empty function declaration test: %A" a
+[<Test>]
+let CParserFunctionApplyTest() =
+  match parseStringC Local "f ( x , g ( ) , y + z )" with
+  |X(A, [T "f"; X(",", [T "x"; X(A, [T "g"; T "()"]); X(A, [X(A, [T "+"; T "y"]); T "z"])])]), [] -> ()
+  |a, _ -> failwithf "failed function application test: %A" a
+[<Test>]
+let CParserDatatypeTest() =
+  match parseStringC Global "long int f ( ) { unsigned int g ; }" with
+  |X("declare function", [T "long int"; T "f"; T "()"; X("{}", [X("sequence", [X("let", [X("declare", [T "unsigned int"; T "g"]); T "nothing"]); T ";"])])]), [] -> ()
+  |a, _ -> failwithf "failed multi-word datatype test: %A" a
+[<Test>]    // semi-colons should be more consistent: int a; = 5; -> error
+let CParserDeclareStructTest1() =
+  match parseStringC Global "struct x { } a , b ; struct x c ;" with
+  |X("sequence", [X("struct", [T "x"; T "sequence"]);X("let", [X("declare",[T"struct x";T"a"]);T"nothing"]);T";";X("let", [X("declare",[T"struct x";T"b"]);T"nothing"]);X("let", [X("declare",[T"struct x";T"c"]);T"nothing"])]), [] -> ()
+  |a, _ -> failwithf "failed struct test 1: %A" a
+[<Test>]
+let CParserDeclareStructTest2() =
+  match parseStringC Global "struct { } ;" with
+  |X("struct", [T "anonymousStruct"; T "sequence"]), [] -> ()
+  |a, _ -> failwithf "failed struct test 2: %A" a
+
+open AST_Compiler
+
+open ASM_Compiler
+let runAST f = compileToASM >> Array.ofList >> Testing.Interpreters.interpretPAsm false >> f
+let runASTDebug f = compileToASM >> Array.ofList >> Testing.Interpreters.interpretPAsm true >> f
+let stack (a, _, _) = a
+let heap (_, a, _) = a
+let output (_, _, a) = a
+
+[<Test>]
+let ASMComb2Test1() =
+  Assert.AreEqual(runAST stack (Apply(Apply(Value "+", [Const "5"]), [Const "-7"])), ["-2"])
+[<Test>]
+let ASMComb2Test2() =
+  Assert.AreEqual(runAST stack (Apply(Apply(Value ">", [Const "5"]), [Const "7"])), ["False"])
+[<Test>]
+let ASMComb2Test3() =
+  Assert.AreEqual(runAST stack (Apply(Apply(Value "<=", [Const "5"]), [Const "7"])), ["True"])
+[<Test>]
+let ASMComb2Test4() =
+  Assert.AreEqual(runAST stack (Apply(Apply(Value "=", [Const "5"]), [Const "7"])), ["False"])
+[<Test>]
+let ASMComb2Test5() =
+  Assert.AreEqual(runAST stack (Apply(Apply(Value "%", [Const "13"]), [Const "7"])), ["6"])
+[<Test>]
+let ASMAllocTest() =
+  Assert.AreEqual((runAST heap (New (Const "3"))).ToArray().[14..], [|""; ""; ""; "endArr"|])
+  Assert.AreEqual(runAST stack (New (Const "3")), ["14"])
+[<Test>]
+let ASMAllocTest2() =
+  Assert.AreEqual((runAST heap (New (Const "1"))).ToArray().[14..], [|""; "endArr"|])
+  Assert.AreEqual(runAST stack (New (Const "1")), ["14"])
+[<Test>]
+let ASMLoopTest() =
+  Sequence [
+    Declare("a", Const "5")
+    Loop(Apply(Apply(Value ">", [Value "a"]), [Const "0"]),
+      Sequence [New (Const "1"); Mutate("a", Apply(Apply(Value "+", [Value "a"]), [Const "-1"]))]
+     )
+   ]
+   |> fun e -> Assert.AreEqual((runAST heap e).ToArray().[14..] |> Array.filter ((=) ""), [|""; ""; ""; ""; ""|])
+[<Test>]
+let ASMLoopTest2() =
+  Sequence [
+    Declare("a", Const "5")
+    Loop(Apply(Apply(Value ">", [Value "a"]), [Const "0"]),
+      Sequence [Mutate("a", Apply(Apply(Value "+", [Value "a"]), [Const "-1"])); Const "4"]
+     )
+   ]
+   |> fun e -> Assert.AreEqual(runAST stack e, ["()"])
+[<Test>]
+let ASMLocalVariableTest() =
+  Sequence [
+    Declare("ff",
+     Define("f", ["ee"],
+      Sequence [
+        Declare("e", Value "ee")
+        If(Apply(Apply(Value "=", [Value "e"]), [Const "9"]),
+          AST.Return(Some(Const "7")),
+          AST.Return(Some <|
+            Apply(Apply(Value "+", [Value "e"]),
+              [Apply(Value "f", [Apply(Apply(Value "+", [Value "e"]), [Const "1"])])]) ) )
+       ]
+      ) )
+    Define("g", ["()"], Apply(Value "ff", [Const "7"]))
+    Apply(Value "g", [Const "()"])
+   ]
+   |> fun e -> Assert.AreEqual(runAST stack e, ["22"])
 
 [<EntryPoint>]
 let main argv =

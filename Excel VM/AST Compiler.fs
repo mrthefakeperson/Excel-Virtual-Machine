@@ -33,6 +33,13 @@ type AST =
         |Loop(a, b) -> indent + sprintf "while %s do\n%s\n" (str "" a) (str (indent+"  ") b)
         |Mutate(a, b) -> indent + sprintf "%s <-\n%s" a (str (indent+"  ") b)
       str "" x
+let (|Children|) = function
+  |Sequence ll -> ll
+  |Declare(_, c) | Define(_, _, c) |New c | Mutate(_, c) | Return(Some c) -> [c]
+  |Value _ | Const _ | Return None -> []
+  |Get(a, b) | Loop(a, b) -> [a; b]
+  |Assign(a, b, c) | If(a, b, c) -> [a; b; c]
+  |Apply(a, ll) -> a::ll
 
 let nxt' x () =
   incr x
@@ -65,19 +72,20 @@ let rec ASTCompile' (capture, captured as cpt) = function
       |e -> failwithf "could not unpack %A" e
     let argName = "$arg" + nxt()
     let extractCode, extractedVars = unpack (Value argName) x
+    let L, K = "L" + nxt(), "K" + nxt()
     let cptr'd = List.map Value capture
-    let cpt' = extractedVars @ capture, Map.add "L" cptr'd captured
+    let cpt' = extractedVars @ capture, Map.add L cptr'd captured
     let functionBody = Sequence (extractCode @ [ASTCompile' cpt' b])
     Sequence [
-      yield Define("L", argName::capture, functionBody)
-      match ASTCompile' cpt' (Token("L", [])) with
+      yield Define(L, argName::capture, functionBody)
+      match ASTCompile' cpt' (Token(L, [])) with
       |Apply(a, args) ->
-        yield Declare("K", New (Const(string(List.length args + 1))))
-        yield Assign(Value "K", Const "0", Get(a, Const "0"))
+        yield Declare(K, New (Const(string(List.length args + 1))))
+        yield Assign(Value K, Const "0", Get(a, Const "0"))
         yield! List.mapi (fun i e ->
-          Assign(Value "K", Const(string(i + 1)), e)
+          Assign(Value K, Const(string(i + 1)), e)
          ) args
-        yield Value "K"
+        yield Value K
       |compiled -> yield compiled
      ]
   |X("declare", [datatypeName; a]) -> ASTCompile' cpt a
@@ -98,8 +106,7 @@ let rec ASTCompile' (capture, captured as cpt) = function
     |X(name, []) -> Mutate(name, ASTCompile' cpt b)
     |X("dot", [a; X("[]", [i])]) ->
       Assign(ASTCompile' cpt a, ASTCompile' cpt i, ASTCompile' cpt b)
-    |X("deref", [_]) ->
-      Assign(ASTCompile' cpt a, Const "0", ASTCompile' cpt b)
+    |X("deref", [a]) -> Assign(ASTCompile' cpt a, Const "0", ASTCompile' cpt b)
     |_ -> failwith "todo: unpacking"
   |X("if", [cond; aff; neg]) ->
     If(ASTCompile' cpt cond, ASTCompile' cpt aff, ASTCompile' cpt neg)

@@ -73,6 +73,18 @@
     <Compile Include="..\Excel VM\Type System.fs">
       <Link>Type System.fs</Link>
     </Compile>
+    <Compile Include="..\Excel VM\AST Compiler.fs">
+      <Link>AST Compiler.fs</Link>
+    </Compile>
+    <Compile Include="..\Excel VM\Excel Language.fs">
+      <Link>Excel Language.fs</Link>
+    </Compile>
+    <Compile Include="..\Excel VM\ASM Compiler.fs">
+      <Link>ASM Compiler.fs</Link>
+    </Compile>
+    <Compile Include="..\Excel VM\Testing _Interpreters_.fs">
+      <Link>Testing _Interpreters_.fs</Link>
+    </Compile>
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <None Include="packages.config" />

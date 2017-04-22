@@ -4,7 +4,7 @@ open ASM_Compiler
 open System
 
 module Interpreters =
-  let interpretPAsm cmds =
+  let interpretPAsm debug cmds =
     let pushstack stack v = stack := v :: !stack
     let popstack stack = stack := match !stack with _ :: tl -> tl | [] -> []
     let topstack stack = match !stack with hd :: _ -> hd | [] -> failwith "took top of an empty stack"
@@ -14,13 +14,14 @@ module Interpreters =
          <| Array.choose (function Store e | Load e | Popv e -> Some e | _ -> None) cmds
          |> Set.ofArray |> Set.toArray
       printfn "%A" x
-      (x, Array.init x.Length (fun _ -> ref []))
+      (x, Array.init x.Length (fun _ -> ref ["0"]))
        ||> Array.zip
        |> dict
     let push name = pushstack stacks.[name]
     let pop name = popstack stacks.[name]
     let top name = topstack stacks.[name]
     let instr, value, _, _, output = "A", "B", "C", "D", "E"
+    pop instr; pop value; pop output
     let heap = ResizeArray()
     let interpretCmd i =
       let fwd = (+) (i-1) >> string     // i-1 because +1 to instrPt gets appended to the end of every cmd
@@ -29,13 +30,17 @@ module Interpreters =
       |Push s -> push value s
       |PushFwdShift ii -> push value (fwd2 ii)
       |Pop -> pop value
-      |Store var -> push var (top value); pop value
+//      |Store var -> push var (top value); pop value
+      |Store var -> pop var; push var (top value); pop value
       |Load var -> push value (top var)
-      |Popv var -> pop var
+//      |Popv var -> pop var
+      |Popv var -> failwith "depreciated"
       |GotoFwdShift ii -> pop instr; push instr (fwd ii)
       |GotoIfTrueFwdShift ii -> (if (top value).ToLower() = "true" then pop instr; push instr (fwd ii)); pop value  //not perfect
-      |Call -> push instr (string(int(top value) - 1)); pop value
-      |Return -> pop instr
+//      |Call -> push instr (string(int(top value) - 1)); pop value
+      |Call -> let newInstr = string(int(top value) - 1) in pop value; push value (top instr); pop instr; push instr newInstr
+//      |Return -> pop instr
+      |Return -> pop instr; push instr (top value); pop value
       |GetHeap -> let yld = heap.[int(top value)] in pop value; push value yld
       |NewHeap -> heap.Add ""; push value (string(heap.Count-1))
       |WriteHeap -> let v = top value in pop value; let i = top value in pop value; heap.[int i] <- v
@@ -45,7 +50,6 @@ module Interpreters =
         let a = top value in pop value
         let b = top value in pop value
         push value (c.Interpret a b)
-    let debug = false
     push instr "0"
     while int(top instr) < Array.length cmds && List.length !stacks.[output] < 50 do
       let i = int(top instr)
