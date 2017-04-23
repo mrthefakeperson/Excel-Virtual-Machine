@@ -55,36 +55,49 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Excel VM\Token.fs">
-      <Link>Token.fs</Link>
+    <Compile Include="..\Excel VM\Parser.Definition.fs">
+      <Link>Parser.Definition.fs</Link>
     </Compile>
-    <Compile Include="..\Excel VM\Lexer.fs">
-      <Link>Lexer.fs</Link>
+    <Compile Include="..\Excel VM\Parser.Lexer.fs">
+      <Link>Parser.Lexer.fs</Link>
     </Compile>
-    <Compile Include="..\Excel VM\String Formatting.fs">
-      <Link>String Formatting.fs</Link>
+    <Compile Include="..\Excel VM\Parser.StringFormatting.fs">
+      <Link>Parser.StringFormatting.fs</Link>
     </Compile>
-    <Compile Include="..\Excel VM\Parser_Fs.fs">
-      <Link>Parser_Fs.fs</Link>
+    <Compile Include="..\Excel VM\Parser.FSharpParser.fs">
+      <Link>Parser.FSharpParser.fs</Link>
     </Compile>
-    <Compile Include="..\Excel VM\Parser_C.fs">
-      <Link>Parser_C.fs</Link>
+    <Compile Include="..\Excel VM\Parser.CParser.fs">
+      <Link>Parser.CParser.fs</Link>
     </Compile>
-    <Compile Include="..\Excel VM\Type System.fs">
-      <Link>Type System.fs</Link>
+    <Compile Include="..\Excel VM\Parser.TypeValidation.fs">
+      <Link>Parser.TypeValidation.fs</Link>
     </Compile>
-    <Compile Include="..\Excel VM\AST Compiler.fs">
-      <Link>AST Compiler.fs</Link>
+    <Compile Include="..\Excel VM\Parser.Implementation.fs">
+      <Link>Parser.Implementation.fs</Link>
     </Compile>
-    <Compile Include="..\Excel VM\Excel Language.fs">
-      <Link>Excel Language.fs</Link>
+    <Compile Include="..\Excel VM\AST.Definition.fs">
+      <Link>AST.Definition.fs</Link>
     </Compile>
-    <Compile Include="..\Excel VM\ASM Compiler.fs">
-      <Link>ASM Compiler.fs</Link>
+    <Compile Include="..\Excel VM\AST.Compile.fs">
+      <Link>AST.Compile.fs</Link>
     </Compile>
-    <Compile Include="..\Excel VM\Testing _Interpreters_.fs">
-      <Link>Testing _Interpreters_.fs</Link>
+    <Compile Include="..\Excel VM\AST.Optimize.fs">
+      <Link>AST.Optimize.fs</Link>
     </Compile>
+    <Compile Include="..\Excel VM\AST.Implementation.fs">
+      <Link>AST.Implementation.fs</Link>
+    </Compile>
+    <Compile Include="..\Excel VM\PseudoASM.Definition.fs">
+      <Link>PseudoASM.Definition.fs</Link>
+    </Compile>
+    <Compile Include="..\Excel VM\PseudoASM.Compile.fs">
+      <Link>PseudoASM.Compile.fs</Link>
+    </Compile>
+    <Compile Include="..\Excel VM\PseudoASM.Implementation.fs">
+      <Link>PseudoASM.Implementation.fs</Link>
+    </Compile>
+    <Compile Include="Parser Unit Tests.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <None Include="packages.config" />

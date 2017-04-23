@@ -1,7 +1,5 @@
-﻿open Parser    // test hyphen rules: 5-4, 5 -4, 5 - 4
-open Parser.Token
-open AST_Compiler
-open ASM_Compiler
+﻿// test hyphen rules: 5-4, 5 -4, 5 - 4
+open PseudoASM.Definition
 open Write_File.ASM
 open Write_File.Excel
 open Testing.IntegrationTests
@@ -17,13 +15,12 @@ let openAndParse file =
   let _, extension = sep file
   let parseSyntax =
     match extension with
-    |"fs" | "fsx" -> Parser.FSharp.parseSyntax
-    |"py" -> Parser.Python2.parseSyntax
-    |_ -> Parser.C.parseSyntax
+    |"fs" | "fsx" -> Parser.FSharpParser.parseSyntax
+    |_ -> Parser.CParser.parseSyntax
   txt
    |> parseSyntax
    |> fun e -> e.Clean()
-   |> Type_System.applyTypeSystem
+   |> Parser.TypeValidation.validateTypes
 [<EntryPoint>]
 let main argv =
   match argv with
@@ -34,9 +31,9 @@ let main argv =
     //testAsmCompilerSimple 1
     //testTypeSystem 26
 
-    //testParser verify 1
-    //testCompilerAST verify 1
-    testExcelCompiler 1
+    testParser verify 1
+    testCompilerAST verify 1
+    //testExcelCompiler 1
     //testAsmCompiler 27
     printfn "done"
     ignore (stdin.ReadLine())
@@ -45,17 +42,17 @@ let main argv =
     let fileName, extension = sep fileNameWithExtension
     let parsed = openAndParse fileNameWithExtension
     parsed.Clean()
-     |> ASTCompile
-     |> compileToASM
-     |> Array.ofList
+     |> AST.Implementation.fromToken
+     |> PseudoASM.Implementation.fromAST
+     |> Array.ofSeq
      |> writeExcelFile (fileName + ".xlsx")
   |[|fileNameWithExtension|] ->
     let fileName, extension = sep fileNameWithExtension
     let parsed = openAndParse fileNameWithExtension
     parsed.Clean()
-     |> ASTCompile
-     |> compileToASM
-     |> Array.ofList
+     |> AST.Implementation.fromToken
+     |> PseudoASM.Implementation.fromAST
+     |> Array.ofSeq
      |> writeBytecode (fileName + ".s")
     if not <| Process.Start("g++", sprintf "%s.s -o %s.exe" fileName fileName).WaitForExit 17000 then
       failwith "g++ not found; please install gcc before using"

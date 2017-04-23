@@ -1,9 +1,41 @@
 ﻿namespace Testing
-open Excel_Language.Definitions
-open ASM_Compiler
+open ExcelLanguage.Definition
+open PseudoASM.Definition
 open System
 
 module Interpreters =
+  [<AbstractClass>]
+  type Op(x:PseudoASM) =
+    inherit Comb2("", (x.CommandInfo :?> Comb2).Symbol)
+    abstract member Apply: string -> string -> string
+  let implementForType<'T> (cast:string -> 'T) (f:'T -> 'T -> string) a b = f (cast a) (cast b)
+  let k f a b = (f a b).ToString()
+  let castToIntThen = implementForType<int> int
+  let checkIntFirst fint fstr a b =
+    if fst (Int32.TryParse a) && fst (Int32.TryParse b)
+     then castToIntThen fint a b
+     else fstr a b
+  let castToBoolThen = implementForType<bool> (fun s ->
+    match s.ToLower() with
+    |"true" -> true
+    |"false" -> false
+    |_ -> failwith "not a bool"
+   )
+  let allCombinators = [  //[Add; Sub; Mul; Div; Mod; Less; LEq; Equals; NotEq; Greater; GEq; And; Or]
+    {new Op(Add) with override x.Apply a b = castToIntThen (k (+)) a b}
+    {new Op(Sub) with override x.Apply a b = castToIntThen (k (-)) a b}
+    {new Op(Mul) with override x.Apply a b = castToIntThen (k (*)) a b}
+    {new Op(Div) with override x.Apply a b = castToIntThen (k (/)) a b}
+    {new Op(Mod) with override x.Apply a b = castToIntThen (k (%)) a b}
+    {new Op(Less) with override x.Apply a b = checkIntFirst (k (<)) (k (<)) a b}
+    {new Op(LEq) with override x.Apply a b = checkIntFirst (k (<=)) (k (<=)) a b}
+    {new Op(Equals) with override x.Apply a b = checkIntFirst (k (=)) (k (=)) a b}
+    {new Op(NotEq) with override x.Apply a b = checkIntFirst (k (<>)) (k (<>)) a b}
+    {new Op(Greater) with override x.Apply a b = checkIntFirst (k (>)) (k (>)) a b}
+    {new Op(GEq) with override x.Apply a b = checkIntFirst (k (>=)) (k (>=)) a b}
+    {new Op(And) with override x.Apply a b = castToBoolThen (k (&&)) a b}
+    {new Op(Or) with override x.Apply a b = castToBoolThen (k (||)) a b}
+   ]
   let interpretPAsm debug cmds =
     let pushstack stack v = stack := v :: !stack
     let popstack stack = stack := match !stack with _ :: tl -> tl | [] -> []
@@ -11,7 +43,7 @@ module Interpreters =
     let stacks =
       let x =
         Array.append (Array.map string [|'A'..'E'|])
-         <| Array.choose (function Store e | Load e | Popv e -> Some e | _ -> None) cmds
+         <| Array.choose (function Store e | Load e -> Some e | _ -> None) cmds
          |> Set.ofArray |> Set.toArray
       printfn "%A" x
       (x, Array.init x.Length (fun _ -> ref ["0"]))
@@ -34,7 +66,6 @@ module Interpreters =
       |Store var -> pop var; push var (top value); pop value
       |Load var -> push value (top var)
 //      |Popv var -> pop var
-      |Popv var -> failwith "depreciated"
       |GotoFwdShift ii -> pop instr; push instr (fwd ii)
       |GotoIfTrueFwdShift ii -> (if (top value).ToLower() = "true" then pop instr; push instr (fwd ii)); pop value  //not perfect
 //      |Call -> push instr (string(int(top value) - 1)); pop value
@@ -46,10 +77,11 @@ module Interpreters =
       |WriteHeap -> let v = top value in pop value; let i = top value in pop value; heap.[int i] <- v
       |Input _ -> push value (stdin.ReadLine())
       |Output _ -> push output (top value); pop value
-      |Combinator_2 c ->
+      |Combinator_2(_, _) as c ->
         let a = top value in pop value
         let b = top value in pop value
-        push value (c.Interpret a b)
+        let op = List.find (fun (e:Op) -> (c.CommandInfo :?> Comb2).Symbol = e.Symbol) allCombinators
+        push value (op.Apply a b)
     push instr "0"
     while int(top instr) < Array.length cmds && List.length !stacks.[output] < 50 do
       let i = int(top instr)

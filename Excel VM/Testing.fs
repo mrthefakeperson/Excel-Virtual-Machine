@@ -1,10 +1,7 @@
 ﻿namespace Testing
-open Parser
-open Parser.Lexer
-open AST_Compiler
-open Excel_Language.Definitions
-open ASM_Compiler
-open Excel_Language.Define_VM
+open PseudoASM.Definition
+open ExcelLanguage.Definition
+open ExcelLanguage.DefineVM
 open Write_File.ASM
 open Write_File.Excel
 open Interpreters
@@ -65,14 +62,14 @@ module IntegrationTests =
     Array.map parseInstruction input
   let getInstruction = fun i -> function
     |"push", x -> Push x | "pop", _ -> Pop
-    |"store", x -> Store x | "load", x -> Load x | "popv", x -> Popv x
+    |"store", x -> Store x | "load", x -> Load x
     |"goto", x -> GotoFwdShift (int x - i) |"gotoiftrue", x -> GotoIfTrueFwdShift (int x - i)
     |"call", _ -> Call | "return", _ -> Return
     |"getheap", _ -> GetHeap | "newheap", _ -> NewHeap | "writeheap", _ -> WriteHeap
-    |"inputline", _ -> Input "%i" | "output", _ -> Output type_int32
+    |"inputline", _ -> Input "%i" | "output", _ -> Output "%i"
     |name, "" when
-      List.exists (function Combinator_2 c -> c.Name = name | _ -> false) allCombinators ->
-      List.find (function Combinator_2 c -> c.Name = name | _ -> false) allCombinators
+      List.exists (function Combinator_2(_, _) as c -> c.CommandInfo.Name = name | _ -> false) PseudoASM.Definition.allCombinators ->
+      List.find (function Combinator_2(_, _) as c -> c.CommandInfo.Name = name | _ -> false) PseudoASM.Definition.allCombinators
     |unknown -> failwithf "unknown: %A" unknown
     
   let testExcelInterpreter a =
@@ -92,16 +89,15 @@ module IntegrationTests =
     let txt = File.ReadAllLines file
     let parseSyntax, txt =
       match txt.[0] with
-      |"F#" -> FSharp.parseSyntax, String.concat "\n" txt.[1..]
-      |"Py2" -> Python2.parseSyntax, String.concat "\n" txt.[1..]
-      |"C" -> C.parseSyntax, String.concat "\n" txt.[1..]
-      |_ -> FSharp.parseSyntax, String.concat "\n" txt
+      |"F#" -> Parser.FSharpParser.parseSyntax, String.concat "\n" txt.[1..]
+      |"C" -> Parser.CParser.parseSyntax, String.concat "\n" txt.[1..]
+      |_ -> Parser.FSharpParser.parseSyntax, String.concat "\n" txt
     txt
      |> parseSyntax
   let openAndParse =
     openAndPartiallyParse
      >> fun e -> e.Clean()
-     >> Type_System.applyTypeSystem
+     >> Parser.TypeValidation.validateTypes
 
   let testParser a =
     test a "test cases - parser" (fun file outFile ->
@@ -125,9 +121,9 @@ module IntegrationTests =
       printfn "%A" (parsed.Clean().ToStringExpr())
       let cmds =
         parsed.Clean()
-         |> ASTCompile |> debug
-         |> compileToASM
-         |> Array.ofList
+         |> AST.Implementation.fromToken |> debug
+         |> PseudoASM.Implementation.fromAST
+         |> Array.ofSeq
       Array.iter (printf "%A   ") cmds
       let stack, heap, output = interpretPAsm false cmds
       logPrintf outFile "stack %A\n" stack
@@ -163,9 +159,9 @@ module IntegrationTests =
       let parsed = openAndParse file
       let cmds =
         parsed.Clean()
-         |> ASTCompile |> debug
-         |> compileToASM
-         |> Array.ofList
+         |> AST.Implementation.fromToken |> debug
+         |> PseudoASM.Implementation.fromAST
+         |> Array.ofSeq
       Array.iter (printf "%A   ") cmds
       writeExcelFile (file + ".xlsx") cmds
      )
@@ -183,8 +179,8 @@ module IntegrationTests =
       let parsed = openAndParse file
       let cmds =
         parsed.Clean()
-         |> ASTCompile |> debug
-         |> compileToASM
-         |> Array.ofList
+         |> AST.Implementation.fromToken |> debug
+         |> PseudoASM.Implementation.fromAST
+         |> Array.ofSeq
       writeBytecode (file + ".s") cmds
      )

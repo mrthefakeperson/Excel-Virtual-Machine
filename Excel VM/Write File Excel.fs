@@ -1,6 +1,6 @@
 ﻿namespace Write_File
-open Excel_Language.Definitions
-open Excel_Language.Define_VM
+open ExcelLanguage.Definition
+open ExcelLanguage.DefineVM
 open System.IO
 open System.Reflection
 open Microsoft.Office.Core

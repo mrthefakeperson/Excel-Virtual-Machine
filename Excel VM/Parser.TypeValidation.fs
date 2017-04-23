@@ -1,8 +1,9 @@
 ﻿// todo: structs get deepcopied, pointers don't
 // todo: recursive structs
 
-module Type_System
-open Parser.Token
+//module private Parser.TypeValidation
+module Parser.TypeValidation
+open Definition
 open System.Collections.Generic
 
 // dict: name_of_member -> (index, initial_value [option])
@@ -135,7 +136,7 @@ let rec processDerefs = function
   |X(s, dep) -> Token(s, List.map processDerefs dep)
 
 
-let applyTypeSystem:Token -> Token =
+let validateTypes: Token -> Token =
   compileObjectsToArrays
    >> compilePointersToArrays
    >> processDerefs

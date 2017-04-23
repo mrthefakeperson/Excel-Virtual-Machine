@@ -73,17 +73,21 @@
       <Isolated>False</Isolated>
       <WrapperTool>primary</WrapperTool>
     </COMReference>
-    <Compile Include="Token.fs" />
-    <Compile Include="Lexer.fs" />
-    <Compile Include="String Formatting.fs" />
-    <Compile Include="Parser_Fs.fs" />
-    <Compile Include="Parser_C.fs" />
-    <Compile Include="Parser_Py2.fs" />
-    <Compile Include="Type System.fs" />
-    <Compile Include="AST Compiler.fs" />
+    <Compile Include="Parser.Definition.fs" />
+    <Compile Include="Parser.Lexer.fs" />
+    <Compile Include="Parser.StringFormatting.fs" />
+    <Compile Include="Parser.FSharpParser.fs" />
+    <Compile Include="Parser.CParser.fs" />
+    <Compile Include="Parser.TypeValidation.fs" />
+    <Compile Include="Parser.Implementation.fs" />
+    <Compile Include="AST.Definition.fs" />
+    <Compile Include="AST.Compile.fs" />
+    <Compile Include="AST.Optimize.fs" />
+    <Compile Include="AST.Implementation.fs" />
+    <Compile Include="PseudoASM.Definition.fs" />
+    <Compile Include="PseudoASM.Compile.fs" />
+    <Compile Include="PseudoASM.Implementation.fs" />
     <Compile Include="Excel Language.fs" />
-    <Compile Include="ASM Compiler.fs" />
-    <Compile Include="Write File.fs" />
     <Compile Include="Excel Conversion.fs" />
     <Compile Include="Write File Excel.fs" />
     <Compile Include="Write File ASM.fs" />

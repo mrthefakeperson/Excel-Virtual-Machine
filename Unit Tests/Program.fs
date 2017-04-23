@@ -1,62 +1,61 @@
 ﻿module NUnitLite.Tests
 open NUnitLite
 open NUnit.Framework
-open Parser
 
-open Lexer
-let tokens = List.ofSeq >> List.map string
+//open Lexer
+//let tokens = List.ofSeq >> List.map string
 
-[<Test>]
-let LexerTest1() =
-  Assert.AreEqual(["sd"; " "; " "; " "; "dfdfdf4"; " "; " "; "_4_e"; " "; "4_4"],
-    tokenize createVariablesAndNumbers (tokens "sd   dfdfdf4  _4_e 4_4"))
-[<Test>]
-let LexerTest2() =
-  Assert.AreEqual(["aadf"; " "; "4.33f"; " "; "df8"; " "; "_45"; " "; "__r4"],
-    tokenize createVariablesAndNumbers (tokens "aadf 4.33f df8 _45 __r4"))
-[<Test>]
-let LexerStringTest1() =
-  Assert.AreEqual([" "; "\"string with \\\"quote\\\"\""; " "],
-    tokenize (createStrings @ createVariablesAndNumbers)
-     (tokens " \"string with \\\"quote\\\"\" "))
-[<Test>]
-let LexerSymbolTest1() =
-  Assert.AreEqual(["sdf"; "("; " "; "df"; "->"; "df"; " "; "d"; "->"; " "; " "; "->"; "fdfd"; " "; "->"; "("; "d"; ")"; " "; "*"],
-    tokenize (createSymbol "->" @ createVariablesAndNumbers)
-     (tokens "sdf( df->df d->  ->fdfd ->(d) *"))
-[<Test>]
-let LexerStringWithSymbolTest() =
-  Assert.AreEqual(["ddf"; " "; "\" fdffdssf-> df334.d 4 \""; "\"\""; " "; "d"; " "; "\""],
-    tokenize (createStrings @ createSymbol "->" @ createVariablesAndNumbers)
-     (tokens "ddf \" fdffdssf-> df334.d 4 \"\"\" d \""))
-[<Test>]
-let LexerMultilineCommentWithSymbolTest() =
-  Assert.AreEqual(["outside"; " "; "comment"; " "; "(* 7inside -> comment\"\"*)"; " "; "outside"; " "; "comment"],
-    tokenize (createDelimitedComment "(*" "*)" @ createSymbol "->" @ createVariablesAndNumbers)
-     (tokens "outside comment (* 7inside -> comment\"\"*) outside comment"))
-[<Test>]
-let LexerFakeDelimitedCommentTest() =
-  Assert.AreEqual(["(*) inside comment *)"],
-    tokenize (createDelimitedComment "(*" "*)" @ createVariablesAndNumbers)
-     (tokens "(*) inside comment *)"))
-[<Test>]
-let LexerSingleLineCommentTest() =
-  Assert.AreEqual(["//fddf\n"; "fdfd"; "//\n"],
-    tokenize (createSingleLineComment "//" @ createVariablesAndNumbers)
-     (tokens "//fddf\nfdfd//\n"))
-[<Test>]
-let LexerOverlappingStringAndCommentTest1() =
-  Assert.AreEqual(["\"string(*\""; "not"; " "; "comment"; "*)"],
-    tokenize (createDelimitedComment "(*" "*)" @ createStrings @ createVariablesAndNumbers)
-     (tokens "\"string(*\"not comment*)"))
-[<Test>]
-let LexerOverlappingStringAndCommentTest2() =
-  Assert.AreEqual(["(*comment\"*)"; "not"; " "; "string"; "\""],
-    tokenize (createDelimitedComment "(*" "*)" @ createStrings @ createVariablesAndNumbers)
-     (tokens "(*comment\"*)not string\""))
+//[<Test>]
+//let LexerTest1() =
+//  Assert.AreEqual(["sd"; " "; " "; " "; "dfdfdf4"; " "; " "; "_4_e"; " "; "4_4"],
+//    tokenize createVariablesAndNumbers (tokens "sd   dfdfdf4  _4_e 4_4"))
+//[<Test>]
+//let LexerTest2() =
+//  Assert.AreEqual(["aadf"; " "; "4.33f"; " "; "df8"; " "; "_45"; " "; "__r4"],
+//    tokenize createVariablesAndNumbers (tokens "aadf 4.33f df8 _45 __r4"))
+//[<Test>]
+//let LexerStringTest1() =
+//  Assert.AreEqual([" "; "\"string with \\\"quote\\\"\""; " "],
+//    tokenize (createStrings @ createVariablesAndNumbers)
+//     (tokens " \"string with \\\"quote\\\"\" "))
+//[<Test>]
+//let LexerSymbolTest1() =
+//  Assert.AreEqual(["sdf"; "("; " "; "df"; "->"; "df"; " "; "d"; "->"; " "; " "; "->"; "fdfd"; " "; "->"; "("; "d"; ")"; " "; "*"],
+//    tokenize (createSymbol "->" @ createVariablesAndNumbers)
+//     (tokens "sdf( df->df d->  ->fdfd ->(d) *"))
+//[<Test>]
+//let LexerStringWithSymbolTest() =
+//  Assert.AreEqual(["ddf"; " "; "\" fdffdssf-> df334.d 4 \""; "\"\""; " "; "d"; " "; "\""],
+//    tokenize (createStrings @ createSymbol "->" @ createVariablesAndNumbers)
+//     (tokens "ddf \" fdffdssf-> df334.d 4 \"\"\" d \""))
+//[<Test>]
+//let LexerMultilineCommentWithSymbolTest() =
+//  Assert.AreEqual(["outside"; " "; "comment"; " "; "(* 7inside -> comment\"\"*)"; " "; "outside"; " "; "comment"],
+//    tokenize (createDelimitedComment "(*" "*)" @ createSymbol "->" @ createVariablesAndNumbers)
+//     (tokens "outside comment (* 7inside -> comment\"\"*) outside comment"))
+//[<Test>]
+//let LexerFakeDelimitedCommentTest() =
+//  Assert.AreEqual(["(*) inside comment *)"],
+//    tokenize (createDelimitedComment "(*" "*)" @ createVariablesAndNumbers)
+//     (tokens "(*) inside comment *)"))
+//[<Test>]
+//let LexerSingleLineCommentTest() =
+//  Assert.AreEqual(["//fddf\n"; "fdfd"; "//\n"],
+//    tokenize (createSingleLineComment "//" @ createVariablesAndNumbers)
+//     (tokens "//fddf\nfdfd//\n"))
+//[<Test>]
+//let LexerOverlappingStringAndCommentTest1() =
+//  Assert.AreEqual(["\"string(*\""; "not"; " "; "comment"; "*)"],
+//    tokenize (createDelimitedComment "(*" "*)" @ createStrings @ createVariablesAndNumbers)
+//     (tokens "\"string(*\"not comment*)"))
+//[<Test>]
+//let LexerOverlappingStringAndCommentTest2() =
+//  Assert.AreEqual(["(*comment\"*)"; "not"; " "; "string"; "\""],
+//    tokenize (createDelimitedComment "(*" "*)" @ createStrings @ createVariablesAndNumbers)
+//     (tokens "(*comment\"*)not string\""))
 
-open Token
-open FSharp
+open Parser.Definition
+open Parser.FSharpParser
 let parseString (str:string) =
   parse Normal ((=) []) (fun _ -> false) []
    (List.mapi (fun i e -> Token(e, (0, i))) (List.ofArray (str.Split ' ')))
@@ -103,7 +102,7 @@ let FsParserFunTest() =
   |X("fun", [X(A, [T "a"; T "b"]); X("fun", [T "c"; T "()"])]), [] -> ()
   |a, _ -> failwithf "failed fun test: %A" a
 
-open C
+open Parser.CParser
 let parseStringC state (str:string) =
   parse state ((=) []) (fun _ -> false) []
    (List.mapi (fun i e -> Token(e, (0, i))) (List.ofArray (str.Split ' ')))
@@ -195,11 +194,11 @@ let CParserDeclareStructTest2() =
   |X("struct", [T "anonymousStruct"; T "sequence"]), [] -> ()
   |a, _ -> failwithf "failed struct test 2: %A" a
 
-open AST_Compiler
+open AST.Definition
 
-open ASM_Compiler
-let runAST f = compileToASM >> Array.ofList >> Testing.Interpreters.interpretPAsm false >> f
-let runASTDebug f = compileToASM >> Array.ofList >> Testing.Interpreters.interpretPAsm true >> f
+open PseudoASM.Implementation
+let runAST f = fromAST >> Array.ofSeq >> Testing.Interpreters.interpretPAsm false >> f
+let runASTDebug f = fromAST >> Array.ofSeq >> Testing.Interpreters.interpretPAsm true >> f
 let stack (a, _, _) = a
 let heap (_, a, _) = a
 let output (_, _, a) = a

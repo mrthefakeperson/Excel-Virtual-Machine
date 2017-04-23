@@ -1,5 +1,5 @@
 ﻿namespace Write_File
-open ASM_Compiler
+open PseudoASM.Definition
 open System
 open System.IO
 
@@ -48,7 +48,6 @@ module ASM =
         |Pop -> 1, 0
         |Store x -> 2, valueOf.[x]
         |Load x -> 3, valueOf.[x]
-        |Popv x -> 4, valueOf.[x]
         |GotoFwdShift n -> 5, i + n
         |GotoIfTrueFwdShift n -> 6, i + n
         |Call -> 7, 0
@@ -57,8 +56,8 @@ module ASM =
         |GetHeap -> 10, 0
         |WriteHeap -> 11, 0
         |Input t -> 12 + List.findIndex ((=) t) inputFormatList, 0
-        |Output t -> 14 + List.findIndex ((=) t) allTypes, 0
-        |Combinator_2 c -> 16 + List.findIndex ((=) (Combinator_2 c)) allCombinators, 0
+        |Output t -> 14 + List.findIndex ((=) t) allFormatSymbols, 0
+        |Combinator_2(_, _) as c -> 16 + List.findIndex ((=) c) allCombinators, 0
        ) cmds
        |> Array.map (fun (a, b) -> sprintf "\t.long %i\n\t.long %i" a b)
        |> String.concat "\n"
