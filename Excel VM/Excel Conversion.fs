@@ -73,36 +73,38 @@ module Define_VM =
      defaultVal
 
   let instructionStack =
-    makeVerticalStack SMALL_SIZE ``instr*``
-     (matchInstrWith [
-        "call", Int 1
-        "return", Int -1
-       ] (Int 0)
-      )
-     (fun self ->
+    let selfName = coordsToS(instrR + 1, instrC)
+    let self = Reference selfName
+    [ Cell(``instr*``, self)
+      Cell(selfName,
         matchInstrWith [
-          "call", currentValue *. Int 2           // ? | call | ?
-          "goto", instr_index 1 *. Int 2          // ? | goto | arg1 | ?
+          "call", currentValue *. Int 2
+          "goto", instr_index 1 *. Int 2
           "gotoiftrue", If(currentValue, instr_index 1 *. Int 2, self +. Int 2)
           "input", If(Reference ``inputMachine*``, self +. Int 2, self +. Int 0)
+          "return", currentValue *. Int 2 +. Int 2
          ] (self +. Int 2)
-      )
+         |> defaultTo (Int 0)
+       )
+      Cell(coordsToS(instrR + 2, instrC), currentInstruction)
+      Cell(coordsToS(instrR + 3, instrC), instr_index 1)
+        ] |> Seq.ofList
 
   let valueStack =
-    makeVerticalStack SMALL_SIZE ``value*``
+    makeVerticalStack LARGE_SIZE ``value*``
      (matchInstrWith
        ([
         "push", Int 1
         "pop", Int -1
         "load", Int 1
         "store", Int -1
-        "call", Int -1
         "newheap", Int 1
         "writeheap", Int -2
         "inputline", Int 1
         "output", Int -1
         "gotoiftrue", Int -1
         "input", If(Reference ``inputMachine*``, Int 1, Int 0)
+        "return", Int -1
        ]
        @ List.map (function
            |Combinator_2 c -> c.Name, Int -1
@@ -118,6 +120,7 @@ module Define_VM =
           "newheap", Reference(coordsToS (heapR + 1, heapC)) -. Int 2    //size of heap
           "getheap", Index(Range(coordsToS (heapR + 2, heapC), "C" + string(heapR + 2 + LARGE_SIZE)), self +. Int 1)
           "input", If(Reference ``inputMachine*``, Reference ``scannedInput*``, self)  // push input
+          "call", Reference ``instr*`` /. Int 2
          ]
          @ List.map (function
              |Combinator_2 c ->
@@ -191,19 +194,13 @@ module Define_VM =
      )
 
   let variableStack sz row col =
-    makeVerticalStack sz (name row col)
-     (conditionTable [
-        If(currentInstruction =. Literal "store", instr_index 1 =. Literal col, Literal "false"),
-         Int 1     //`store` pushes the value to the top of the stack, remembering previous values for recursion
-        If(currentInstruction =. Literal "popv", instr_index 1 =. Literal col, Literal "false"),
-         Int -1    //`popv` pops this variable
-       ] (Int 0))
-     (fun self ->
-      conditionTable [
-        // ? | store | at | ?
-        If(currentInstruction =. Literal "store", instr_index 1 =. Literal col, Literal "false"),
-         Reference ``value*``
-       ] self)
+    let selfName = name (row + 1) col
+    let self = Reference selfName
+    [ Cell(name row col, self)
+      Cell(selfName,
+        If((currentInstruction =. Literal "store") &&. (instr_index 1 =. Literal col), currentValue, self)
+         |> defaultTo (Literal "-")
+       ) ]
 
   let seed = Cell(``seed*``, Reference ``seed*`` +. Int 1)
   let allOutput = Cell(``allOutput*``, Reference ``output*``)

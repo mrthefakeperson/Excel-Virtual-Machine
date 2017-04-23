@@ -1,2 +1,2 @@
-let main = (fun _ -> ((fun _1 -> (((printf) ("%i")) (_1); (printf) ("
+let main = (fun () -> ((fun _1 -> (((printf) ("%i")) (_1); (printf) ("
 "))) (1))); (main) (())

@@ -1,1 +1,1 @@
-let main = (fun _ -> (((+) (k)) (7); (if ((+) (0)) (0) then return(a) else return(((+) (k)) ((e) (((+) (k)) (1))))))); (main) (())
+let main = (fun () -> (((+) (k)) (7); (if ((+) (0)) (0) then return(a) else return(((+) (k)) ((e) (((+) (k)) (1))))))); (main) (())

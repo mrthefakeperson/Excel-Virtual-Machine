@@ -1,1 +1,1 @@
-let main = (fun _ -> (let declare(int e) = (0); (while ((<) (e)) (30) do (); assign(e ((+) (e)) (1))))); (main) (())
+let main = (fun () -> (let declare(int e) = (0); (while ((<) (e)) (30) do (); assign(e ((+) (e)) (1))))); (main) (())
