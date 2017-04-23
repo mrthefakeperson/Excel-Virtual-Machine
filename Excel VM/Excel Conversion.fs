@@ -119,7 +119,7 @@ let valueStack =
         "Call", Reference ``instr*`` /. Int 2
        ]
        @ List.map (fun (comb2:Comb2WithFormula) ->
-             comb2.Name, comb2.ToFormula (Index(Range(coordsToS (valueR + 2, valueC), "B" + string(valueR + 2 + LARGE_SIZE)), valueTopstackPt +. Int 1)) self
+           comb2.Name, comb2.ToFormula (Index(Range(coordsToS (valueR + 2, valueC), "B" + string(valueR + 2 + LARGE_SIZE)), valueTopstackPt +. Int 1)) self
           ) allCombinators
        ) self
     )

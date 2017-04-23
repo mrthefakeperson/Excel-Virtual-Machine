@@ -12,7 +12,7 @@ type Cmd(name, ?arg: obj) =
     |Some arg -> failwithf "argument type not recognized: %O" arg
 
 type Comb2(name, symbol) =
-  inherit Cmd("Combinator_2", name)
+  inherit Cmd(name, "")
   override x.StringPair = name, ""
   member x.Symbol = symbol
 
