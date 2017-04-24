@@ -85,19 +85,10 @@ module IntegrationTests =
        |> printCells outFile
      )
 
-  let openAndPartiallyParse file =
-    let txt = File.ReadAllLines file
-    let parseSyntax, txt =
-      match txt.[0] with
-      |"F#" -> Parser.FSharpParser.parseSyntax, String.concat "\n" txt.[1..]
-      |"C" -> Parser.CParser.parseSyntax, String.concat "\n" txt.[1..]
-      |_ -> Parser.FSharpParser.parseSyntax, String.concat "\n" txt
-    txt
-     |> parseSyntax
+  let openAndPartiallyParse =
+    Project.Input.Implementation.fromTestFile >> Parser.Implementation.fromStringRunUntilParsed
   let openAndParse =
-    openAndPartiallyParse
-     >> fun e -> e.Clean()
-     >> Parser.TypeValidation.validateTypes
+    Project.Input.Implementation.fromTestFile >> Parser.Implementation.fromString
 
   let testParser a =
     test a "test cases - parser" (fun file outFile ->
@@ -110,7 +101,7 @@ module IntegrationTests =
 
   let testTypeSystem =
     test ignore "test cases - parser" (fun file outFile ->
-      let parsed = (openAndParse file).Clean()
+      let parsed = fst <| openAndParse file
       printfn "%O" (parsed.ToStringExpr())
      )
 
@@ -118,12 +109,12 @@ module IntegrationTests =
     test a "test cases - compiler AST" (fun file outFile ->
       Console.WindowWidth <- 170
       let parsed = openAndParse file
-      printfn "%A" (parsed.Clean().ToStringExpr())
+      printfn "%A" (fst(parsed).ToStringExpr())
       let cmds =
-        parsed.Clean()
+        parsed
          |> AST.Implementation.fromToken |> debug
          |> PseudoASM.Implementation.fromAST
-         |> Array.ofSeq
+         |> fst |> Array.ofSeq
       Array.iter (printf "%A   ") cmds
       let stack, heap, output = interpretPAsm false cmds
       logPrintf outFile "stack %A\n" stack
@@ -158,10 +149,10 @@ module IntegrationTests =
       Console.WindowWidth <- 170
       let parsed = openAndParse file
       let cmds =
-        parsed.Clean()
-         |> AST.Implementation.fromToken |> debug
+        parsed
+         |> AST.Implementation.fromToken
          |> PseudoASM.Implementation.fromAST
-         |> Array.ofSeq
+         |> fst |> Array.ofSeq
       Array.iter (printf "%A   ") cmds
       writeExcelFile (file + ".xlsx") cmds
      )
@@ -178,9 +169,9 @@ module IntegrationTests =
     test ignore "test cases - compiler AST" (fun file _ ->
       let parsed = openAndParse file
       let cmds =
-        parsed.Clean()
-         |> AST.Implementation.fromToken |> debug
+        parsed
+         |> AST.Implementation.fromToken
          |> PseudoASM.Implementation.fromAST
-         |> Array.ofSeq
+         |> fst |> Array.ofSeq
       writeBytecode (file + ".s") cmds
      )

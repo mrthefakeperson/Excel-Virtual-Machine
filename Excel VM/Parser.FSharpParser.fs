@@ -1,5 +1,4 @@
-﻿//module private Parser.FSharpParser
-module Parser.FSharpParser
+﻿module private Parser.FSharpParser
 open Definition
 open Definition.Symbols
 open Lexer

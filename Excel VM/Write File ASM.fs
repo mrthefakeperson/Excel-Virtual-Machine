@@ -62,7 +62,7 @@ module ASM =
        |> Array.map (fun (a, b) -> sprintf "\t.long %i\n\t.long %i" a b)
        |> String.concat "\n"
        |> fun e ->
-            Definitions.TEMPLATE
+            "this has been depreciated"
              .Replace("\t.long k", e)
              .Replace("\t.byte k", stringDataBytes)
      )

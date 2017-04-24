@@ -1,5 +1,4 @@
-﻿//module private Parser.CParser
-module Parser.CParser
+﻿module private Parser.CParser
 open Definition
 open Lexer
 open Lexer.CommonClassifiers

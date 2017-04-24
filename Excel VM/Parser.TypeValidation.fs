@@ -1,8 +1,7 @@
 ﻿// todo: structs get deepcopied, pointers don't
 // todo: recursive structs
 
-//module private Parser.TypeValidation
-module Parser.TypeValidation
+module private Parser.TypeValidation
 open Definition
 open System.Collections.Generic
 

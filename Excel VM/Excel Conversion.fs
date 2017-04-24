@@ -216,7 +216,7 @@ let makeProgram cmds =
       |x -> x
      ) cmds             //sequence of pAsm commands
 //     |> Seq.mapi cmdToStrPair               //pairs of commands as string values
-     |> Seq.map (fun e -> e.CommandInfo.StringPair)
+     |> Seq.map (fun e -> match e.CommandInfo.StringPair with "Load", s -> "Load", string(alphaToNumber s - 5) | x -> x)
      |> Seq.collect (fun (a, b) -> [a; b])  //final sequence of commands as string values (as they will be written)
      |> Seq.mapi (fun i e ->
           let cellCoords = coordsToS (1, 2 + i)

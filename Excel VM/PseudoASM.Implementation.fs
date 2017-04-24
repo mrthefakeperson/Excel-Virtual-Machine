@@ -1,6 +1,7 @@
 ﻿module PseudoASM.Implementation
+open Project.Definitions
 open AST.Definition
 open Definition
-open Compile
 
-let fromAST: AST -> PseudoASM seq = CompileToASM
+let fromAST (ast:AST, args:CommandLineArguments): PseudoASM seq*CommandLineArguments =
+  Compile.CompileToASM ast, args

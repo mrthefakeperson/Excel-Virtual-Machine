@@ -94,8 +94,14 @@
     <Compile Include="..\Excel VM\PseudoASM.Compile.fs">
       <Link>PseudoASM.Compile.fs</Link>
     </Compile>
+    <Compile Include="..\Excel VM\Excel Language.fs">
+      <Link>Excel Language.fs</Link>
+    </Compile>
     <Compile Include="..\Excel VM\PseudoASM.Implementation.fs">
       <Link>PseudoASM.Implementation.fs</Link>
+    </Compile>
+    <Compile Include="..\Excel VM\Testing _Interpreters_.fs">
+      <Link>Testing _Interpreters_.fs</Link>
     </Compile>
     <Compile Include="Parser Unit Tests.fs" />
     <Compile Include="Program.fs" />

@@ -56,7 +56,7 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <None Include="App.config" />
-    <Compile Include="Definitions.fs" />
+    <Compile Include="Project.fs" />
     <COMReference Include="Microsoft Excel 15.0 Object Library">
       <Guid>{00020813-0000-0000-c000-000000000046}</Guid>
       <VersionMajor>1</VersionMajor>
