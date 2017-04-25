@@ -1,5 +1,5 @@
 ﻿module Parser.Implementation
-open Project.Definitions
+open Project.Util
 open Definition
 
 let fromStringRunUntilParsed (txt:string, args:CommandLineArguments): Token =

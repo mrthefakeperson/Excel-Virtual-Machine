@@ -1,13 +1,25 @@
 ﻿namespace Project
 
-module Definitions =
+module Util =
   type CommandLineArguments = Map<string, string>
+  let definedOperators = [
+    "+"; "-"; "*"; "/"; "%"
+    "<"; "<="; "="; "<>"; ">"; ">="
+    "&&"; "||"
+   ]
+  let definedPrefixOperators = ["~&"; "~*"; "~-"; "~!"]
+  [<Literal>]
+  let PRINT = "printf"
+  let (|PRINT|_|) (e:string) = if e = "printf" then Some PRINT else None
+  [<Literal>]
+  let SCAN = "scan"
+  let (|SCAN|_|) (e:string) = if e = "scan" then Some SCAN else None
 
 module Input =
   open System.IO
   module Implementation =
 
-    let fromTestFile fileName: string*Definitions.CommandLineArguments =
+    let fromTestFile fileName: string*Util.CommandLineArguments =
       let txt = File.ReadAllLines fileName
       match txt.[0] with
       |("C" | "F#" as inferredLanguage) ->
@@ -15,7 +27,7 @@ module Input =
       |_ -> String.concat "\n" txt, Map ["language", "F#"]
 
     // format: Excel_VM (output file can appear anywhere) -(param name) (argument to param)
-    let fromCommandLine (argv:string[]): string*Definitions.CommandLineArguments =
+    let fromCommandLine (argv:string[]): string*Util.CommandLineArguments =
       // parameterizedArgs: map of parameter -> argument pairs
       // fileName: the first non-parameter non-argument string
       let parameterizedArgs, fileName =

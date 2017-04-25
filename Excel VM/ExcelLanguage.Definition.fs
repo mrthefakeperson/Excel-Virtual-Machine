@@ -115,3 +115,27 @@ let number = separate >> snd >> int     //extract row
 let alpha = separate >> fst >> alphaToNumber   //extract col
 let coordinates s = number s, alpha s   //(row, col)
 let coordsToS (r, c) = numberToAlpha c + string r
+
+// size of stack
+[<Literal>]
+let LARGE_SIZE = 400
+
+// locations of important cells
+[<Literal>]
+let ``seed*`` = "A1"
+let ``allInput*``, ``allOutput*`` = "A2", "B2"
+[<Literal>]
+let ``instr*`` = "A3"
+let instrR, instrC = coordinates ``instr*``
+[<Literal>]
+let ``value*`` = "B3"
+let valueR, valueC = coordinates ``value*``
+[<Literal>]
+let ``heap*`` = "C3"
+let heapR, heapC = coordinates ``heap*``
+let ``inputMachine*`` = "D3"
+let inputR, inputC = coordinates ``inputMachine*``
+let ``scannedInput*`` = coordsToS (inputR + 1, inputC)
+let ``output*`` = "E3"
+[<Literal>]
+let ``var*`` = 3

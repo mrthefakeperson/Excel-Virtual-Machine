@@ -5,6 +5,57 @@ module private Parser.TypeValidation
 open Definition
 open System.Collections.Generic
 
+/// give distinct names to all declarations in a parse tree
+let changeNames (e:Token): Token =
+  let nameMappings = Dictionary()   // stores old name -> new name, used while traversing the parse tree
+  let latestNameMappings = Dictionary()  // stores name -> most recent mapped name
+  // convenient manipulation of stored names
+  let getName s = List.head nameMappings.[s]
+  let addName s =
+    let s' =
+      if latestNameMappings.ContainsKey s then latestNameMappings.[s] + "`" else s
+    latestNameMappings.[s] <- s'
+    if nameMappings.ContainsKey s && nameMappings.[s] <> []
+     then nameMappings.[s] <- s'::nameMappings.[s]
+     else nameMappings.[s] <- [s']
+  let popName s = nameMappings.[s] <- nameMappings.[s].Tail
+  List.iter addName (Project.Util.definedOperators @ Project.Util.definedPrefixOperators)
+  addName Project.Util.PRINT
+  addName Project.Util.SCAN
+  // manipulate stored names for all variable names in a subtree
+  let rec mapAllNames action = function
+    |Var name -> Token(action name)
+    |X(s, children) -> Token(s, List.map (mapAllNames action) children)
+  let toAllNames action = mapAllNames (fun e -> action e; e) >> ignore
+  let getNameExclude s e = if e = s then e else getName e
+  // transform parse tree into an equivalent form, only with unique names for unique variables
+  let rec changeNames = function
+    |X("sequence", children) ->
+      let rec scan = function
+        |X(("let" | "let rec" as let_), [namedPattern; xpr])::tl ->
+          toAllNames addName namedPattern
+          try Token("let", [mapAllNames (getNameExclude "declare") namedPattern;
+                           (if let_ = "let" then changeNames xpr else xpr)])::scan tl
+          finally toAllNames popName namedPattern
+        |hd::tl -> changeNames hd::scan tl
+        |[] -> []
+      Token("sequence", scan children)
+    |X(("let" | "let rec"), _) as e ->   // only for debugging purposes
+      changeNames (Token("sequence", [e]))
+    |X("fun", [namedPattern; xpr]) ->
+      toAllNames addName namedPattern
+      try Token("fun", [mapAllNames (getNameExclude "declare") namedPattern; changeNames xpr])
+      finally toAllNames popName namedPattern
+    |X("for", [namedPattern; iter; xpr]) ->
+      toAllNames addName namedPattern
+      try Token("for", [mapAllNames (getNameExclude "declare") namedPattern; iter; changeNames xpr])
+      finally toAllNames popName namedPattern
+    |X("struct", [name; members]) -> Token("struct", [name; changeNames members])
+    |Var name -> Token(getName name)
+    |X(s, children) -> Token(s, List.map changeNames children)
+  changeNames e
+
+
 // dict: name_of_member -> (index, initial_value [option])
 // used to map member names of objects (as strings) to array indices, with possible initial values
 // objects will be compiled to arrays, with each member using its mapped index
@@ -137,5 +188,6 @@ let rec processDerefs = function
 
 let validateTypes: Token -> Token =
   compileObjectsToArrays
+   >> changeNames
    >> compilePointersToArrays
    >> processDerefs

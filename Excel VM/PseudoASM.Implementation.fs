@@ -1,5 +1,5 @@
 ﻿module PseudoASM.Implementation
-open Project.Definitions
+open Project.Util
 open AST.Definition
 open Definition
 

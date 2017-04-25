@@ -1,31 +1,7 @@
-﻿module ExcelLanguage.DefineVM
+﻿module private ExcelLanguage.DefineVM
 open PseudoASM.Definition
 open Definition
 open System
-
-// size of stacks (two categories)
-[<Literal>]   //400
-let LARGE_SIZE = 400
-
-// locations of important cells
-[<Literal>]
-let ``seed*`` = "A1"
-let ``allInput*``, ``allOutput*`` = "A2", "B2"
-[<Literal>]
-let ``instr*`` = "A3"
-let instrR, instrC = coordinates ``instr*``
-[<Literal>]
-let ``value*`` = "B3"
-let valueR, valueC = coordinates ``value*``
-[<Literal>]
-let ``heap*`` = "C3"
-let heapR, heapC = coordinates ``heap*``
-let ``inputMachine*`` = "D3"
-let inputR, inputC = coordinates ``inputMachine*``
-let ``scannedInput*`` = coordsToS (inputR + 1, inputC)
-let ``output*`` = "E3"
-[<Literal>]
-let ``var*`` = 3
 
 let name row col = sprintf "%s%i" col row
 let Int a = Literal (string a)

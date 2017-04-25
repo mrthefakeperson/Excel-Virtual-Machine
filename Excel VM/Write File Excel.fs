@@ -1,6 +1,5 @@
 ﻿namespace Write_File
 open ExcelLanguage.Definition
-open ExcelLanguage.DefineVM
 open System.IO
 open System.Reflection
 open Microsoft.Office.Core
@@ -23,10 +22,10 @@ module Excel =
     // write finished program and save
     let set cellname txt =
       sheet.Range(cellname).Value(Missing.Value) <- txt
-    let cells = makeProgram cmds
-    Array.iter (fun (Cell(xy, _) as cell) ->
+    let cells = ExcelLanguage.Implementation.fromPseudoASMSeq (cmds, Map.empty)       // integrate this later
+    Seq.iter (fun (Cell(xy, _) as cell) ->
       set xy (cell.ToString())
-     ) cells
+     ) (fst cells)
     try sheet._SaveAs (Directory.GetCurrentDirectory() + @"\" + fileName)
     with _ -> sheet.SaveAs fileName
     back.Quit()

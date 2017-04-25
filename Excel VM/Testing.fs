@@ -1,7 +1,6 @@
 ﻿namespace Testing
 open PseudoASM.Definition
 open ExcelLanguage.Definition
-open ExcelLanguage.DefineVM
 open Write_File.ASM
 open Write_File.Excel
 open Interpreters
@@ -26,7 +25,7 @@ module IntegrationTests =
       printfn "%s:" name
       runFile name outName
       action outName
-      //ignore (stdin.ReadLine())
+//      ignore (stdin.ReadLine())
       test action folderName runFile (n + 1)
   let verify name =
     if (File.ReadAllLines name) <> (File.ReadAllLines (name + ".ans"))
@@ -80,7 +79,7 @@ module IntegrationTests =
         Array.append input [|sprintf "goto %i" (Array.filter ((<>) "") input).Length|]
          |> parseInstructionList
          |> Array.mapi getInstruction
-      makeProgram instructions
+      ExcelLanguage.Implementation.fromPseudoASMSeq (instructions, Map.empty) |> fst |> Array.ofSeq // integrate later
        |> interpret 80
        |> printCells outFile
      )
@@ -107,23 +106,17 @@ module IntegrationTests =
 
   let testCompilerAST a =
     test a "test cases - compiler AST" (fun file outFile ->
-      Console.WindowWidth <- 170
       let parsed = openAndParse file
       printfn "%A" (fst(parsed).ToStringExpr())
       let cmds =
         parsed
-         |> AST.Implementation.fromToken |> debug
+         |> AST.Implementation.fromToken |> fun e -> fst e |> printfn "%O"; e
          |> PseudoASM.Implementation.fromAST
          |> fst |> Array.ofSeq
-      Array.iter (printf "%A   ") cmds
       let stack, heap, output = interpretPAsm false cmds
       logPrintf outFile "stack %A\n" stack
       logPrintf outFile "\noutput %A\n" output
       printfn "heap: %A" heap
-    //logPrintf outFile "heap [%s]\n" (String.concat "; " (Seq.map (sprintf "%A") heap))
-    //makeProgram cmds
-    // |> interpret 800
-    // |> printCells outFile
      )
    
   let testPAsm a =

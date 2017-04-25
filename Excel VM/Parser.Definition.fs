@@ -88,6 +88,8 @@ let (|Var|Cnst|Other|) = function               //todo: non-numeric constants
   |Inner '"' s -> Cnst s        //cases like "\" should not have made it through the lexer
   |Inner ''' s -> Cnst s        //cases like 'dd' are the lexer's job
   |T "()" -> Cnst "()"
+  |T "nothing" -> Cnst "nothing"    // change in future? maybe...
   |T ("true" | "false" as s) -> Cnst s
+  |T ("return" | "break") -> Other
   |T s -> if s <> "" && '0' <= s.[0] && s.[0] <= '9' then Cnst s else Var s
   |_ -> Other

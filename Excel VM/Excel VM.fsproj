@@ -87,8 +87,9 @@
     <Compile Include="PseudoASM.Definition.fs" />
     <Compile Include="PseudoASM.Compile.fs" />
     <Compile Include="PseudoASM.Implementation.fs" />
-    <Compile Include="Excel Language.fs" />
-    <Compile Include="Excel Conversion.fs" />
+    <Compile Include="ExcelLanguage.Definition.fs" />
+    <Compile Include="ExcelLanguage.DefineVM.fs" />
+    <Compile Include="ExcelLanguage.Implementation.fs" />
     <Compile Include="Write File Excel.fs" />
     <Compile Include="Write File ASM.fs" />
     <Compile Include="Testing _Interpreters_.fs" />

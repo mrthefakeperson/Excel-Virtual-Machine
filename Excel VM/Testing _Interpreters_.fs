@@ -85,6 +85,7 @@ module Interpreters =
     push instr "0"
     while int(top instr) < Array.length cmds && List.length !stacks.[output] < 50 do
       let i = int(top instr)
+//      let debug = cmds.[i] = Store "*TCO" || cmds.[i] = Load "*TCO"
       if debug then printfn "%A" cmds.[i]
       try
         interpretCmd i cmds.[i]

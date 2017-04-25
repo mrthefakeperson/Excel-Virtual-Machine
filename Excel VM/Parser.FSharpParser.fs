@@ -185,7 +185,7 @@ and (|For|_|) state stop fail = function
              (fun e -> stop e || fail e) [] restr
           Token("..", [a; step; b]), restr
     let body, restr = parse state stop fail [] (Token("do", t.Indentation)::restr)
-    let parsed = Token("for", t.Indentation, [name; iterable; body])
+    let parsed = Token("for", t.Indentation, [name; iterable; body])    // consider depreciating this (change this to a while right here)
     Some (parse state stop fail restl (parsed::restr))
   |_ -> None
 and (|Let|_|) state stop fail = function
