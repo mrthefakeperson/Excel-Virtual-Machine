@@ -90,8 +90,9 @@
     <Compile Include="ExcelLanguage.Definition.fs" />
     <Compile Include="ExcelLanguage.DefineVM.fs" />
     <Compile Include="ExcelLanguage.Implementation.fs" />
-    <Compile Include="Write File Excel.fs" />
-    <Compile Include="Write File ASM.fs" />
+    <Compile Include="Output.Excel.fs" />
+    <Compile Include="Output.ASM.fs" />
+    <Compile Include="Output.Implementation.fs" />
     <Compile Include="Testing _Interpreters_.fs" />
     <Compile Include="Testing.fs" />
     <Compile Include="Main.fs" />

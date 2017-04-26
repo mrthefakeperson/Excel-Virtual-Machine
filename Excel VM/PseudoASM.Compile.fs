@@ -20,8 +20,8 @@ let getLocalVariables = function
     Seq.toList (System.Collections.Generic.HashSet !yld)
   |_ -> failwith "local variables are for functions only"
 // new assembly compilation function, with a single stack
-// todo: change to list comprehension with yield!s for better performance
-// todo: all names should be unique 
+// todo: change to dfs order passing for better performance
+// todo: all names should be unique, including closure args
 let rec compileASM redef =
   let inline compileASM' x = compileASM redef x
   let (|RedefDetected|_|) construct = redef construct
@@ -57,22 +57,28 @@ let rec compileASM redef =
       storeReturnValue @ getAllLocalsFromStack @ storeCallingAddress
        @ loadReturnValue @ loadCallingAddress @ [Return]
     let rec redefWithEarlyReturn = function
-      |AST.Return (Apply(_, k) as a) ->   // tailcall optimization
-        printfn "tailcall detected"
-        let pushArgsAndAddress =
-          let tcall = compileASM redefWithEarlyReturn a   // last command is a call
-          Seq.take (Seq.length tcall - 1) tcall |> List.ofSeq
-          // stack: original args @ calling address :: ...
-//        printfn "%A" pushArgsAndAddress
-//        let popPrevArgsIntoTemp = List.map (fun i -> Store (string i + "-arg")) [List.length xs - 1.. -1..0]
-//        let restorePrevArgsFromTemp =
-//          List.mapi (fun i e -> [Load (string i + "-arg"); Store e]) xs |> List.concat
-//        let fixReturn = [Push "-1"; Add]     // assuming possibility 2; todo: investigate how return actually works
-//        let cacheArgs = List.map (fun i -> Store (string i + "-arg")) [k.Length - 1.. -1..0]
-//        let uncacheArgs = List.map (fun i -> Load (string i + "-arg")) [0..k.Length - 1]
-//        Some (popPrevArgsIntoTemp   // stack: calling address :: ...
-//               @ pushArgsAndAddress @ fixReturn @ [Store "*TCO"]   // new args @ calling address :: ...
-//               @ restorePrevArgsFromTemp @ cacheArgs @ [Store "*TCO1"] @ uncacheArgs @ [Load "*TCO1"; Load "*TCO"; Return] |> fun e -> printfn "%A" e; e)
+      |AST.Return (Apply(a, b's)) ->   // tailcall optimization
+        let pushB'sThenA = List.collect (compileASM redef) b's @ (compileASM redef) a
+        let storeB'sAndA = List.map (fun i -> Store (string i + "-arg")) [b's.Length.. -1..0]
+        let loadB'sAndA = List.map (fun i -> Load (string i + "-arg")) [0..b's.Length]
+        let handleCall =
+          pushB'sThenA @ storeB'sAndA
+           @ getAllLocalsFromStack @ storeCallingAddress @ loadB'sAndA
+        // state: a (address) :: args @ ... with calling address stored
+        let unboxA =  // a :: ... -> unboxed a @ ...
+          let pushSuffixArgs =   // x :: ... -> (args in reverse order) @ ...
+            let loopBody =  // x :: ... -> x + 1 :: *x :: ...
+              [stTemp; ldTemp; GetHeap; ldTemp; Push "1"; Add]
+            let loopCond =  // x :: ... -> (*x = terminator)? :: x :: ...
+              pushAgain @ [GetHeap; Push "endArr"; Equals]
+            let skipBody = List.length loopBody + 2
+            let loopAgain = -(List.length loopCond + 1 + List.length loopBody)
+            [Push "1"; Add] @ loopCond @ [GotoIfTrueFwdShift skipBody] @ loopBody @ [GotoFwdShift loopAgain; Pop]
+          [stTemp2; ldTemp2] @ pushSuffixArgs @ [ldTemp2; GetHeap]
+        handleCall @ unboxA @ [stTemp] @ loadCallingAddress @ [ldTemp]
+         @ [Push "-1"; Add]    // adjust return
+         @ [Return]
+         |> Some
       |AST.Return a -> Some (compileASM redefWithEarlyReturn a @ restorePrevArgsAndReturnTopstackValue)
       |x -> redef x
     let functionBlock =

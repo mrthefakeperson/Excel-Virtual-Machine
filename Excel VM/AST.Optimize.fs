@@ -1,5 +1,6 @@
 ﻿module private AST.Optimize
 open Definition
+open System.Collections.Generic
 
 let rec TCOPreprocess =
   let rec TCOPreprocess' = function
@@ -12,6 +13,10 @@ let rec TCOPreprocess =
     |Return x -> TCOPreprocess' x
     |x -> AST.map TCOPreprocess x
   TCOPreprocess
-
 //let rec findCircularReferences =
   
+
+
+
+let all ast =
+  TCOPreprocess ast

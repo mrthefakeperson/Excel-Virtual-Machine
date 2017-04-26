@@ -1,8 +1,7 @@
 ﻿namespace Testing
 open PseudoASM.Definition
 open ExcelLanguage.Definition
-open Write_File.ASM
-open Write_File.Excel
+open Output.Implementation
 open Interpreters
 open System
 open System.IO
@@ -129,42 +128,42 @@ module IntegrationTests =
        |> logPrintf outFile "%A\n"
      )
 
-  let testExcelFile =
-    test ignore "test cases - Excel pseudo-asm" (fun file _ ->
-      File.ReadAllLines file
-       |> parseInstructionList
-       |> Array.mapi getInstruction
-       |> writeExcelFile (file + ".xlsx")
-     )
-
-  let testExcelCompiler =
-    test ignore "test cases - compiler AST" (fun file _ ->
-      Console.WindowWidth <- 170
-      let parsed = openAndParse file
-      let cmds =
-        parsed
-         |> AST.Implementation.fromToken
-         |> PseudoASM.Implementation.fromAST
-         |> fst |> Array.ofSeq
-      Array.iter (printf "%A   ") cmds
-      writeExcelFile (file + ".xlsx") cmds
-     )
-
-  let testAsmCompilerSimple =
-    test ignore "test cases - Excel pseudo-asm" (fun file _ ->
-      File.ReadAllLines file
-       |> parseInstructionList
-       |> Array.mapi getInstruction
-       |> writeBytecode (file + ".s")
-     )
-
-  let testAsmCompiler =
-    test ignore "test cases - compiler AST" (fun file _ ->
-      let parsed = openAndParse file
-      let cmds =
-        parsed
-         |> AST.Implementation.fromToken
-         |> PseudoASM.Implementation.fromAST
-         |> fst |> Array.ofSeq
-      writeBytecode (file + ".s") cmds
-     )
+//  let testExcelFile =
+//    test ignore "test cases - Excel pseudo-asm" (fun file _ ->
+//      File.ReadAllLines file
+//       |> parseInstructionList
+//       |> Array.mapi getInstruction
+//       |> writeExcelFile (file + ".xlsx")
+//     )
+//
+//  let testExcelCompiler =
+//    test ignore "test cases - compiler AST" (fun file _ ->
+//      Console.WindowWidth <- 170
+//      let parsed = openAndParse file
+//      let cmds =
+//        parsed
+//         |> AST.Implementation.fromToken
+//         |> PseudoASM.Implementation.fromAST
+//         |> fst |> Array.ofSeq
+//      Array.iter (printf "%A   ") cmds
+//      writeExcelFile (file + ".xlsx") cmds
+//     )
+//
+//  let testAsmCompilerSimple =
+//    test ignore "test cases - Excel pseudo-asm" (fun file _ ->
+//      File.ReadAllLines file
+//       |> parseInstructionList
+//       |> Array.mapi getInstruction
+//       |> writeBytecode (file + ".s")
+//     )
+//
+//  let testAsmCompiler =
+//    test ignore "test cases - compiler AST" (fun file _ ->
+//      let parsed = openAndParse file
+//      let cmds =
+//        parsed
+//         |> AST.Implementation.fromToken
+//         |> PseudoASM.Implementation.fromAST
+//         |> fst |> Array.ofSeq
+//      writeBytecode (file + ".s") cmds
+//     )

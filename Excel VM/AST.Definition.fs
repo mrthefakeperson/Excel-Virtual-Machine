@@ -13,13 +13,17 @@ type AST =
   |Get of a:AST*i:AST           //get array a at i
   |Assign of a:AST*i:AST*e:AST  //set array a at i to e
   |Return of a:AST
+  |Break
+  |Continue
   |Loop of a:AST*b:AST
   |Mutate of a:string*b:AST     //a <- b
    with
     static member map f = function
       |Apply(a, b) -> Apply(f a, List.map f b)
       |Assign(a, b, c) -> Assign(f a, f b, f c)
+      |Break -> Break
       |Const a -> Const a
+      |Continue -> Continue
       |Declare(a, b) -> Declare(a, f b)
       |Define(a, bs, c) -> Define(a, bs, f c)
       |Get(a, b) -> Get(f a, f b)
@@ -42,7 +46,7 @@ type AST =
         isInline.[ast] <- x
         x
       let rec isInline' e = e |> function
-        |Value _ | Const _ -> push e true
+        |Value _ | Const _ | Break | Continue -> push e true
         |Sequence ll ->
           ignore (List.map isInline' ll)
           push e false
@@ -87,6 +91,8 @@ type AST =
              (AorB b (sprintf "[%s]" (str""b)) (sprintf "[\n%s\n%s ]" (str ind' b) indent))
              (AorB c (str""c) (sprintf "\n%s" (str ind' c)))
           |Return a -> sprintf "return%s" (AorB a (sprintf " %s" (str""a)) (sprintf "\n%s" (str ind' a)))
+          |Break -> "break"
+          |Continue -> "continue"
           |Mutate(a, Inline b) -> sprintf "%s <- %s" a (str""b)
           |Mutate(a, b) -> sprintf "%s <-\n%s" a (str ind' b)
         indent + a

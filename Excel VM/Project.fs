@@ -10,10 +10,8 @@ module Util =
   let definedPrefixOperators = ["~&"; "~*"; "~-"; "~!"]
   [<Literal>]
   let PRINT = "printf"
-  let (|PRINT|_|) (e:string) = if e = "printf" then Some PRINT else None
   [<Literal>]
   let SCAN = "scan"
-  let (|SCAN|_|) (e:string) = if e = "scan" then Some SCAN else None
 
 module Input =
   open System.IO
@@ -28,13 +26,14 @@ module Input =
 
     // format: Excel_VM (output file can appear anywhere) -(param name) (argument to param)
     let fromCommandLine (argv:string[]): string*Util.CommandLineArguments =
+      printfn "argv: %A" argv
       // parameterizedArgs: map of parameter -> argument pairs
       // fileName: the first non-parameter non-argument string
       let parameterizedArgs, fileName =
         let (|ParamName|_|) (s:string) =
           if s.Length >= 2 && s.[0] = '-' then Some s.[1..] else None
         let rec searchOrderedParamList = function
-          |ParamName s::(ParamName _::_ as tl) ->
+          |ParamName s::((ParamName _::_ | []) as tl) ->
             let foundArgs, foundFileName = searchOrderedParamList tl
             Map.add s "" foundArgs, foundFileName
           |ParamName s::arg::tl ->
@@ -47,6 +46,9 @@ module Input =
         searchOrderedParamList (List.ofArray argv)
       // check for no file given error
       let fileName = fileName.Force()
+      // add file name to args
+      let parameterizedArgs = parameterizedArgs.Add("input_file", fileName)
+      printfn "args: %A" parameterizedArgs
       let txt = String.concat "\n" (File.ReadAllLines fileName)
       if parameterizedArgs.ContainsKey "language" then txt, parameterizedArgs
       else
