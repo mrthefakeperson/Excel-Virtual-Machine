@@ -62,16 +62,12 @@ module Interpreters =
       |Push s -> push value s
       |PushFwdShift ii -> push value (fwd2 ii)
       |Pop -> pop value
-//      |Store var -> push var (top value); pop value
       |Store var -> pop var; push var (top value); pop value
       |Load var -> push value (top var)
-//      |Popv var -> pop var
       |GotoFwdShift ii -> pop instr; push instr (fwd ii)
       |GotoIfTrueFwdShift ii -> (if (top value).ToLower() = "true" then pop instr; push instr (fwd ii)); pop value  //not perfect
-//      |Call -> push instr (string(int(top value) - 1)); pop value
-      |Call -> let newInstr = string(int(top value) - 1) in pop value; push value (top instr); pop instr; push instr newInstr
-//      |Return -> pop instr
-      |Return -> pop instr; push instr (top value); pop value
+      |Call -> let newInstr = string(int(top value) - 1) in pop value; push value (string(int(top instr) + 1)); pop instr; push instr newInstr
+      |Return -> pop instr; push instr (string(int(top value) - 1)); pop value
       |GetHeap -> let yld = heap.[int(top value)] in pop value; push value yld
       |NewHeap -> heap.Add ""; push value (string(heap.Count-1))
       |WriteHeap -> let v = top value in pop value; let i = top value in pop value; heap.[int i] <- v

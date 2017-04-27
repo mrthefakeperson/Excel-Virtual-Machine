@@ -49,12 +49,10 @@ let instructionStack =
     Cell(selfName,
       matchInstrWith [
         "Call", currentValue *. Int 2
-//        "goto", instr_index 1 *. Int 2
-//        "gotoiftrue", If(currentValue, instr_index 1 *. Int 2, self +. Int 2)
         "GotoFwdShift", self +. (instr_index 1 *. Int 2)
         "GotoIfTrueFwdShift", If(currentValue, self +. (instr_index 1 *. Int 2), self +. Int 2)
         "Input", If(Reference ``inputMachine*``, self +. Int 2, self)
-        "Return", currentValue *. Int 2 +. Int 2
+        "Return", currentValue *. Int 2
        ] (self +. Int 2)
        |> defaultTo (Int 0)
      )
@@ -92,7 +90,7 @@ let valueStack =
         "NewHeap", Reference(coordsToS (heapR + 1, heapC)) -. Int 2    //size of heap
         "GetHeap", Index(Range(coordsToS (heapR + 2, heapC), "C" + string(heapR + 2 + LARGE_SIZE)), self +. Int 1)
         "Input", If(Reference ``inputMachine*``, Reference ``scannedInput*``, self)  // push input
-        "Call", Reference ``instr*`` /. Int 2
+        "Call", Reference ``instr*`` /. Int 2 +. Int 1
        ]
        @ List.map (fun (comb2:Comb2WithFormula) ->
            comb2.Name, comb2.ToFormula (Index(Range(coordsToS (valueR + 2, valueC), "B" + string(valueR + 2 + LARGE_SIZE)), valueTopstackPt +. Int 1)) self

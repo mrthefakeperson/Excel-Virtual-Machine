@@ -1,4 +1,4 @@
-﻿module Parser.Parser_Unit_Tests
+﻿module Parser.UnitTests
 open NUnitLite
 open NUnit.Framework
 open Lexer
@@ -103,7 +103,7 @@ let FsParserFunTest() =
   |a, _ -> failwithf "failed fun test: %A" a
 
 open Parser.CParser
-let parseStringC state (str:string) =
+let private parseStringC state (str:string) =
   parse state ((=) []) (fun _ -> false) []
    (List.mapi (fun i e -> Token(e, (0, i))) (List.ofArray (str.Split ' ')))
    |> fun (e, rest) -> e.Clean(), rest

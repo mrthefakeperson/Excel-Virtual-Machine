@@ -75,9 +75,7 @@ let rec compileASM redef =
             let loopAgain = -(List.length loopCond + 1 + List.length loopBody)
             [Push "1"; Add] @ loopCond @ [GotoIfTrueFwdShift skipBody] @ loopBody @ [GotoFwdShift loopAgain; Pop]
           [stTemp2; ldTemp2] @ pushSuffixArgs @ [ldTemp2; GetHeap]
-        handleCall @ unboxA @ [stTemp] @ loadCallingAddress @ [ldTemp]
-         @ [Push "-1"; Add]    // adjust return
-         @ [Return]
+        handleCall @ unboxA @ [stTemp] @ loadCallingAddress @ [ldTemp; Return]
          |> Some
       |AST.Return a -> Some (compileASM redefWithEarlyReturn a @ restorePrevArgsAndReturnTopstackValue)
       |x -> redef x
@@ -117,7 +115,7 @@ let rec compileASM redef =
       cond @ [GotoIfTrueFwdShift 2; GotoFwdShift skipBody] @ body @ [GotoFwdShift loopAgain; Pop]
     [NewHeap] @ pushAgain @ compileASM' a @ pushAgain @ allocInALoop    // stack: a :: newheap :: newheap :: ...
      @ [Add; Push "endArr"; WriteHeap]   // write terminator
-  |AST.Return a -> failwith "invalid: found return which was not in a function"
+  |AST.Return _ | Break | Continue -> failwith "invalid: found return/break/continue in a wrong place"
   |Sequence ll ->
     match List.map compileASM' ll with
     |[] -> [Push "()"]

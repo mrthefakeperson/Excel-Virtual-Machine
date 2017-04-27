@@ -55,6 +55,9 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Excel VM\Project.fs">
+      <Link>Project.fs</Link>
+    </Compile>
     <Compile Include="..\Excel VM\Parser.Definition.fs">
       <Link>Parser.Definition.fs</Link>
     </Compile>
@@ -94,16 +97,17 @@
     <Compile Include="..\Excel VM\PseudoASM.Compile.fs">
       <Link>PseudoASM.Compile.fs</Link>
     </Compile>
-    <Compile Include="..\Excel VM\Excel Language.fs">
-      <Link>Excel Language.fs</Link>
-    </Compile>
     <Compile Include="..\Excel VM\PseudoASM.Implementation.fs">
       <Link>PseudoASM.Implementation.fs</Link>
+    </Compile>
+    <Compile Include="..\Excel VM\ExcelLanguage.Definition.fs">
+      <Link>ExcelLanguage.Definition.fs</Link>
     </Compile>
     <Compile Include="..\Excel VM\Testing _Interpreters_.fs">
       <Link>Testing _Interpreters_.fs</Link>
     </Compile>
     <Compile Include="Parser Unit Tests.fs" />
+    <Compile Include="PseudoAsm Unit Tests.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <None Include="packages.config" />
