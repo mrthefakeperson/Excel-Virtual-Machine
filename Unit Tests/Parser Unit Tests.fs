@@ -193,3 +193,10 @@ let CParserDeclareStructTest2() =
   match parseStringC Global "struct { } ;" with
   |X("struct", [T "anonymousStruct"; T "sequence"]), [] -> ()
   |a, _ -> failwithf "failed struct test 2: %A" a
+
+open TypeValidation
+
+[<Test>]
+let ChangeNamesScanTest() =
+  printfn "%A"
+   <| changeNames (Token("apply", [Token "scan"; Token "\"%i\""]))

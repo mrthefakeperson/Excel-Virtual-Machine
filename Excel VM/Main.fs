@@ -15,12 +15,13 @@ let main argv =
     //testAsmCompilerSimple 1
     //testTypeSystem 26
 
-    //testParser verify 1
-    testCompilerAST verify 1
+//    testParser verify 1
+//    testCompilerAST verify 1
     //testExcelCompiler 1
-    //testAsmCompiler 27
-    printfn "done"
-    ignore (stdin.ReadLine())
+//    printfn "done"
+//    ignore (stdin.ReadLine())
+    Output.Implementation.debugPseudoASM "test.s" [Push "5"; Push "1"] [Div]
+    ()
   |[|"help"|] -> printfn "first argument should be the input file; -outputExcelFile outputs an Excel file"
   |args ->
     let openAndCompile: string[] -> unit =

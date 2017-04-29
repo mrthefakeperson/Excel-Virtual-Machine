@@ -9,3 +9,5 @@ let fromPseudoASM (cmds:PseudoASM seq, args:CommandLineArguments): unit =
   else
     let outputFile = if args.ContainsKey "o" then args.["o"] else args.["input_file"] + ".s"
     Output.ASM.writeASM outputFile cmds
+
+let debugPseudoASM = Output.ASM.debugASM

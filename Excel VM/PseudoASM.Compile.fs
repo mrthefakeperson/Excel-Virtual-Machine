@@ -165,6 +165,9 @@ let definePrint (formattedName:string) =
   [GotoFwdShift skipFunctionBlock] @ functionBlock @ [PushFwdShift pushFunctionBlock] @ assignFunction
 let CompileToASM ast =
   List.collect (fun (c2:PseudoASM) -> defineBinaryOperator (c2.CommandInfo :?> Comb2)) allCombinators
-   @ List.collect ((+) "printf " >> definePrint) allFormatSymbols
-   @ compileASM predefined ast
+   @
+  List.collect ((+) "printf " >> definePrint) allFormatSymbols
+   @
+//  defineBinaryOperator (allCombinators.Head.CommandInfo :?> Comb2) @
+  compileASM predefined ast
    |> Seq.ofList
