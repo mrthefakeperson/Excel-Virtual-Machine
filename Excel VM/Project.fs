@@ -2,6 +2,11 @@
 
 module Util =
   type CommandLineArguments = Map<string, string>
+  let splitFileExtension (s:string) =
+    match s.LastIndexOf '.' with
+    | -1 -> s, ""
+    |i -> s.[..i - 1], s.[i + 1..]
+
   let definedOperators = [
     "+"; "-"; "*"; "/"; "%"
     "<"; "<="; "="; "<>"; ">"; ">="
@@ -52,7 +57,7 @@ module Input =
       let txt = String.concat "\n" (File.ReadAllLines fileName)
       if parameterizedArgs.ContainsKey "language" then txt, parameterizedArgs
       else
-        let fileExtension = fileName.[fileName.LastIndexOf '.' + 1..]
+        let fileExtension = snd (Util.splitFileExtension fileName)
         match fileExtension with
         |"fs" | "fsx" -> txt, parameterizedArgs.Add("language", "F#")
         |_ -> txt, parameterizedArgs.Add("language", "C")

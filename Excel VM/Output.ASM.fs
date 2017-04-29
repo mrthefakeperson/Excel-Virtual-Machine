@@ -7,14 +7,26 @@ open System.Collections.Generic
 // compile to GCC asm
 // registers are for operations, (%ebp) is the heap pointer, -4(%ebp) reserved for scanning, division
 let generateCommands cmds =
-  printfn "commands: %A" cmds
+
   let convertIdiomaticSymbols = function
     |Push "()" | Push "nothing" -> Push "0"
-    |Push "endArr" -> Push "7777777"
+    |Push "endArr" -> Push "7777777"         // bugs occur around this value
     |Push s when s.ToLower() = "true" -> Push "1"
     |Push s when s.ToLower() = "false" -> Push "0"
     |x -> x
   let cmds = Seq.map convertIdiomaticSymbols cmds
+
+  let getTextAddress = sprintf "defined_%i"
+  let convertStrings = fun i -> function
+    |Push s when not (fst (Int32.TryParse s)) ->
+      printfn "found string `%s`" ((s.Replace("\n", "\\n")))
+      Some (sprintf "%s:\t.ascii \"%s\0\"" (getTextAddress i) (s.Replace("\n", "\\n"))),
+       Push ("$" + getTextAddress i)
+    |x -> None, x
+  let textDefinitions, cmds = Seq.mapi convertStrings cmds |> Seq.toArray |> Array.unzip
+  let textDefinitions = Array.choose id textDefinitions
+
+  // number off the commands (in p-asm), convert the forward shifts to reference the appropriate command
   let getLabel = sprintf "label_%i"
   let convertFwdShift = fun i -> function
     |PushFwdShift n -> PushFwdShift (i + n)
@@ -22,48 +34,50 @@ let generateCommands cmds =
     |GotoIfTrueFwdShift n -> GotoIfTrueFwdShift (i + n)
     |x -> x
   let cmds = Seq.mapi convertFwdShift cmds
-  let (|Goto|GotoIfTrue|Unused|) = function
-    |GotoFwdShift x -> Goto x
-    |GotoIfTrueFwdShift x -> GotoIfTrue x
-    |_ -> Unused
+
+  // number off the local variables, convert the locals to the appropriate stack addresses
   let getLocal e = "-" + string (e * 4 + 4) + "(%ebp)"
   let varToLocal =
     Seq.choose (function Store s | Load s -> Some s | _ -> None) cmds
      |> Set.ofSeq |> Seq.toArray
      |> Seq.mapi (fun i e -> e, getLocal i)
      |> dict
-  let numberOfLocalVariables = varToLocal.Count + 2  // + 2 reserved variables
-  let declareLocals = [|"\tsubl $" + string (4 * numberOfLocalVariables) + ", %esp"; "\tmovl $0, (%ebp)"|]
   let mapVars = function
     |Store s -> Store varToLocal.[s]
     |Load s -> Load varToLocal.[s]
     |x -> x
   let cmds = Seq.map mapVars cmds
+  let numberOfLocalVariables = varToLocal.Count + 2  // + 2 reserved variables
+  // put at start to allocate space for locals and set heap pointer to 0
+  let declareLocals = [|"\tsubl $" + string (4 * numberOfLocalVariables) + ", %esp"; "\tmovl $0, (%ebp)"|]
+  // put at end to pop all locals; if it segfaults after this then the stack pointer is being mismanaged
+  let leave = [|"\taddl $" + string (4 * numberOfLocalVariables + 4) + ", %esp"|]
+
+  // generate GNU ASM code
   let GAS =
     let labels = Seq.init (Seq.length cmds) getLabel
     let usedLabels =
       HashSet(
         Seq.choose
-         (function PushFwdShift x | Goto x | GotoIfTrue x -> Some (getLabel x) | _ -> None)
+         (function PushFwdShift x | GotoFwdShift x | GotoIfTrueFwdShift x -> Some (getLabel x) | _ -> None)
          cmds
        )
     let comb2Arith name = ["popl %edx"; "popl %eax"; name + " %eax, %edx"; "pushl %edx"]
-    let comb2Divide register = ["popl %eax"; "popl %edx"; "movl %edx, -4(%ebp)"; "xorl %edx, %edx"; "cltd"; "idivl -4(%ebp)"; "pushl " + register]
+    let comb2Divide register = ["popl %ecx"; "movl %ecx, %eax"; "xorl %edx, %edx"; "cltd"; "idivl (%esp)"; "movl " + register + ", (%esp)"]
     let comb2Comp name = ["popl %eax"; "popl %edx"; "cmpl %edx, %eax"; name + " %dl"; "xorl %eax, %eax"; "movb %dl, %al"; "push %eax"]
     let code =
       Seq.map (function
         |Push "%i" -> ["pushl $IntFormat"] | Push "%s" -> ["pushl $StringFormat"]
         |Push x ->
-          if fst (Int32.TryParse x)
-           then ["pushl $" + x]
-           else failwithf "%A  todo: convert strings and other literals" x
+          if x.Length > 0 && x.[0] = '$' then ["pushl " + x]
+          elif fst (Int32.TryParse x) then ["pushl $" + x]
+          else failwithf "%A  todo: convert strings and other literals" x
         |PushFwdShift x -> ["pushl $" + getLabel x]
         |Pop -> ["addl $4, %esp"]
         |Load x -> ["leal " + x + ", %eax"; "pushl (%eax)"] // [sprintf "pushl %s" x]
         |Store x -> ["popl %eax"; "movl %eax, " + x]
-        |Goto x -> ["jmp " + getLabel x]
-        |GotoIfTrue x -> ["popl %eax"; "cmpl $0, %eax"; "jne " + getLabel x]
-        |GotoFwdShift _ | GotoIfTrueFwdShift _ -> failwith "should never happen"
+        |GotoFwdShift x -> ["jmp " + getLabel x]
+        |GotoIfTrueFwdShift x -> ["popl %eax"; "cmpl $0, %eax"; "jne " + getLabel x]
         |Call -> ["popl %eax"; "call *%eax"]
         |Return -> ["ret"]
         |NewHeap -> ["pushl (%ebp)"; "addl $1, (%ebp)"]
@@ -94,19 +108,24 @@ let generateCommands cmds =
      ) code labels
      |> Seq.concat
      |> Array.ofSeq
-  Array.concat [|declareLocals; GAS; [|"\taddl $" + string (4 * numberOfLocalVariables + 4) + ", %esp"|]|]
+
+  textDefinitions, Array.concat [|declareLocals; GAS; leave|]
 
 let writeASM fileName cmds =
+  let constants, program = generateCommands cmds
   let definitions =
     """
 .text
 IntFormat:  .ascii "%i\0"
 StringFormat:   .ascii "%s\0"
+    """.Split '\n' |> fun e -> Array.append e constants
+  let start =
+    """
 .globl _main
 _main:
 	pushl %ebp
 	movl %esp, %ebp
-    """.Trim('\n').Split '\n'
+    """.Split '\n'
   let exit =
     """
 	popl %ebp
@@ -114,8 +133,8 @@ _main:
 	.def	_printf;	.scl	2;	.type	32;	.endef
 	.def	_scanf;	.scl	2;	.type	32;	.endef
 	.comm	_heap, 4000
-    """.Trim('\n').Split '\n'
-  File.WriteAllLines(fileName, Array.concat [|definitions; generateCommands cmds; exit|])
+    """.Split '\n'
+  File.WriteAllLines(fileName, Array.concat [|definitions; start; program; exit|])
 
 let debugASM fileName arrangeCmds actCmds =
   let definitions =
@@ -158,6 +177,6 @@ begin:
 	.def	_scanf;	.scl	2;	.type	32;	.endef
 	.comm	_heap, 4000
     """.Trim('\n').Split '\n'
-  let a, b = generateCommands arrangeCmds, generateCommands actCmds
+  let (_a, a), (_b, b) = generateCommands arrangeCmds, generateCommands actCmds  // strings currently not in debug mode
   File.WriteAllLines(fileName,
     Array.concat [|definitions; a.[..a.Length - 2]; definitions2; b.[2..b.Length - 2]; exit|])
