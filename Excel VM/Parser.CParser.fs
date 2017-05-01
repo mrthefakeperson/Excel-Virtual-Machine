@@ -12,6 +12,7 @@ let preprocess:string -> Token list =
      @ createDelimitedComment "/*" "*/"
      @ createStrings
      @ createSymbol "==" @ createSymbol "!=" @ createSymbol "<=" @ createSymbol ">="
+     @ createSymbol "+=" @ createSymbol "-=" @ createSymbol "*=" @ createSymbol "/="
      @ createSymbol "++" @ createSymbol "--"
      @ createVariablesAndNumbers
   List.ofSeq
@@ -83,6 +84,7 @@ let rec parse state stop fail left right =
       |Assignment state stop fail x
       |Dot state stop fail x
       |Prefix state stop fail x
+      |Suffix state stop fail x
       |Operator state stop fail x
       |Apply state stop fail x
       |Index state stop fail x
@@ -96,6 +98,7 @@ let rec parse state stop fail left right =
       |Assignment state stop fail x
       |Dot state stop fail x
       |Prefix state stop fail x
+      |Suffix state stop fail x
       |Operator state stop fail x
       |Apply state stop fail x
       |Index state stop fail x
@@ -284,11 +287,17 @@ and (|Return|_|) state stop fail = function
     let parsed = Token("return", [returnedValue])
     Some (Local, restl, parsed::restr)
   |_ -> None
+// todo: error check for break / continue
 and (|Assignment|_|) state stop fail = function
-  |a::restl, T "="::restr ->
+  |a::restl, T("=" | "+=" | "-=" | "*=" | "/=" as asn)::restr ->
     let assignment, restr =
       parse LocalImd (function T ";"::_ -> true | e -> stop e) fail [] restr     //consider: a = b }    close block w/o ;
-    let parsed = Token("assign", [a; assignment])
+    let parsed =
+      match asn with
+      |"=" -> Token("assign", [a; assignment])
+      |composite ->                             // x += y; -> x = x + y;
+        let operation = Token composite.[..0]
+        Token("assign", [a; Token("apply", [Token("apply", [operation; a]); assignment])])
     Some (LocalImd, restl, parsed::restr)
   |_ -> None
 and (|Dot|_|) state stop fail = function
@@ -310,6 +319,17 @@ and (|Prefix|_|) state stop fail = function
           parse state (function T _::_ -> false | _ -> true) (fun e -> stop e || fail e) [] right
         b, restr
     let parsed = Token("apply", a.Indentation, true, [a; b])
+    Some (state, restl, parsed::restr)
+  |_ -> None
+and (|Suffix|_|) state stop fail = function  // needs more integration testing with prefix
+  |a::restl, T("++" | "--" as suffix)::restr ->
+    let rec removeSideEffects = function
+      |X("apply", [T("~++" | "~--"); x]) -> removeSideEffects x  // applying anything else should be a fail
+      |x -> x
+    let a' = removeSideEffects a
+    let change, undo = match suffix with "++" -> "+", "-" | "--" -> "-", "+" | _ -> failwith "unrecognized"
+    let apply c a = Token("apply", [Token("apply", [Token c; a]); Token "1"])
+    let parsed = Token("sequence", [Token("assign", [removeSideEffects a; apply change a]); apply undo (removeSideEffects a)])
     Some (state, restl, parsed::restr)
   |_ -> None
 and (|Operator|_|) state stop fail = function
@@ -354,8 +374,11 @@ let rec postProcess = function
   |X("==", xprs) -> Token("=", List.map postProcess xprs)
   |X("apply", [T ("printf" | "sprintf" | "scanf") as formatFunction; X(",", format::args)]) ->
     List.fold (fun acc e ->
-      Token("apply", [acc; e])
+      Token("apply", [acc; postProcess e])
      ) (Token("apply", [formatFunction; format])) args
+  |X("apply", [T("~++" | "~--" as abbrev); a]) ->
+    let op = Token abbrev.[1..1]
+    Token("assign", [a; Token("apply", [Token("apply", [op; postProcess a]); Token "1"])])
   |X(s, xprs) -> Token(s, List.map postProcess xprs)
 let parseSyntax e =
   restoreDefault()

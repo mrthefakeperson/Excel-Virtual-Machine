@@ -91,8 +91,8 @@ type AST =
              (AorB b (sprintf "[%s]" (str""b)) (sprintf "[\n%s\n%s ]" (str ind' b) indent))
              (AorB c (str""c) (sprintf "\n%s" (str ind' c)))
           |Return a -> sprintf "return%s" (AorB a (sprintf " %s" (str""a)) (sprintf "\n%s" (str ind' a)))
-          |Break -> "break"
-          |Continue -> "continue"
+          |Break -> "Break"
+          |Continue -> "Continue"
           |Mutate(a, Inline b) -> sprintf "%s <- %s" a (str""b)
           |Mutate(a, b) -> sprintf "%s <-\n%s" a (str ind' b)
         indent + a

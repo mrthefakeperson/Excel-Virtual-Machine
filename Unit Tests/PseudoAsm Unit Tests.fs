@@ -75,3 +75,7 @@ let ASMLocalVariableTest() =
    ]
    |> fun e -> printfn "%A" e; e
    |> fun e -> Assert.AreEqual(runAST stack e, ["22"])
+[<Test>]
+let ASMBreakTest() =
+  Loop(Const "true", Break) |> runAST stack
+   |> fun e -> Assert.AreEqual(e, ["()"])

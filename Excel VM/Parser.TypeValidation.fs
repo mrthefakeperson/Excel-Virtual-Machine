@@ -22,6 +22,8 @@ let changeNames (e:Token): Token =
   List.iter addName (Project.Util.definedOperators @ Project.Util.definedPrefixOperators)
   addName Project.Util.PRINT
   addName Project.Util.SCAN
+  addName "continue"
+  addName "break"
   // manipulate stored names for all variable names in a subtree
   let rec mapAllNames action = function
     |Var name -> Token(action name)

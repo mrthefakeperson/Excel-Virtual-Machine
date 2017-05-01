@@ -28,6 +28,7 @@ let rec compileASM redef =
   function
   |RedefDetected yld -> yld
   |Apply(a, b) ->   // a is an array, a.[0]: function, a.[1..]: suffix of args
+    
     let pushSuffixArgs =   // x :: ... -> (args in reverse order) @ ...
       let loopBody =  // x :: ... -> x + 1 :: *x :: ...
         [stTemp; ldTemp; GetHeap; ldTemp; Push "1"; Add]
@@ -37,9 +38,9 @@ let rec compileASM redef =
       let loopAgain = -(List.length loopCond + 1 + List.length loopBody)
       [Push "1"; Add] @ loopCond @ [GotoIfTrueFwdShift skipBody] @ loopBody @ [GotoFwdShift loopAgain; Pop]
     List.collect compileASM' b @ compileASM' a @ [stTemp2; ldTemp2] @ pushSuffixArgs @ [ldTemp2; GetHeap; Call]
-  |Assign(a, i, e) -> compileASM' a @ compileASM' i @ [Add] @ compileASM' e @ [WriteHeap; Push "()"]
+  |Assign(a, i, e) -> compileASM' a @ compileASM' i @ [Add] @ compileASM' e @ pushAgain @ [stTemp; WriteHeap; ldTemp]
   |Const c -> [Push c]
-  |Declare(a, b) -> compileASM' b @ [Store a; Push "()"]
+  |Declare(a, b) -> compileASM' b @ [Store a; Load a]
   |Define(f, xs, b) as ast ->   // returns an array address, since functions are aliases for arrays
     // on stack: calling address :: args in reverse order @ ...
     let storeCallingAddress, loadCallingAddress = [Store "*call_addr"], [Load "*call_addr"]
@@ -98,11 +99,18 @@ let rec compileASM redef =
     compileASM' a @ [GotoIfTrueFwdShift skipNegBlock] @ compiledNeg
      @ [GotoFwdShift skipAffBlock] @ compiledAff
   |Loop(a, b) ->
-    let compiledCond, compiledBody = compileASM' a, compileASM' b @ [Pop]
+    let compiledCond = compileASM' a
+    let pushBranchAddr = [PushFwdShift (List.length compiledCond + 1)]
+    let redefWithBreakCont = function
+      |Break -> Some [stTemp; ldTemp; Push "False"; ldTemp; Return]
+      |Continue -> Some [stTemp; ldTemp; Push "True"; ldTemp; Return]  // infinite loop: for loops don't execute the increment
+      |x -> redef x
+    let compiledBody = compileASM redefWithBreakCont b @ [Pop]
     let skipBody = List.length compiledBody + 2
     let loopAgain = -(List.length compiledCond + 2 + List.length compiledBody)
-    compiledCond @ [GotoIfTrueFwdShift 2; GotoFwdShift skipBody]
-     @ compiledBody @ [GotoFwdShift loopAgain; Push "()"]
+    pushBranchAddr
+     @ compiledCond @ [GotoIfTrueFwdShift 2; GotoFwdShift skipBody]
+     @ compiledBody @ [GotoFwdShift loopAgain; Pop; Push "()"]
   |Mutate(a, b) -> compileASM' (Declare(a, b))
   |New a ->
     let allocInALoop =  // a :: ... -> ... where a spots have been created

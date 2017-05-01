@@ -17,10 +17,11 @@ let main argv =
 
 //    testParser verify 1
 //    testCompilerAST verify 1
+    testCompilerAST ignore 29
     //testExcelCompiler 1
-//    printfn "done"
-//    ignore (stdin.ReadLine())
-    Output.Implementation.debugPseudoASM "test.s" [Push "5"; Push "1"] [Div]
+    printfn "done"
+    ignore (stdin.ReadLine())
+//    Output.Implementation.debugPseudoASM "test.s" [Push "5"; Push "1"] [Div]
     ()
   |[|"help"|] -> printfn "first argument should be the input file; -outputExcelFile outputs an Excel file"
   |args ->

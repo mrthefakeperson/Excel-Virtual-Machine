@@ -12,6 +12,7 @@ let rec ASTCompile' (capture, captured as cpt) = function
     |[] -> AST.Return (Const "()")
     |[x] -> AST.Return (ASTCompile' cpt x)
     |_ -> failwith "cannot return more than one item"
+  |T "break" -> Break | T "continue" -> Continue
   |Var s -> if Map.containsKey s captured && captured.[s] <> [] then Apply(Value s, captured.[s]) else Value s   //variables
   |Cnst s -> Const s    //constants, could use some work
   |X(",", tupled) ->

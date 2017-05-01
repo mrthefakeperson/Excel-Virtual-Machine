@@ -1,0 +1,9 @@
+﻿C
+int main()
+{
+  int a = 1, b = 2;
+  a -= 5;   // a = -4
+  b += a *= 2;  // a = -8, b = -6
+  printf("%i %i", a, b);
+  return 0;
+}

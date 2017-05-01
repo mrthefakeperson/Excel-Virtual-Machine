@@ -193,6 +193,40 @@ let CParserDeclareStructTest2() =
   match parseStringC Global "struct { } ;" with
   |X("struct", [T "anonymousStruct"; T "sequence"]), [] -> ()
   |a, _ -> failwithf "failed struct test 2: %A" a
+[<Test>]
+let CParserCompositeAssignTest1() =
+  match parseStringC Local "a += 1 ;" with
+  |X("sequence", [X("assign", [T "a"; X("apply", [X("apply", [T "+"; T "a"]); T "1"])]); T ";"]), [] -> ()
+  |a, _ -> failwithf "failed composite assign test: %A" a
+[<Test>]
+let CParserCompositeAssignTest2() =
+  match parseStringC Local "b = a /= 1 ;" with
+  |X("sequence", [X("assign", [T "b"; X("assign", [T "a"; X("apply", [X("apply", [T "/"; T "a"]); T "1"])])]); T ";"]), [] -> ()
+  |a, _ -> failwithf "failed composite assign test: %A" a
+[<Test>]
+let CParserAbbreviatedAssignTest1() =
+  match parseStringC Local "++ a + -- a ;" |> fst |> CParser.postProcess with
+  |X("sequence", [X(A, [X(A, [T"+"; X("assign", [T"a"; X(A, [X(A, [T"+"; T"a"]); T"1"])])]); X("assign", [T"a"; X(A, [X(A, [T"-"; T"a"]); T"1"])])])]) -> ()
+  |a -> failwithf "failed abbreviated assign test (prefix): %A" a
+[<Test>]
+let CParserAbbreviatedAssignTest2() =
+  match parseStringC Local "a ++ + a -- ;" with
+  |X("sequence",
+     [X(A,[X(A,[T"+";
+               X("sequence", [X("assign",[T"a";X(A,[X(A,[T"+";T"a"]);T"1"])]);X(A,[X(A,[T"-";T"a"]);T"1"])])]);
+          X("sequence", [X("assign",[T"a";X(A,[X(A,[T"-";T"a"]);T"1"])]);X(A,[X(A,[T"+";T"a"]);T"1"])])]);
+     T ";"]), [] -> ()
+  |a, _ -> failwithf "failed abbreviated assign test (suffix): %A" a
+[<Test>]
+let CParserAbbreviatedAssignTest3() =
+  match parseStringC Local "++ a ++ ;" with
+  |X("sequence", [X("sequence", [X("assign",[T"a";X(A,[X(A,[T"+";X(A,[T"~++";T"a"])]);T"1"])]);X(A,[X(A,[T"-";T"a"]);T"1"])]);T";"]), [] -> ()
+  |a, _ -> failwithf "failed abbreviated assign test: %A" a
+[<Test>]
+let CParserBreakContinueTest() =
+  match parseStringC Local "break ; { continue ; }" with
+  |X("sequence", [T "break"; T ";"; X("{}", [X("sequence", [T "continue"; T ";"])])]), [] -> ()
+  |a, _ -> failwithf "failed break / continue test: %A" a
 
 open TypeValidation
 

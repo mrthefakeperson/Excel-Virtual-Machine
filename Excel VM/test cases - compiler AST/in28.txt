@@ -1,0 +1,11 @@
+﻿C
+int main()
+{
+  int a = 7;
+  printf("%i %i %i %i\n", a++, a--, ++a, --a);  // 1, 2, 2, 1, arguments are evaluated left -> right
+  int b[2];
+  b[0] = 3;
+  b[0]++;
+  printf("%i\n", --b[0])  // 3
+  return 0;
+}
