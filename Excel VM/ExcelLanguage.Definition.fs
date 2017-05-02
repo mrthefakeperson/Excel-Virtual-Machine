@@ -118,7 +118,7 @@ let coordsToS (r, c) = numberToAlpha c + string r
 
 // size of stack
 [<Literal>]
-let LARGE_SIZE = 400
+let LARGE_SIZE = 1000
 
 // locations of important cells
 [<Literal>]

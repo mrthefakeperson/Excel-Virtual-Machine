@@ -141,7 +141,6 @@ module IntegrationTests =
          |> AST.Implementation.fromToken
          |> PseudoASM.Implementation.fromAST
          |> fst |> Array.ofSeq
-      Array.iter (printf "%A   ") cmds
       Output.Implementation.writeExcelFile (file + ".xlsx") cmds
      )
 

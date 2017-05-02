@@ -399,4 +399,3 @@ let parseSyntax e =
    |> postProcess (function _ -> None)
    |> function X("sequence", x) -> Token("sequence", x @ [Token("apply", [Token "main"; Token "()"])])
    |> StringFormatting.processStringFormatting
-   |> fun e -> printfn "%A" e; e
