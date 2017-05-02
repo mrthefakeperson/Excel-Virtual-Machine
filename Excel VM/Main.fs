@@ -17,8 +17,7 @@ let main argv =
 
 //    testParser verify 1
 //    testCompilerAST verify 1
-    testCompilerAST ignore 29
-    //testExcelCompiler 1
+    testExcelCompiler 1
     printfn "done"
     ignore (stdin.ReadLine())
 //    Output.Implementation.debugPseudoASM "test.s" [Push "5"; Push "1"] [Div]
@@ -31,7 +30,7 @@ let main argv =
        >> AST.Implementation.fromToken
        >> PseudoASM.Implementation.fromAST
        >> Output.Implementation.fromPseudoASM
-    openAndCompile args
-    
+    try openAndCompile args
+    with _ -> printfn "compile failed"
   0
 

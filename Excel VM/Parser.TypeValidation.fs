@@ -22,8 +22,8 @@ let changeNames (e:Token): Token =
   List.iter addName (Project.Util.definedOperators @ Project.Util.definedPrefixOperators)
   addName Project.Util.PRINT
   addName Project.Util.SCAN
-  addName "continue"
   addName "break"
+  addName "continue"
   // manipulate stored names for all variable names in a subtree
   let rec mapAllNames action = function
     |Var name -> Token(action name)
@@ -184,7 +184,7 @@ let compilePointersToArrays x =
   yld
 
 let rec processDerefs = function
-  |X("apply", [T "~*"; x]) -> Token("deref", [x])
+  |X("apply", [T "~*"; x]) -> Token("dot", [x; Token("[]", [Token "0"])])
   |X(s, dep) -> Token(s, List.map processDerefs dep)
 
 

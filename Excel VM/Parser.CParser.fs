@@ -270,13 +270,13 @@ and (|For|_|) state stop fail = function
   |T "for"::restl, T "("::restr ->
     let decl, T ";"::restr =
       parse Local (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
-    //let X("declare", [datatypeName; name]) = decl
     let cond, T ";"::restr =
       parse Local (function T ";"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
     let incr, T ")"::restr =
       parse Local (function T ")"::_ -> true | _ -> false) (fun e -> stop e || fail e) [] restr
     let body, restr = getNextStatement state stop fail restr
-    let parsed = Token("sequence", [decl; Token("while", [cond; Token("sequence", [body; incr])])])
+//    let parsed = Token("sequence", [decl; Token("while", [cond; Token("sequence", [body; incr])])])
+    let parsed = Token("for", [decl; cond; incr; body])
     Some (Local, restl, parsed::restr)
   |_ -> None
 and (|Return|_|) state stop fail = function
@@ -364,28 +364,39 @@ and (|Transfer|_|) state stop fail = function
   |left, x::restr -> Some (state, x::left, restr)
   |_ -> None
 
-let rec postProcess = function
+let rec postProcess (|DynamicRules|_|) =
+  let inline callSelf e = postProcess (|DynamicRules|_|) e
+  function
+  |DynamicRules x -> x
   |X("declare function", [datatype; name; args; xprs]) ->
-    Token("let", [name; Token("fun", [postProcess args; postProcess xprs])])
-  |X("{}", xprs) -> postProcess (Token("sequence", xprs))
+    Token("let", [name; Token("fun", [callSelf args; callSelf xprs])])
+  |X("{}", xprs) -> callSelf (Token("sequence", xprs))
   |X("sequence", xprs) ->
     let xprs' = List.filter (function T ";" -> false | _ -> true) xprs
-    Token("sequence", List.map postProcess xprs')
-  |X("==", xprs) -> Token("=", List.map postProcess xprs)
+    Token("sequence", List.map callSelf xprs')
+  |X("==", xprs) -> Token("=", List.map callSelf xprs)
   |X("apply", [T ("printf" | "sprintf" | "scanf") as formatFunction; X(",", format::args)]) ->
     List.fold (fun acc e ->
-      Token("apply", [acc; postProcess e])
+      Token("apply", [acc; callSelf e])
      ) (Token("apply", [formatFunction; format])) args
   |X("apply", [T("~++" | "~--" as abbrev); a]) ->
     let op = Token abbrev.[1..1]
-    Token("assign", [a; Token("apply", [Token("apply", [op; postProcess a]); Token "1"])])
-  |X(s, xprs) -> Token(s, List.map postProcess xprs)
+    Token("assign", [a; Token("apply", [Token("apply", [op; callSelf a]); Token "1"])])
+  |X("for", [decl; cond; incr; body]) ->
+    let incr' = callSelf incr
+    let replaceCont = function
+      |T "continue" -> Token("sequence", [incr'; Token "continue"]) |> Some
+      |x -> (|DynamicRules|_|) x
+    Token("sequence", [callSelf decl;
+      Token("while", [callSelf cond; Token("sequence", [postProcess replaceCont body; incr'])])
+     ])
+  |X(s, xprs) -> Token(s, List.map callSelf xprs)
 let parseSyntax e =
   restoreDefault()
   preprocess e
    |> parse Global (function [] -> true | _ -> false) (fun _ -> false) []
    |> fst
-   |> postProcess
+   |> postProcess (function _ -> None)
    |> function X("sequence", x) -> Token("sequence", x @ [Token("apply", [Token "main"; Token "()"])])
    |> StringFormatting.processStringFormatting
    |> fun e -> printfn "%A" e; e

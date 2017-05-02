@@ -15,6 +15,8 @@ type AST =
   |Return of a:AST
   |Break
   |Continue
+//  |Goto of string
+//  |Label of string
   |Loop of a:AST*b:AST
   |Mutate of a:string*b:AST     //a <- b
    with
@@ -27,7 +29,9 @@ type AST =
       |Declare(a, b) -> Declare(a, f b)
       |Define(a, bs, c) -> Define(a, bs, f c)
       |Get(a, b) -> Get(f a, f b)
+//      |Goto a -> Goto a
       |If(a, b, c) -> If(f a, f b, f c)
+//      |Label a -> Label a
       |Loop(a, b) -> Loop(f a, f b)
       |Mutate(a, b) -> Mutate(a, f b)
       |New a -> New(f a)
@@ -46,7 +50,7 @@ type AST =
         isInline.[ast] <- x
         x
       let rec isInline' e = e |> function
-        |Value _ | Const _ | Break | Continue -> push e true
+        |Value _ | Const _ | Break | Continue (*| Goto _ | Label _*) -> push e true
         |Sequence ll ->
           ignore (List.map isInline' ll)
           push e false
@@ -93,6 +97,8 @@ type AST =
           |Return a -> sprintf "return%s" (AorB a (sprintf " %s" (str""a)) (sprintf "\n%s" (str ind' a)))
           |Break -> "Break"
           |Continue -> "Continue"
+//          |Goto a -> "Goto " + a
+//          |Label a -> "(Label " + a + ")"
           |Mutate(a, Inline b) -> sprintf "%s <- %s" a (str""b)
           |Mutate(a, b) -> sprintf "%s <-\n%s" a (str ind' b)
         indent + a

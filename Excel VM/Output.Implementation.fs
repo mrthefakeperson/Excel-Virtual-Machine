@@ -12,3 +12,5 @@ let fromPseudoASM (cmds:PseudoASM seq, args:CommandLineArguments): unit =
     Output.ASM.writeASM outputFile cmds
 
 let debugPseudoASM = Output.ASM.debugASM
+
+let writeExcelFile = Output.Excel.writeExcelFile

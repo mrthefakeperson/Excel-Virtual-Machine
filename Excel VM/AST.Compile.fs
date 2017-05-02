@@ -2,6 +2,8 @@
 open Parser.Definition
 open AST.Definition
 
+
+
 let nxt' x () =
   incr x
   string !x
@@ -51,7 +53,7 @@ let rec ASTCompile' (capture, captured as cpt) = function
       |compiled -> yield compiled
      ]
   |X("declare", [datatypeName; a]) -> ASTCompile' cpt a
-  |X("let", [a; b]) ->           //todo: handle non-recursive statements by renaming
+  |X("let", [a; b]) ->
     match a with
     |X("apply", [aa; ab]) -> ASTCompile' cpt (Token("let", [aa; Token("fun", [ab; b])]))
     |T s | X("declare", [_; T s]) ->

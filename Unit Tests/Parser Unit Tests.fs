@@ -205,7 +205,7 @@ let CParserCompositeAssignTest2() =
   |a, _ -> failwithf "failed composite assign test: %A" a
 [<Test>]
 let CParserAbbreviatedAssignTest1() =
-  match parseStringC Local "++ a + -- a ;" |> fst |> CParser.postProcess with
+  match parseStringC Local "++ a + -- a ;" |> fst |> CParser.postProcess (function _ -> None) with
   |X("sequence", [X(A, [X(A, [T"+"; X("assign", [T"a"; X(A, [X(A, [T"+"; T"a"]); T"1"])])]); X("assign", [T"a"; X(A, [X(A, [T"-"; T"a"]); T"1"])])])]) -> ()
   |a -> failwithf "failed abbreviated assign test (prefix): %A" a
 [<Test>]

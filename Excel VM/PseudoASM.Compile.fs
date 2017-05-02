@@ -28,7 +28,6 @@ let rec compileASM redef =
   function
   |RedefDetected yld -> yld
   |Apply(a, b) ->   // a is an array, a.[0]: function, a.[1..]: suffix of args
-    
     let pushSuffixArgs =   // x :: ... -> (args in reverse order) @ ...
       let loopBody =  // x :: ... -> x + 1 :: *x :: ...
         [stTemp; ldTemp; GetHeap; ldTemp; Push "1"; Add]
@@ -103,7 +102,8 @@ let rec compileASM redef =
     let pushBranchAddr = [PushFwdShift (List.length compiledCond + 1)]
     let redefWithBreakCont = function
       |Break -> Some [stTemp; ldTemp; Push "False"; ldTemp; Return]
-      |Continue -> Some [stTemp; ldTemp; Push "True"; ldTemp; Return]  // infinite loop: for loops don't execute the increment
+      |Continue -> Some [stTemp; ldTemp; Push "True"; ldTemp; Return]
+      |AST.Return x -> Some (Pop::compileASM' (AST.Return x))  // need to maintain return address on top of stack
       |x -> redef x
     let compiledBody = compileASM redefWithBreakCont b @ [Pop]
     let skipBody = List.length compiledBody + 2
@@ -113,6 +113,7 @@ let rec compileASM redef =
      @ compiledBody @ [GotoFwdShift loopAgain; Pop; Push "()"]
   |Mutate(a, b) -> compileASM' (Declare(a, b))
   |New a ->
+//    compileASM' a @ [NewHeap; Push "1"; NewHeap; Push "endArr"; WriteHeap]
     let allocInALoop =  // a :: ... -> ... where a spots have been created
       let cond =  // a :: ... -> (a > 1)? :: a :: ...
         pushAgain @ [Push "1"; LEq]

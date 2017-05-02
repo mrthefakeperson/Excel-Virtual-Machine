@@ -1,8 +1,8 @@
 ﻿C
 int main()
 {
-  for (int e = 0; e < 10; e++) {  // 0 1 2 3 4 5
-    //if (e == 3) continue;    <- this creates an infinite loop as of now because the e++ gets skipped
+  for (int e = 0; e < 10; e++) {  // 0 1 2 4 5
+    if (e == 3) continue;
     printf("%i\n", e);
 	if (e == 5) break;
 	if (e < 0) break;

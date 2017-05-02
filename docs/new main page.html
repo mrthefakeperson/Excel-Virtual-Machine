@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Excel VM - Compile Your Programs Into Spreadsheets Online</title>
+	<style>
+	  body {
+	    padding: 0px;
+		margin: 0px;
+		background: #ececec;
+		font-family: Arial, Helvetica, sans-serif;
+	  }
+	  #navbar {
+	    padding-right: 90px;
+		border-bottom-width: 1px;
+		border-color: #d0d0d0;
+		border-bottom-style: solid;
+		height: 50px;
+		background: #ffffff;
+		box-shadow: 0px 0px 10px #bbbbbb;
+	  }
+	  .navbarLink {
+	    float: right;
+		height: 50px;
+		font-size: 20px;
+		font-weight: bold;
+		padding-left: 20px;
+		padding-right: 20px;
+		color: #aaaaaa;
+		line-height: 50px;
+		text-decoration: none;
+        transition: all 0.30s ease-in-out;
+		border-radius: 2px;
+	  }
+	  .navbarLink:hover {
+	    background-color: #dddddd;
+        transition: all 0.30s ease-in-out;
+		color: #555555;
+	  }
+	  #codeAndTitleContainer {
+	    width: 780px;
+		height: 610px;
+		border-width: 1px;
+		border-color: #d0d0d0;
+		border-style: solid;
+		background: #ffffff;
+		box-shadow: 0px 0px 10px #bbbbbb;
+		margin-top: 25px;
+		margin-left: 90px;
+	  }
+	  #codeTitle {
+		border-bottom-width: 1px;
+		border-color: #d0d0d0;
+		border-bottom-style: solid;
+		font-size: 19px;
+		color: #777777;
+		padding: 4px;
+	  }
+	  #codeNumbering {
+	    width: 50px;
+		float: left;
+	  }
+	  #codeContainer {
+	    height: 400px;
+		width: 726px;
+	    border: none;
+		shadow: none;
+	  }
+	  #consoleContainer {
+	    width: 100%;
+		height: 110px;
+	  }
+	  #codeSettings {
+		border-top-width: 1px;
+		border-color: #d0d0d0;
+		border-top-style: solid;
+		padding: 10px;
+	  }
+	  .compileButton {
+	    float: right;
+		background-color: #442299;
+		color: #eeffee;
+		border: none;
+		border-radius: 3px;
+		font-size: 20px;
+		cursor: pointer;
+		margin-left: 5px;
+		height: 36px;
+	  }
+	</style>
+  </head>
+  <body>
+    <div id="navbar">
+	  <a class="navbarLink" href="__GITHUB_LINK__"><div>Github</div></a>
+	  <a class="navbarLink" href="__DOCS_LINK__"><div>What is this?</div></a>
+	  <a class="navbarLink" href="__SAMPLES_LINK__"><div>Samples</div></a>
+	  <a class="navbarLink" style="color:#555555;" href="__NEW_CODE_LINK__"><div>New Code</div></a>
+	</div>
+	<div id="codeAndTitleContainer">
+	  <div id="codeTitle">
+	    Enter your source code or insert <a href="__SAMPLES_LINK__" style="text-decoration: none;">sample</a> below:
+	  </div>
+	  <div id="codeNumbering">1</div>
+	  <textarea id="codeContainer"></textarea>
+	  <div id="consoleContainer"></div>
+	  <div id="codeSettings">
+	    <select id="languageSelection">
+		  <option value="C">C</option>
+		</select>
+		<button class="compileButton" id="compileToSpreadsheetButton">Compile to Spreadsheet and Run</button>
+		<button class="compileButton" id="compileAndRuttonButton">Compile and Run</button>
+	  </div>
+	</div>
+  </body>
+</html>
