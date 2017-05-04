@@ -1,8 +1,9 @@
-#load "../Excel VM/Project.fs"
+//#load "../Excel VM/Project.fs"
+#load "./unused modules/UnusedModule1.fsx"
 #load "../Excel VM/Parser.Definition.fs"
 #load "../Excel VM/Parser.Lexer.fs"
 #load "../Excel VM/Parser.StringFormatting.fs"
-#load "./UnusedModule.fsx"
+#load "./unused modules/UnusedModule2.fsx"
 #load "../Excel VM/Parser.CParser.fs"
 #load "../Excel VM/Parser.TypeValidation.fs"
 #load "../Excel VM/Parser.Implementation.fs"
@@ -110,7 +111,7 @@ module Interpreter =
         printfn "stack %A" !stacks.[value]
         printfn "heap [%s]" (String.concat "; " (Seq.map (sprintf "%A") heap))
         printfn "instruction %s" (top instr)
-        ignore (stdin.ReadLine())
+//        ignore (stdin.ReadLine())
       let pt = int(top instr)
       pop instr; push instr (string(pt+1))
 
@@ -118,11 +119,10 @@ module Interpreter =
 let compileAndRun getInput sendOutput txt =
   Parser.Implementation.fromString (txt, Map ["language", "C"])
    |> AST.Implementation.fromToken
-   |> fun e -> printfn "%O" e; e
    |> PseudoASM.Implementation.fromAST
    |> fst
    |> Array.ofSeq
    |> Interpreter.interpretPAsm false getInput sendOutput
 
 
-compileAndRun (ignore >> stdin.ReadLine) stdout.WriteLine "int main(){printf(\"%i\", 45);}"
+//compileAndRun (ignore >> stdin.ReadLine) stdout.WriteLine "int main(){printf(\"%i\", 45);}"

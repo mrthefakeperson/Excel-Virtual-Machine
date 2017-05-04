@@ -7,10 +7,26 @@ open Fable.Import.Browser
 
 let getById<'a when 'a :> HTMLElement> s = document.getElementById s :?> 'a
 
-getById<Browser.HTMLButtonElement>("compile").onclick <- fun _ ->
-  let inputCode = getById<Browser.HTMLTextAreaElement>("input_code").value;
-  let stdInput = getById<Browser.HTMLTextAreaElement>("stdin").value;
-  let stdOutput = getById<Browser.HTMLTextAreaElement>("stdout");
-  let output = CompileAndRun.compileAndRun inputCode stdInput
-  stdOutput.textContent <- output
+// make a function which will extract tokens from the stdinData element in order
+let makeTokenGenerator() =
+  let stdinData = getById<Browser.HTMLTextAreaElement>("stdinData").value
+  let tokenStream = stdinData.Split ' ' |> List.ofArray |> ref
+  let popStream() =
+    try List.head !tokenStream
+    finally tokenStream := List.tail !tokenStream
+  function
+    |"%i" ->
+      tokenStream := Seq.skipWhile (System.Int32.TryParse >> fst >> not) !tokenStream |> List.ofSeq
+      popStream()
+    |"%s" -> popStream()
+    |_ -> failwith "unrecognized or unsupported input format string"
+
+let consoleElement = getById<Browser.HTMLDivElement>("consoleContainer")
+let printToConsole s = 
+  consoleElement.textContent <- consoleElement.textContent + s
+
+getById<Browser.HTMLButtonElement>("compileAndRuttonButton").onclick <- fun _ ->
+  consoleElement.textContent <- ""
+  getById<Browser.HTMLTextAreaElement>("codeContainer").value  // get input code
+   |> CompileAndRun.compileAndRun (makeTokenGenerator()) printToConsole  // compile and run
   System.Object()

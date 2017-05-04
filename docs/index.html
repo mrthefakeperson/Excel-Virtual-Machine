@@ -173,6 +173,10 @@
 	    (e.style.display == "block")? disableDisplay(e): enableDisplay(e);
 	   };
 	</script>
+	<script src = "scripts/require.js"></script>
+	<script>
+	  requirejs(["scripts/main"]);
+	</script>
   </head>
   <body>
     <div id="navbar">
@@ -187,7 +191,12 @@
 	    Enter your source code or insert <a onclick="enableDisplay(document.getElementById('samples'));disableDisplay(document.getElementById('ExcelSheetBackground'));" style="color:blue;cursor:pointer;">sample</a> below:
 	  </div>
 	  <div id="codeNumbering">1</div>
-	  <textarea id="codeContainer"></textarea>
+	  <textarea id="codeContainer">int main()
+{
+  int a, b; scanf("%i%i", &a, &b);
+  printf("%i\n", a + b);
+  return 0;
+}</textarea>
 	  <div id="consoleContainer"></div>
 	  <div id="codeSettings">
 	    <select id="languageSelection">
@@ -218,7 +227,7 @@
         </div>
 	  </div>
 	</div>
-    <textarea id="stdinData"></textarea>
+    <textarea id="stdinData">3 5</textarea>
 	<div id="samples">
 	  <ul>
 	    <li>sample1.c</li>

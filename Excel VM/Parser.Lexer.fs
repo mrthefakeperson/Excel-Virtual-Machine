@@ -1,4 +1,5 @@
-﻿module private Parser.Lexer
+﻿module private Parser.Lexer  // screws up the web build
+//module Parser.Lexer
 open System
 
 type stringClassifier = string -> bool

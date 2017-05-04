@@ -17,7 +17,7 @@ let getLocalVariables = function
         getLocalVariables children
       |Children children -> List.iter getLocalVariables children
     getLocalVariables e
-    Seq.toList (System.Collections.Generic.HashSet !yld)
+    Set.toList (Set.ofList !yld)
   |_ -> failwith "local variables are for functions only"
 // new assembly compilation function, with a single stack
 // todo: change to dfs order passing for better performance
