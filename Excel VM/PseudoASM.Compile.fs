@@ -83,7 +83,8 @@ let rec compileASM redef =
       storeCallingAddress @ storeArgumentsLocally @ getArgumentsFromStack
        @ loadCallingAddress @ storeArgumentsOnStackFromLocal
        @ compileASM redefWithEarlyReturn b
-//       @ restorePrevArgsAndReturnTopstackValue    // no longer necessary with TCO preprocessing
+       @ restorePrevArgsAndReturnTopstackValue    // no longer necessary with TCO preprocessing
+                                                  // but not including it creates a weird bug... in30.txt
     let skipFunctionBlock, pushFunctionBlock = List.length functionBlock + 1, - List.length functionBlock
     let assignFunction =  // x :: ... -> newheap :: ... where newheap <- [|x; terminator|]
       [ stTemp; NewHeap; Store f;  // temp <- x, f <- newheap

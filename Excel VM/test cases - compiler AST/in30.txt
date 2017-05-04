@@ -1,0 +1,9 @@
+﻿C
+int k()
+{
+  printf("%i", 4);
+}
+int main()
+{
+  k();
+}

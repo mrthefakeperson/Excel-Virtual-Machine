@@ -30,6 +30,7 @@
 		text-decoration: none;
         transition: all 0.30s ease-in-out;
 		border-radius: 2px;
+		cursor: pointer;
 	  }
 	  .navbarLink:hover {
 	    background-color: #dddddd;
@@ -46,6 +47,7 @@
 		box-shadow: 0px 0px 10px #bbbbbb;
 		margin-top: 25px;
 		margin-left: 90px;
+		margin-bottom: 25px;
 	  }
 	  #codeTitle {
 		border-bottom-width: 1px;
@@ -56,7 +58,11 @@
 		padding: 4px;
 	  }
 	  #codeNumbering {
-	    width: 50px;
+		border-right-width: 1px;
+		border-color: #d0d0d0;
+		border-right-style: solid;
+	    width: 49px;
+		height: 408px;
 		float: left;
 	  }
 	  #codeContainer {
@@ -64,40 +70,121 @@
 		width: 726px;
 	    border: none;
 		shadow: none;
+		font-family: "Lucida Console", Monaco, monospace;
 	  }
 	  #consoleContainer {
 	    width: 100%;
 		height: 110px;
-	  }
-	  #codeSettings {
 		border-top-width: 1px;
+		border-bottom-width: 1px;
 		border-color: #d0d0d0;
 		border-top-style: solid;
+		border-bottom-style: solid;
+		font-family: "Lucida Console", Monaco, monospace;
+	  }
+	  #codeSettings {
 		padding: 10px;
+	  }
+	  #stdinButton {
+	    border: 1px outset #d0d0d0;
+		border-radius: 3px;
+		font-size: 19px;
+		margin-left: 10px;
+		padding: 8px 15px 8px 15px;
+		cursor: pointer;
 	  }
 	  .compileButton {
 	    float: right;
-		background-color: #442299;
+		background-color: #0099cc;
 		color: #eeffee;
-		border: none;
+		border: 1px outset #d0d0d0;
 		border-radius: 3px;
-		font-size: 20px;
+		font-size: 19px;
 		cursor: pointer;
-		margin-left: 5px;
-		height: 36px;
+		margin-left: 10px;
+		padding: 8px 15px 8px 15px;
+	  }
+	  #informationSection {
+		box-shadow: 0px 0px 10px #bbbbbb;
+		border-top-width: 1px;
+		border-color: #d0d0d0;
+		border-top-style: solid;
+		padding-left: 90px;
+		padding-right: 100px;
+		padding-top: 30px;
+		background: #ffffff;
+		overflow: hidden;
+	  }
+	  .descriptionCell {
+		width: 30%;
+	    float: left;
+		margin: 15px;
+	  }
+	  .descriptionCellTitle {
+	    font-size: 30px;
+		padding-bottom: 8px;
+		border-bottom-width: 1px;
+		border-color: #d0d0d0;
+		border-bottom-style: solid;
+	  }
+	  .descriptionDetails {
+	    padding-top: 16px;
+		color: #777777;
+		font-size: 18px;
+	  }
+	  #stdinData {
+	    position: absolute;
+		top: 432px;
+		left: 82px;
+        border: 2px outset #d0d0d0;
+		border-radius: 3px;
+	    width: 200px;
+		height: 200px;
+		display: none;
+	  }
+	  #samples {
+	    position: absolute;
+		top: 76px;
+		left: calc(100% - 251px);
+		height: 610px;
+		width: 250px;
+		border-width: 1px 0px 1px 1px;
+		border-color: #d0d0d0;
+		border-style: solid;
+		background: #ffffff;
+		box-shadow: 0px 0px 10px #bbbbbb;
+		display: none;
+	  }
+	  #ExcelSheetBackground {
+	    position: absolute;
+		top: 76px;
+		left: calc(100% - 446px);
+		border-width: 1px 0px 1px 1px;
+		border-color: #d0d0d0;
+		border-style: solid;
+		box-shadow: 0px 0px 10px #bbbbbb;
+		display: none;
 	  }
 	</style>
+	<script>
+	  let enableDisplay = e => e.style.display = "block";
+	  let disableDisplay = e => e.style.display = "none";
+	  let toggleDisplay = e => {
+	    (e.style.display == "block")? disableDisplay(e): enableDisplay(e);
+	   };
+	</script>
   </head>
   <body>
     <div id="navbar">
+	  <img alt="image here"></img>
 	  <a class="navbarLink" href="__GITHUB_LINK__"><div>Github</div></a>
-	  <a class="navbarLink" href="__DOCS_LINK__"><div>What is this?</div></a>
-	  <a class="navbarLink" href="__SAMPLES_LINK__"><div>Samples</div></a>
+	  <a class="navbarLink" onclick="window.scrollTo(0,500);"><div>What is this?</div></a>
+	  <a class="navbarLink" onclick="enableDisplay(document.getElementById('samples'));disableDisplay(document.getElementById('ExcelSheetBackground'));"><div>Samples</div></a>
 	  <a class="navbarLink" style="color:#555555;" href="__NEW_CODE_LINK__"><div>New Code</div></a>
 	</div>
 	<div id="codeAndTitleContainer">
 	  <div id="codeTitle">
-	    Enter your source code or insert <a href="__SAMPLES_LINK__" style="text-decoration: none;">sample</a> below:
+	    Enter your source code or insert <a onclick="enableDisplay(document.getElementById('samples'));disableDisplay(document.getElementById('ExcelSheetBackground'));" style="color:blue;cursor:pointer;">sample</a> below:
 	  </div>
 	  <div id="codeNumbering">1</div>
 	  <textarea id="codeContainer"></textarea>
@@ -106,9 +193,38 @@
 	    <select id="languageSelection">
 		  <option value="C">C</option>
 		</select>
-		<button class="compileButton" id="compileToSpreadsheetButton">Compile to Spreadsheet and Run</button>
-		<button class="compileButton" id="compileAndRuttonButton">Compile and Run</button>
+		<button id="stdinButton" onclick="toggleDisplay(document.getElementById('stdinData'));">stdin</button>
+		<button class="compileButton" id="compileToSpreadsheetButton" style="background-color:#009900;" onclick="disableDisplay(document.getElementById('samples'));enableDisplay(document.getElementById('ExcelSheetBackground'));">Run as Spreadsheet</button>
+		<button class="compileButton" id="compileAndRuttonButton">Run in Console</button>
 	  </div>
 	</div>
+	<div id="informationSection">
+	  <div class="descriptionCell">
+	    <div class="descriptionCellTitle">What is Excel VM?</div>
+		<div class="descriptionDetails">
+		  Excel VM is a compiler for I/O based operations in the C programming language which allows you to execute source code in a Microsoft Excel spreadsheet.
+        </div>
+	  </div>
+	  <div class="descriptionCell">
+	    <div class="descriptionCellTitle">How is it used?</div>
+		<div class="descriptionDetails">
+		  This is an online demo. Enter your source code, along with optional input data, and you are ready to compile. On the spreadsheet, your <b>stdin</b> data is stored in cell A2, and <b>stdout</b> is stored in cell B2.
+        </div>
+	  </div>
+	  <div class="descriptionCell">
+	    <div class="descriptionCellTitle">Links</div>
+		<div class="descriptionDetails">
+		  Download the latest release <a href="__DOWNLOAD_LINK__">here</a>, click <a onclick="enableDisplay(document.getElementById('samples'));disableDisplay(document.getElementById('ExcelSheetBackground'));" style="text-decoration:underline;color:blue;cursor:pointer;">here</a> to try some samples, or <a href="__GITHUB_LINK__">view the source code on Github</a>.
+        </div>
+	  </div>
+	</div>
+    <textarea id="stdinData"></textarea>
+	<div id="samples">
+	  <ul>
+	    <li>sample1.c</li>
+		<li>sample2.c</li>
+	  </ul>
+	</div>
+	<img id="ExcelSheetBackground" src="Excel sheet background.png"><img>
   </body>
 </html>
