@@ -155,15 +155,40 @@
 		box-shadow: 0px 0px 10px #bbbbbb;
 		display: none;
 	  }
-	  #ExcelSheetBackground {
+	  li {
+	    cursor: pointer;
+	  }
+	  li:hover {
+	    text-decoration: underline;
+	  }
+	  #ExcelSheet {
 	    position: absolute;
 		top: 76px;
 		left: calc(100% - 446px);
+		display: none;
+		width: 445px;
+		height: 610px;
 		border-width: 1px 0px 1px 1px;
 		border-color: #d0d0d0;
 		border-style: solid;
 		box-shadow: 0px 0px 10px #bbbbbb;
-		display: none;
+		background-image: url("Excel sheet background.PNG");
+	  }
+	  td {
+	    border: 1px solid transparent;
+		height: 14px;
+	  }
+	  .ExcelLeftBuffer {
+	    width: 18px;
+	  }
+	  .ExcelColumnA {
+	    width: 155px;
+	  }
+	  .ExcelColumnB {
+	    width: 183px;
+	  }
+	  .ExcelColumnC {
+	    width: 58px;
 	  }
 	</style>
 	<script>
@@ -171,6 +196,19 @@
 	  let disableDisplay = e => e.style.display = "none";
 	  let toggleDisplay = e => {
 	    (e.style.display == "block")? disableDisplay(e): enableDisplay(e);
+	   };
+	  let getSample = fileName => {
+	    let file = new XMLHttpRequest();
+		file.open("GET", "samples/" + fileName);
+		file.onreadystatechange = () => {
+		  if (file.readyState === 4) {
+		    if (file.status === 200 || file.status == 0) {
+			  let txt = file.responseText;
+			  document.getElementById("codeContainer").value = txt;
+			}
+		  }
+		 };
+		file.send();
 	   };
 	</script>
 	<script src = "scripts/require.js"></script>
@@ -183,12 +221,12 @@
 	  <img alt="image here"></img>
 	  <a class="navbarLink" href="__GITHUB_LINK__"><div>Github</div></a>
 	  <a class="navbarLink" onclick="window.scrollTo(0,500);"><div>What is this?</div></a>
-	  <a class="navbarLink" onclick="enableDisplay(document.getElementById('samples'));disableDisplay(document.getElementById('ExcelSheetBackground'));"><div>Samples</div></a>
+	  <a class="navbarLink" onclick="enableDisplay(document.getElementById('samples'));disableDisplay(document.getElementById('ExcelSheet'));"><div>Samples</div></a>
 	  <a class="navbarLink" style="color:#555555;" href="__NEW_CODE_LINK__"><div>New Code</div></a>
 	</div>
 	<div id="codeAndTitleContainer">
 	  <div id="codeTitle">
-	    Enter your source code or insert <a onclick="enableDisplay(document.getElementById('samples'));disableDisplay(document.getElementById('ExcelSheetBackground'));" style="color:blue;cursor:pointer;">sample</a> below:
+	    Enter your source code or insert <a onclick="enableDisplay(document.getElementById('samples'));disableDisplay(document.getElementById('ExcelSheet'));" style="color:blue;cursor:pointer;">sample</a> below:
 	  </div>
 	  <div id="codeNumbering">1</div>
 	  <textarea id="codeContainer">int main()
@@ -203,7 +241,7 @@
 		  <option value="C">C</option>
 		</select>
 		<button id="stdinButton" onclick="toggleDisplay(document.getElementById('stdinData'));">stdin</button>
-		<button class="compileButton" id="compileToSpreadsheetButton" style="background-color:#009900;" onclick="disableDisplay(document.getElementById('samples'));enableDisplay(document.getElementById('ExcelSheetBackground'));">Run as Spreadsheet</button>
+		<button class="compileButton" id="compileToSpreadsheetButton" style="background-color:#009900;" onclick="disableDisplay(document.getElementById('samples'));enableDisplay(document.getElementById('ExcelSheet'));">Run as Spreadsheet</button>
 		<button class="compileButton" id="compileAndRuttonButton">Run in Console</button>
 	  </div>
 	</div>
@@ -223,17 +261,80 @@
 	  <div class="descriptionCell">
 	    <div class="descriptionCellTitle">Links</div>
 		<div class="descriptionDetails">
-		  Download the latest release <a href="__DOWNLOAD_LINK__">here</a>, click <a onclick="enableDisplay(document.getElementById('samples'));disableDisplay(document.getElementById('ExcelSheetBackground'));" style="text-decoration:underline;color:blue;cursor:pointer;">here</a> to try some samples, or <a href="__GITHUB_LINK__">view the source code on Github</a>.
+		  Download the latest release <a href="__DOWNLOAD_LINK__">here</a>, click <a onclick="enableDisplay(document.getElementById('samples'));disableDisplay(document.getElementById('ExcelSheet'));" style="text-decoration:underline;color:blue;cursor:pointer;">here</a> to try some samples, or <a href="__GITHUB_LINK__">view the source code on Github</a>.
         </div>
 	  </div>
 	</div>
     <textarea id="stdinData">3 5</textarea>
 	<div id="samples">
 	  <ul>
-	    <li>sample1.c</li>
-		<li>sample2.c</li>
+	    <li onclick="getSample('sample1.c');">sample1.c</li>
+		<li onclick="getSample('sample2.c');">sample2.c</li>
 	  </ul>
 	</div>
-	<img id="ExcelSheetBackground" src="Excel sheet background.PNG"><img>
+	<div id="ExcelSheet">
+	  <table>
+	    <tr>
+		  <td class="ExcelLeftBuffer"></td><td class="ExcelColumnA"></td><td class="ExcelColumnB"></td><td class="ExcelColumnC"></td>
+		</tr>
+	    <tr>
+		  <td class="ExcelLeftBuffer"></td><td class="ExcelColumnA"></td><td class="ExcelColumnB"></td><td class="ExcelColumnC"></td>
+		</tr>
+	    <tr style="height:218px;">
+		  <td class="ExcelLeftBuffer"></td><td class="ExcelColumnA"></td><td class="ExcelColumnB"></td><td class="ExcelColumnC"></td>
+		</tr>
+	    <tr>
+		  <td class="ExcelLeftBuffer"></td><td class="ExcelColumnA"></td><td class="ExcelColumnB"></td><td class="ExcelColumnC"></td>
+		</tr>
+	    <tr>
+		  <td class="ExcelLeftBuffer"></td><td class="ExcelColumnA"></td><td class="ExcelColumnB"></td><td class="ExcelColumnC"></td>
+		</tr>
+	    <tr>
+		  <td class="ExcelLeftBuffer"></td><td class="ExcelColumnA"></td><td class="ExcelColumnB"></td><td class="ExcelColumnC"></td>
+		</tr>
+	    <tr>
+		  <td class="ExcelLeftBuffer"></td><td class="ExcelColumnA"></td><td class="ExcelColumnB"></td><td class="ExcelColumnC"></td>
+		</tr>
+	    <tr>
+		  <td class="ExcelLeftBuffer"></td><td class="ExcelColumnA"></td><td class="ExcelColumnB"></td><td class="ExcelColumnC"></td>
+		</tr>
+	    <tr>
+		  <td class="ExcelLeftBuffer"></td><td class="ExcelColumnA"></td><td class="ExcelColumnB"></td><td class="ExcelColumnC"></td>
+		</tr>
+	    <tr>
+		  <td class="ExcelLeftBuffer"></td><td class="ExcelColumnA"></td><td class="ExcelColumnB"></td><td class="ExcelColumnC"></td>
+		</tr>
+	    <tr>
+		  <td class="ExcelLeftBuffer"></td><td class="ExcelColumnA"></td><td class="ExcelColumnB"></td><td class="ExcelColumnC"></td>
+		</tr>
+	    <tr>
+		  <td class="ExcelLeftBuffer"></td><td class="ExcelColumnA"></td><td class="ExcelColumnB"></td><td class="ExcelColumnC"></td>
+		</tr>
+	    <tr>
+		  <td class="ExcelLeftBuffer"></td><td class="ExcelColumnA"></td><td class="ExcelColumnB"></td><td class="ExcelColumnC"></td>
+		</tr>
+	    <tr>
+		  <td class="ExcelLeftBuffer"></td><td class="ExcelColumnA"></td><td class="ExcelColumnB"></td><td class="ExcelColumnC"></td>
+		</tr>
+	    <tr>
+		  <td class="ExcelLeftBuffer"></td><td class="ExcelColumnA"></td><td class="ExcelColumnB"></td><td class="ExcelColumnC"></td>
+		</tr>
+	    <tr>
+		  <td class="ExcelLeftBuffer"></td><td class="ExcelColumnA"></td><td class="ExcelColumnB"></td><td class="ExcelColumnC"></td>
+		</tr>
+	    <tr>
+		  <td class="ExcelLeftBuffer"></td><td class="ExcelColumnA"></td><td class="ExcelColumnB"></td><td class="ExcelColumnC"></td>
+		</tr>
+	    <tr>
+		  <td class="ExcelLeftBuffer"></td><td class="ExcelColumnA"></td><td class="ExcelColumnB"></td><td class="ExcelColumnC"></td>
+		</tr>
+	    <tr>
+		  <td class="ExcelLeftBuffer"></td><td class="ExcelColumnA"></td><td class="ExcelColumnB"></td><td class="ExcelColumnC"></td>
+		</tr>
+	    <tr>
+		  <td class="ExcelLeftBuffer"></td><td class="ExcelColumnA"></td><td class="ExcelColumnB"></td><td class="ExcelColumnC"></td>
+		</tr>
+	  </table>
+	</div>
   </body>
 </html>
