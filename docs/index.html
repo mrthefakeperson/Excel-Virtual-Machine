@@ -65,14 +65,16 @@
 		height: 408px;
 		float: left;
 	  }
-	  #codeContainer {
-	    height: 400px;
-		width: 726px;
+	  textarea {
 	    border: none;
 		shadow: none;
 		font-family: "Lucida Console", Monaco, monospace;
 	  }
-	  #consoleContainer {
+	  #codeContainer {
+	    height: 400px;
+		width: 726px;
+	  }
+	  #consoleContainerDiv {
 	    width: 100%;
 		height: 110px;
 		border-top-width: 1px;
@@ -81,6 +83,10 @@
 		border-top-style: solid;
 		border-bottom-style: solid;
 		font-family: "Lucida Console", Monaco, monospace;
+	  }
+	  #consoleContainer {
+	    width: 776px;
+		height: 110px;
 	  }
 	  #codeSettings {
 		padding: 10px;
@@ -177,6 +183,10 @@
 	  td {
 	    border: 1px solid transparent;
 		height: 14px;
+		white-space: pre;
+		vertical-align: top;
+		overflow: auto;
+		text-align: right;
 	  }
 	  .ExcelLeftBuffer {
 	    width: 18px;
@@ -211,18 +221,18 @@
 		file.send();
 	   };
 	</script>
-	<script src = "scripts/require.js"></script>
+	<script src="scripts/require.js"></script>
 	<script>
 	  requirejs(["scripts/main"]);
 	</script>
   </head>
   <body>
     <div id="navbar">
-	  <img alt="image here"></img>
-	  <a class="navbarLink" href="__GITHUB_LINK__"><div>Github</div></a>
+	  <img src="title image.PNG" alt="image here"></img>
+	  <a class="navbarLink" href="https://github.com/mrthefakeperson/Excel-Virtual-Machine/tree/v0.2"><div>Github</div></a>
 	  <a class="navbarLink" onclick="window.scrollTo(0,500);"><div>What is this?</div></a>
 	  <a class="navbarLink" onclick="enableDisplay(document.getElementById('samples'));disableDisplay(document.getElementById('ExcelSheet'));"><div>Samples</div></a>
-	  <a class="navbarLink" style="color:#555555;" href="__NEW_CODE_LINK__"><div>New Code</div></a>
+	  <a class="navbarLink" style="color:#555555;" href=""><div>New Code</div></a>
 	</div>
 	<div id="codeAndTitleContainer">
 	  <div id="codeTitle">
@@ -235,7 +245,9 @@
   printf("%i\n", a + b);
   return 0;
 }</textarea>
-	  <div id="consoleContainer"></div>
+	  <div id="consoleContainerDiv">
+	    <textarea id="consoleContainer" readonly></textarea>
+      </div>
 	  <div id="codeSettings">
 	    <select id="languageSelection">
 		  <option value="C">C</option>
@@ -261,7 +273,7 @@
 	  <div class="descriptionCell">
 	    <div class="descriptionCellTitle">Links</div>
 		<div class="descriptionDetails">
-		  Download the latest release <a href="__DOWNLOAD_LINK__">here</a>, click <a onclick="enableDisplay(document.getElementById('samples'));disableDisplay(document.getElementById('ExcelSheet'));" style="text-decoration:underline;color:blue;cursor:pointer;">here</a> to try some samples, or <a href="__GITHUB_LINK__">view the source code on Github</a>.
+		  Download the latest release <a href="https://github.com/mrthefakeperson/Excel-Virtual-Machine/releases/tag/v0.2">here</a>, click <a onclick="enableDisplay(document.getElementById('samples'));disableDisplay(document.getElementById('ExcelSheet'));" style="text-decoration:underline;color:blue;cursor:pointer;">here</a> to try some samples, or <a href="https://github.com/mrthefakeperson/Excel-Virtual-Machine/tree/v0.2">view the source code on Github</a>.
         </div>
 	  </div>
 	</div>
@@ -273,7 +285,7 @@
 	  </ul>
 	</div>
 	<div id="ExcelSheet">
-	  <table>
+	  <table style="table-layout:fixed;">
 	    <tr>
 		  <td class="ExcelLeftBuffer"></td><td class="ExcelColumnA"></td><td class="ExcelColumnB"></td><td class="ExcelColumnC"></td>
 		</tr>
@@ -336,5 +348,13 @@
 		</tr>
 	  </table>
 	</div>
+	<script>
+	  let excelTable = document.getElementById("ExcelSheet").childNodes[1].childNodes[1];
+	  for (let e = 1; e < 20; e++) {
+	    excelTable.childNodes[e*2].childNodes[2].id = "A" + e;
+	    excelTable.childNodes[e*2].childNodes[3].id = "B" + e;
+	    excelTable.childNodes[e*2].childNodes[4].id = "C" + e;
+	  }
+	</script>
   </body>
 </html>

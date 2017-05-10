@@ -22,7 +22,7 @@ let main argv =
     ignore (stdin.ReadLine())
 //    Output.Implementation.debugPseudoASM "test.s" [Push "5"; Push "1"] [Div]
     ()
-  |[|"help"|] -> printfn "first argument should be the input file; -outputExcelFile outputs an Excel file"
+  |[||] | [|"help"|] -> printfn "first argument should be the input file; -outputExcelFile outputs an Excel file"
   |args ->
     let openAndCompile: string[] -> unit =
       Project.Input.Implementation.fromCommandLine
