@@ -2,7 +2,7 @@
 
 int main()
 {
-  int height = 7;
+  int height = 5;
   for (int i = 0; i < height; i++) {
     int padding = height - i;
     for (int j = 0; j < padding; j++)
