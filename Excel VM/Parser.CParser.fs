@@ -29,7 +29,7 @@ let preprocess:string -> Token list =
        (negate
          (isWhitespace >>|| isDelimitedString "//" "\n" >>|| isDelimitedString "/*" "*/"))
    >> List.map (fun e -> Token e)
-let listOfDatatypeNamesDefault =    // can be simplified if all datatypes are 1 or 2 tokens
+let listOfDatatypeNamesDefault =
   List.sortBy (fun (e:string) -> -(e.Split ' ').Length) [
     "int"; "long long"; "long"; "bool"; "char"; "unsigned"; "unsigned int";
     "unsigned long int"; "unsigned long long int"; "long int"; "long long int"
@@ -42,7 +42,6 @@ type State =
   |Local
   |LocalImd    // keywords must appear at the beginning of a statement; LocalImd doesn't include them
 let rec parse state stop fail left right =
-//    printfn "%A" (left, right)
   match stop right, fail right, state with
   |true, _, _ -> Token("sequence", List.rev left), right
   |_, true, _ -> failwithf "tokens are incomplete: %A" (left, right)
@@ -71,8 +70,6 @@ let rec parse state stop fail left right =
       |_ -> failwithf "unknown: %A" (left, right)
     |Local ->
       match left, right with
-//        |T ";"::T _::restl, right    //single value as a statement is meaningless
-//        |T ";"::restl, right -> parse Local stop fail restl right        //handles a(b); after a(b) has been parsed
       |T ";"::_, a::restr -> parse Local stop fail (a::left) restr
       |DatatypeLocal state stop fail x
       |Brackets state stop fail x

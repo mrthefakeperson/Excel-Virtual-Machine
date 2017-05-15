@@ -19,7 +19,7 @@ let generateCommands cmds =
   let getTextAddress = sprintf "defined_%i"
   let convertStrings = fun i -> function
     |Push s when not (fst (Int32.TryParse s)) ->
-      printfn "found string `%s`" ((s.Replace("\n", "\\n")))
+//      printfn "found string `%s`" ((s.Replace("\n", "\\n")))
       Some (sprintf "%s:\t.ascii \"%s\0\"" (getTextAddress i) (s.Replace("\n", "\\n"))),
        Push ("$" + getTextAddress i)
     |x -> None, x

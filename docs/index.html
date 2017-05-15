@@ -159,7 +159,7 @@
 		border-style: solid;
 		background: #ffffff;
 		box-shadow: 0px 0px 10px #bbbbbb;
-		display: none;
+		padding-left: 20px;
 	  }
 	  li {
 	    cursor: pointer;
@@ -239,12 +239,8 @@
 	    Enter your source code or insert <a onclick="enableDisplay(document.getElementById('samples'));disableDisplay(document.getElementById('ExcelSheet'));" style="color:blue;cursor:pointer;">sample</a> below:
 	  </div>
 	  <div id="codeNumbering">1</div>
-	  <textarea id="codeContainer">int main()
-{
-  int a, b; scanf("%i%i", &a, &b);
-  printf("%i\n", a + b);
-  return 0;
-}</textarea>
+	  <textarea id="codeContainer"></textarea>
+	  <script>getSample('APlusB.c');</script>
 	  <div id="consoleContainerDiv">
 	    <textarea id="consoleContainer" readonly></textarea>
       </div>
@@ -279,9 +275,13 @@
 	</div>
     <textarea id="stdinData">3 5</textarea>
 	<div id="samples">
+	  <h4>Load one of the files below:</h4>
 	  <ul>
-	    <li onclick="getSample('sample1.c');">sample1.c</li>
-		<li onclick="getSample('sample2.c');">sample2.c</li>
+		<li onclick="getSample('HelloWorld.c');">HelloWorld.c</li>
+		<li onclick="getSample('APlusB.c');">APlusB.c</li>
+		<li onclick="getSample('AsciiTriangle.c');">AsciiTriangle.c</li>
+		<li onclick="getSample('Recursion.c');">Recursion.c</li>
+		<li onclick="getSample('Struct.c');">Struct.c</li>
 	  </ul>
 	</div>
 	<div id="ExcelSheet">
