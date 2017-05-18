@@ -815,7 +815,7 @@ define(["exports", "fable-core/umd/List", "./Parser.Lexer", "./Parser.Definition
                 break;
 
               case 1:
-                throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 131, 12);
+                throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 128, 12);
                 break;
             }
 
@@ -1650,7 +1650,7 @@ define(["exports", "fable-core/umd/List", "./Parser.Lexer", "./Parser.Definition
             return [$var81[1], $var81[2]];
 
           case 1:
-            throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 209, 8);
+            throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 206, 8);
         }
 
       case 1:
@@ -1734,7 +1734,7 @@ define(["exports", "fable-core/umd/List", "./Parser.Lexer", "./Parser.Definition
             return [$var84[1], $var84[2]];
 
           case 1:
-            throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 215, 8);
+            throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 212, 8);
         }
 
       case 1:
@@ -2129,7 +2129,7 @@ define(["exports", "fable-core/umd/List", "./Parser.Lexer", "./Parser.Definition
                         return [$var91[1], $var91[2]];
 
                       case 1:
-                        throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 240, 10);
+                        throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 237, 10);
                     }
 
                 }
@@ -2501,15 +2501,15 @@ define(["exports", "fable-core/umd/List", "./Parser.Lexer", "./Parser.Definition
                     return [new State("Local", []), $var97[1], new _List2.default(parsed, patternInput_3[1])];
 
                   case 1:
-                    throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 275, 8);
+                    throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 272, 8);
                 }
 
               case 1:
-                throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 273, 8);
+                throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 270, 8);
             }
 
           case 1:
-            throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 271, 8);
+            throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 268, 8);
         }
 
       case 1:
@@ -2857,7 +2857,7 @@ define(["exports", "fable-core/umd/List", "./Parser.Lexer", "./Parser.Definition
                 break;
 
               case 1:
-                throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 313, 12);
+                throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 310, 12);
                 break;
             }
 
@@ -2964,7 +2964,7 @@ define(["exports", "fable-core/umd/List", "./Parser.Lexer", "./Parser.Definition
                     break;
 
                   case 1:
-                    throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 318, 12);
+                    throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 315, 12);
                     break;
                 }
 
@@ -3437,7 +3437,7 @@ define(["exports", "fable-core/umd/List", "./Parser.Lexer", "./Parser.Definition
             return [state, $var126[2], new _List2.default(parsed, $var128[2])];
 
           case 1:
-            throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 358, 8);
+            throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 355, 8);
         }
 
       case 1:
@@ -3765,7 +3765,7 @@ define(["exports", "fable-core/umd/List", "./Parser.Lexer", "./Parser.Definition
       if (activePatternResult662[0] === "sequence") {
         return _Parser2.Token[".ctor_2"]("sequence", (0, _List.append)(activePatternResult662[1], (0, _List.ofArray)([_Parser2.Token[".ctor_2"]("apply", (0, _List.ofArray)([_Parser2.Token[".ctor_3"]("main"), _Parser2.Token[".ctor_3"]("()")]))])));
       } else {
-        throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 400, 6);
+        throw new Error("C:\\Users\\Thefak\\Documents\\Visual Studio 2013\\Projects\\Excel VM\\build-docs\\../Excel VM/Parser.CParser.fs", 397, 6);
       }
     }(postProcess(function (_arg2) {
       return null;

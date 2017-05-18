@@ -717,7 +717,7 @@ define(["exports", "../Excel VM/PseudoASM.Definition", "fable-core/umd/Symbol", 
       return _class13;
     }(Op))()]);
 
-    var interpretPAsm = __exports.interpretPAsm = function (debug, getInput, sendOutput, cmds) {
+    var interpretPAsm = __exports.interpretPAsm = function (act, getInput, sendOutput, cmds) {
       var pushstack = function pushstack(stack) {
         return function (v) {
           stack.contents = new _List2.default(v, stack.contents);
@@ -892,23 +892,7 @@ define(["exports", "../Excel VM/PseudoASM.Definition", "fable-core/umd/Symbol", 
           throw new Error("failed");
         }
 
-        if (debug) {
-          (0, _String.fsFormat)("%A")(function (x) {
-            console.log(x);
-          })(cmds[i_2]);
-          (0, _String.fsFormat)("stack %A")(function (x) {
-            console.log(x);
-          })(stacks.get(patternInput[1]).contents);
-          (0, _String.fsFormat)("heap [%s]")(function (x) {
-            console.log(x);
-          })((0, _String.join)("; ", (0, _Seq.map)((0, _String.fsFormat)("%A")(function (x) {
-            return x;
-          }), heap)));
-          (0, _String.fsFormat)("instruction %s")(function (x) {
-            console.log(x);
-          })(top(patternInput[0]));
-        }
-
+        act(stacks)(heap)(cmds[i_2]);
         var pt = Number.parseInt(top(patternInput[0]));
         pop(patternInput[0]);
         push(patternInput[0])(String(pt + 1));
@@ -918,13 +902,10 @@ define(["exports", "../Excel VM/PseudoASM.Definition", "fable-core/umd/Symbol", 
     return __exports;
   }({});
 
-  function compileAndRun(getInput, sendOutput, txt) {
-    (function () {
-      var debug = false;
-      return function (cmds) {
-        Interpreter.interpretPAsm(debug, getInput, sendOutput, cmds);
-      };
-    })()(Array.from(function (tupledArg) {
+  function compileAndRun(act, getInput, sendOutput, txt) {
+    (function (cmds) {
+      Interpreter.interpretPAsm(act, getInput, sendOutput, cmds);
+    })(Array.from(function (tupledArg) {
       return (0, _PseudoASM2.fromAST)(tupledArg[0], tupledArg[1]);
     }(function (tupledArg_1) {
       return (0, _AST.fromToken)(tupledArg_1[0], tupledArg_1[1]);

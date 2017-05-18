@@ -52,7 +52,7 @@ module Interpreter =
     {new Op(And) with override x.Apply a b = castToBoolThen (k (&&)) a b}
     {new Op(Or) with override x.Apply a b = castToBoolThen (k (||)) a b}
    ]
-  let interpretPAsm debug getInput sendOutput cmds =
+  let interpretPAsm act getInput sendOutput cmds =
     let pushstack stack v = stack := v :: !stack
     let popstack stack = stack := match !stack with _ :: tl -> tl | [] -> []
     let topstack stack = match !stack with hd :: _ -> hd | [] -> failwith "took top of an empty stack"
@@ -106,23 +106,18 @@ module Interpreter =
         printfn "heap [%s]" (String.concat "; " (Seq.map (sprintf "%A") heap))
         printfn "%A" cmds.[i]
         failwith "failed"
-      if debug then
-        printfn "%A" cmds.[i]
-        printfn "stack %A" !stacks.[value]
-        printfn "heap [%s]" (String.concat "; " (Seq.map (sprintf "%A") heap))
-        printfn "instruction %s" (top instr)
-//        ignore (stdin.ReadLine())
+      act stacks heap cmds.[i]
       let pt = int(top instr)
       pop instr; push instr (string(pt+1))
 
 
-let compileAndRun getInput sendOutput txt =
+let compileAndRun act getInput sendOutput txt =
   Parser.Implementation.fromString (txt, Map ["language", "C"])
    |> AST.Implementation.fromToken
    |> PseudoASM.Implementation.fromAST
    |> fst
    |> Array.ofSeq
-   |> Interpreter.interpretPAsm false getInput sendOutput
+   |> Interpreter.interpretPAsm act getInput sendOutput
 
 
 //compileAndRun (ignore >> stdin.ReadLine) stdout.WriteLine "int main(){printf(\"%i\", 45);}"

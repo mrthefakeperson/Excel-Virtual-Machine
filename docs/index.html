@@ -187,6 +187,7 @@
 		vertical-align: top;
 		overflow: auto;
 		text-align: right;
+		font-size: 12px;
 	  }
 	  .ExcelLeftBuffer {
 	    width: 18px;
@@ -249,8 +250,10 @@
 		  <option value="C">C</option>
 		</select>
 		<button id="stdinButton" onclick="toggleDisplay(document.getElementById('stdinData'));">stdin</button>
-		<button class="compileButton" id="compileToSpreadsheetButton" style="background-color:#009900;" onclick="disableDisplay(document.getElementById('samples'));enableDisplay(document.getElementById('ExcelSheet'));">Run as Spreadsheet</button>
-		<button class="compileButton" id="compileAndRuttonButton">Run in Console</button>
+		<button class="compileButton" id="compileToSpreadsheetButton" style="background-color:#009900;"
+		  onclick="disableDisplay(document.getElementById('samples'));enableDisplay(document.getElementById('ExcelSheet'));document.getElementById('consoleContainer').value='> Excel_VM code.c -outputExcelFile';"
+		 >Run as Spreadsheet</button>
+		<button class="compileButton" id="compileAndRunButton">Run in Console</button>
 	  </div>
 	</div>
 	<div id="informationSection">
