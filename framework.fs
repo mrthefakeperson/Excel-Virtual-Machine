@@ -22,9 +22,9 @@ type Rule(name) =
     |_ -> None
   member it.is(token: string) : rule = it.isOneOf token
   member it.isSequenceOf([<ParamArray>]rules: Lazy<rule>[]) : rule = fun tokens ->
-    if not (Array.isEmpty rules) then
-      let x = rules.[0]
-      rules.[0] <- lazy addRecursionGuard (x.Force())
+    // if not (Array.isEmpty rules) then  // be careful doing this! adding it to multiple rules in `isOneOf` will cause collisions
+    //   let x = rules.[0]
+    //   rules.[0] <- lazy addRecursionGuard (x.Force())
     Array.fold (fun state (rule: Lazy<rule>) ->
       let (|Rule|_|) = rule.Force()
       match state with
@@ -43,3 +43,12 @@ type Rule(name) =
       |Rule(x, rest) -> matchWhile (T(name, [acc; x])) rest
       |tokens -> acc, tokens
     function Rule(x, rest) -> Some(matchWhile x rest) | _ -> None
+
+let optional ((|Rule|_|): rule) = function Rule x -> Some x | tokens -> Some(T("", []), tokens)
+
+let debug msg (rule: rule) e =
+  printfn "%s" msg
+  printfn "%A" e
+  let yld = rule e
+  printfn "result: %A" yld
+  yld
