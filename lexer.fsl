@@ -1,0 +1,26 @@
+{
+module Lexer
+open Microsoft.FSharp.Text.Lexing
+
+let lexeme = LexBuffer<_>.LexemeString
+}   
+  
+// regex macros   
+let char        = ['a'-'z' 'A'-'Z']   
+let digit       = ['0'-'9']   
+let int         = '-'?digit+   
+let float       = '-'?digit+ '.' digit+   
+let whitespace  = [' ' '\t']   
+let newline     = "\n\r" | '\n' | '\r'
+let important = 'L' | '.' | char | '(' | ')'
+  
+// rules   
+rule tokenize1 = parse   
+| whitespace    { tokenize1 lexbuf }   
+| newline       { lexbuf.EndPos <- lexbuf.EndPos.NextLine; tokenize1 lexbuf; }
+| important     { lexeme lexbuf }
+| eof           { sprintf "%c" (char 0) }
+
+{
+let tokenize = LexBuffer<_>.FromString >> Seq.unfold (fun lexbuf -> if lexbuf.IsPastEndOfStream then None else Some(tokenize1 lexbuf, lexbuf))
+}
