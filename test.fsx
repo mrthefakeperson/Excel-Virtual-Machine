@@ -12,7 +12,7 @@ let text = """
 let tokens = Lexer.tokenize text |> List.ofSeq
 
 let anything: Lazy<rule> = lazy function hd::rest -> Some(T(hd, []), rest) | _ -> None
-let var = lazy Rule().isOneOf("x", "y", "z")
+let var = lazy Rule().is("[xyz]")
 let prop = lazy Rule("prop").isSequenceOf(var, lazy Rule().is "=", anything)
 let openTag =  // note: only the last one of `isSequenceOf` should be `isOneOf`, or otherwise it won't work (fail on one branch -> doesn't check others)
   lazy Rule("open tag").isSequenceOf(lazy Rule().is "<", var, lazy optional (Rule().isManyOf prop), lazy Rule().is ">")

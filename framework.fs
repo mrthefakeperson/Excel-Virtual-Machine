@@ -1,5 +1,6 @@
 module Framework
 open System
+open System.Text.RegularExpressions
 
 type AST = T of string * AST list
 
@@ -18,7 +19,7 @@ type Rule(name) =
   new() = Rule("")
   // create matching function from <type>
   member it.isOneOf([<ParamArray>]tokens: string[]) : rule = function
-    |x::rest when Array.exists ((=) x) tokens -> Some(T(x, []), rest)
+    |x::rest when Array.exists (fun e -> Regex.IsMatch(e, x)) tokens -> Some(T(x, []), rest)
     |_ -> None
   member it.is(token: string) : rule = it.isOneOf token
   member it.isSequenceOf([<ParamArray>]rules: Lazy<rule>[]) : rule = fun tokens ->
