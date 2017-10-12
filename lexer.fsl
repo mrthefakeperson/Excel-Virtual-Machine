@@ -14,7 +14,7 @@ let int         = '-'?digit+
 let float       = '-'?digit+ '.' digit+   
 let variable    = (char | '_')(char | digit | '_')*
 let string      = '"'("\\\"" | [^'"'])*'"'
-let reserved    = ['<' '>' '/' '=']
+let reserved    = [':' ',' '{' '}' '[' ']']
   
 // rules   
 rule tokenize1 = parse   

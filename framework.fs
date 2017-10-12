@@ -19,9 +19,12 @@ type Rule(name) =
   new() = Rule("")
   // create matching function from <type>
   member it.isOneOf([<ParamArray>]tokens: string[]) : rule = function
-    |x::rest when Array.exists (fun e -> Regex.IsMatch(e, x)) tokens -> Some(T(x, []), rest)
+    |x::rest when Array.exists ((=) x) tokens -> Some(T(x, []), rest)
     |_ -> None
   member it.is(token: string) : rule = it.isOneOf token
+  member it.matches(xpr: string) : rule = function
+    |x::rest when Regex.IsMatch(x, xpr) -> Some(T(x, []), rest)
+    |_ -> None
   member it.isSequenceOf([<ParamArray>]rules: Lazy<rule>[]) : rule = fun tokens ->
     // if not (Array.isEmpty rules) then  // be careful doing this! adding it to multiple rules in `isOneOf` will cause collisions
     //   let x = rules.[0]
