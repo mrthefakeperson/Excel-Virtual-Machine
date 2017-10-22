@@ -15,29 +15,32 @@ type Rule = unit -> rule
 let Rename name (rule: Rule) () : rule =
   let (|Rule|_|) = rule()
   function Rule(T(_, ch), rest) -> Some(T(name, ch), rest) | _ -> None
+let (/<-) = Rename
+let (->/) a b = Rename b a
 let Clean (rule: Rule) () : rule =
   let (|Rule|_|) = rule()
   let rec clean = function
     T(name, ch) -> T(name, List.map clean ch |> List.collect (function T("", ch') -> ch' | e -> [e]))
   function Rule(ast, rest) -> Some(clean ast, rest) | _ -> None
+let (!!!) = Clean
 let Equals(token: string) () : rule =
   function x::rest when x = token -> Some(T(x, []), rest) | _ -> None
 let (!) = Equals
 let Matches(xpr: string) () : rule =
   function x::rest when Regex.IsMatch(x, xpr) -> Some(T(x, []), rest) | _ -> None
 let (!!) = Matches
-let (/+) (x: Rule) (y: Rule) () : rule = fun tokens ->
+let (+/) (x: Rule) (y: Rule) () : rule = fun tokens ->
   let (|MatchesX|_|), (|MatchesY|_|) = x(), y()
   match tokens with
   |MatchesX(xAST, MatchesY(yAST, rest)) -> Some(T("", [xAST; yAST]), rest)
   |_ -> None
-let IsSequenceOf([<ParamArray>]rules: Rule[]) : rule = Array.reduce (/+) rules ()
-let (/|) (x: Rule) (y: Rule) () : rule = fun tokens ->
+let IsSequenceOf(rules: #seq<Rule>) : rule = Seq.reduce (+/) rules ()
+let (|/) (x: Rule) (y: Rule) () : rule = fun tokens ->
   let (|MatchesX|_|), (|MatchesY|_|) = x(), y()
   match tokens with
   |MatchesX(ast, rest) | MatchesY(ast, rest) -> Some(ast, rest)
   |_ -> None
-let IsOneOf([<ParamArray>]rules: Rule[]) : rule = Array.reduce (/|) rules ()
+let IsOneOf(rules: #seq<Rule>) : rule = Seq.reduce (|/) rules ()
 let IsManyOf(rule: Rule) () : rule =
   let (|Rule|_|) = rule()
   let rec matchWhile acc = function

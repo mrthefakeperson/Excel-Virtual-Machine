@@ -15,13 +15,13 @@ let _var = !!"[a-z A-Z][a-z 0-9 A-Z _]*"
 let _string = !!"\"(\\\"|[^\"])*\""
 let _int = !!"-?[0-9]+"
 let rec value() = () |> (
-  Rename "object" (Equals "{" /+ ~~assignmentSeq /+ !"}")
-   /| Rename "list" (Equals "[" /+ ~~valueSeq /+ !"]")
-   /| _string /| _int
+  !"{" +/ ~~assignmentSeq +/ !"}" ->/ "object"
+   |/ !"[" +/ ~~valueSeq +/ !"]" ->/ "list"
+   |/ _string |/ _int
  )
-and valueSeq() = () |> value /+ ~~(+(!"," /+ value))
-and assignment() = () |> Rename "assignment" (_var /+ !":" /+ value)
-and assignmentSeq() = () |> Clean (assignment /+ ~~(+(!"," /+ assignment)))
+and valueSeq() = () |> value +/ ~~(+(!"," +/ value))
+and assignment() = () |> _var +/ !":" +/ value ->/ "assignment"
+and assignmentSeq() = () |> !!!(assignment +/ ~~(+(!"," +/ assignment)))
 
 // let _var = lazy Rule().matches("[a-z A-Z][a-z 0-9 A-Z _]*")
 // let _string = lazy Rule().matches("\"(\\\"|[^\"])*\"")
