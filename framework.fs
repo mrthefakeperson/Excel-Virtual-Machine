@@ -23,37 +23,42 @@ let Clean (rule: Rule) () : rule =
     T(name, ch) -> T(name, List.map clean ch |> List.collect (function T("", ch') -> ch' | e -> [e]))
   function Rule(ast, rest) -> Some(clean ast, rest) | _ -> None
 let (!!!) = Clean
-let Equals(token: string) () : rule =
+let Pass = Rename ""
+let Equal(token: string) () : rule =
   function x::rest when x = token -> Some(T(x, []), rest) | _ -> None
-let (!) = Equals
-let Matches(xpr: string) () : rule =
+let (!) = Equal >> Pass
+let (~%) = Equal
+let Match(xpr: string) () : rule =
   function x::rest when Regex.IsMatch(x, xpr) -> Some(T(x, []), rest) | _ -> None
-let (!!) = Matches
+let (!!) = Match >> Pass
+let (~%%) = Match
 let (+/) (x: Rule) (y: Rule) () : rule = fun tokens ->
   let (|MatchesX|_|), (|MatchesY|_|) = x(), y()
   match tokens with
   |MatchesX(xAST, MatchesY(yAST, rest)) -> Some(T("", [xAST; yAST]), rest)
   |_ -> None
-let IsSequenceOf(rules: #seq<Rule>) : rule = Seq.reduce (+/) rules ()
+let SequenceOf(rules: #seq<Rule>) : rule = Seq.reduce (+/) rules ()
 let (|/) (x: Rule) (y: Rule) () : rule = fun tokens ->
   let (|MatchesX|_|), (|MatchesY|_|) = x(), y()
   match tokens with
   |MatchesX(ast, rest) | MatchesY(ast, rest) -> Some(ast, rest)
   |_ -> None
-let IsOneOf(rules: #seq<Rule>) : rule = Seq.reduce (|/) rules ()
-let IsManyOf(rule: Rule) () : rule =
+let OneOf(rules: #seq<Rule>) : rule = Seq.reduce (|/) rules ()
+let ListOf(rule: Rule) () : rule =
   let (|Rule|_|) = rule()
   let rec matchWhile acc = function
     |Rule(ast, rest) -> matchWhile (ast::acc) rest
     |tokens -> T("", List.rev acc), tokens
   function Rule(ast, rest) -> Some(matchWhile [ast] rest) | _ -> None
-let (~+) = IsManyOf
-let IsOptional(rule: Rule) () : rule =
+let (~+) = ListOf
+let Optional(rule: Rule) () : rule =
   let (|Rule|_|) = rule()
   function Rule(ast, rest) -> Some(ast, rest) | tokens -> Some(T("", []), tokens)
-let (~~) = IsOptional
+let (~~) = Optional
+let JoinedListOf (rule: Rule) (delimiter: Rule) = rule +/ ~~(+(delimiter +/ rule))
+let (&/) = JoinedListOf 
 
-// type RuleDetails = {name: string; clean: bool}
+let test (tokenize: string -> string list) (rule: Rule) = List.map (tokenize >> rule())
 
 // type RuleBuilder(detailList') =
 //   let mutable detailList = detailList'

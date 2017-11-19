@@ -14,7 +14,8 @@ let int         = '-'?digit+
 let float       = '-'?digit+ '.' digit+   
 let variable    = (char | '_')(char | digit | '_')*
 let string      = '"'("\\\"" | [^'"'])*'"'
-let reserved    = [':' ',' '{' '}' '[' ']']
+let datatype    = "int" | "char" | "bool" | "long" | "double" | "float" | "void"
+let reserved    = [':' ',' '{' '}' '[' ']' '-' '+' '*' '/' '(' ')' ';' '=' '!' '&'] | "if" | "while" | "for" | datatype
   
 // rules   
 rule tokenize1 = parse   
@@ -28,5 +29,8 @@ rule tokenize1 = parse
 | eof           { "" }
 
 {
-let tokenize = LexBuffer<_>.FromString >> Seq.unfold (fun lexbuf -> if lexbuf.IsPastEndOfStream then None else Some(tokenize1 lexbuf, lexbuf))
+let tokenize =
+  LexBuffer<_>.FromString
+   >> Seq.unfold (fun lexbuf -> if lexbuf.IsPastEndOfStream then None else Some(tokenize1 lexbuf, lexbuf))
+   >> List.ofSeq
 }
