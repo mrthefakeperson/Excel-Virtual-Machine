@@ -143,6 +143,12 @@ astx_to_ast_converters.Add(function
             Assign(Value(Variable(value_name, datatype)), ast)
           |Value(Variable(value_name, Unknown ll)) when ll = [] || List.exists ((=) datatype) ll ->
             Value(Variable(value_name, datatype))
+          |Index(Value(Variable(value_name, Unknown ll)), Value(Literal _)) ->
+            Assign(Value(Variable(value_name, Pointer(datatype))), Value(Variable("placeholder", Unknown [])))
+          |Apply(Value(Variable("*prefix", _)), [Value(Variable(value_name, Unknown ll))]) ->
+            Value(Variable(value_name, Pointer(datatype)))
+          |Assign(Apply(Value(Variable("*prefix", _)), [Value(Variable(value_name, Unknown ll))]), ast) ->
+            Assign(Value(Variable(value_name, Pointer(datatype))), ast)
           |unexpected -> failwithf "bad declare statement: %A" unexpected
          ) (List.map convert_astx_to_ast declared_values)
      )
@@ -224,7 +230,8 @@ astx_to_ast_converters.Add(function
 let parseGlobalScope =
   //let rec parseGlobal() = () |> (declareFunction |/ declareValue +/ !";") +/ (EOF |/ parseGlobal)
   //parseGlobal ->/ "global level parse"
-  ListOf (declareFunction |/ declareValue +/ !";") +/ EOF ->/ "global level parse"
+  let try_parse_decl = declareFunction |/ declareValue +/ !";"
+  ListOf try_parse_decl +/ (EOF |/ try_parse_decl) ->/ "global level parse"  // try_parse_decl in parallel with EOF to get correct error messages
 astx_to_ast_converters.Add(function
   |T("global level parse", values) -> Some (GlobalParse(List.map convert_astx_to_ast values))
   |_ -> None
@@ -241,5 +248,5 @@ let parse_tokens_to_ast tokens =
   match result with
   |Yes(astx, []) -> convert_astx_to_ast astx
   |Yes(_, fail::_) -> failwithf "unexpected token: %A" fail
-  |No error -> failwith error
+  |No(error, rest) -> failwithf "%s\n%A" error rest
   

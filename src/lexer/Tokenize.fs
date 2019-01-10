@@ -16,7 +16,8 @@ and tokenize: string -> string list = function
   |Rgx "[0-9]+\.[0-9]*\w?" x  // float
   |Rgx "[\w]+" x
   |Rgx "\"(\\\\\\\"|[^\"])*\"" x  // string
-  |Rgx "(--|\+\+|>=|<=|==|!=)" x  // other tokens
+  |Rgx "'\\\\?.'" x   // char
+  |Rgx "(--|\+\+|>=|<=|==|!=|&)" x  // other tokens
   |Rgx "[{}();,=+\-*/%<>\[\]]" x
   |Rgx WHITESPACE x -> x
   |"" -> []
