@@ -5,28 +5,21 @@ open System.IO
 let text = """
 #include <stdio.h>
 
-// Variable declaration:
-extern int a, b;
-extern int c;
-extern float f;
-
 int main () {
 
-   /* variable definition: */
-   int a, b;
-   int c;
-   float f;
- 
-   /* actual initialization */
-   a = 10;
-   b = 20;
-  
-   c = a + b;
-   printf("value of c : %d \n", c);
+   int n[ 10 ]; /* n is an array of 10 integers */
+   int i,j;
 
-   f = 70.0/3.0;
-   printf("value of f : %f \n", f);
- 
+   /* initialize elements of array n to 0 */
+   for ( i = 0; i < 10; i++ ) {
+      n[ i ] = i + 100; /* set element at location i to i + 100 */
+   }
+
+   /* output each array element's value */
+   for (j = 0; j < 10; j++ ) {
+      printf("Element[%d] = %d\n", j, n[j] );
+   }
+
    retur 0;
 }
 """
@@ -48,7 +41,7 @@ int main () {
 open Parser.Combinators
 [<EntryPoint>]
 let main argv =
-  //let tokens = tokenize_text text2
+  //let tokens = tokenize_text text
   //List.iter (printfn "%O") tokens
   //try
   //  let ast = parse_tokens_to_ast tokens
@@ -58,7 +51,7 @@ let main argv =
 
   Directory.GetFiles("../../../samples")
    |> Array.sortBy (fun fname -> int(fname.Replace(".c", "").Replace("../../../samples\\", "")))
-   |> Seq.skip 17
+   |> Seq.skip 0  // 17
    |> Seq.iter (fun fname ->
         let text = File.ReadAllText fname
         printfn "file: %s\n\ntext:\n%s\n\n\nlex:" fname text

@@ -10,14 +10,15 @@ let rec (|Rgx|_|) pattern txt =
   |matched -> Some(matched :: tokenize (txt.Substring(matched.Length)))
 
 and tokenize: string -> string list = function
-  |Rgx "#[^\n]*" x  // preprocessor
+  |Rgx "#[^\n]*" x  // preprocessor (TODO: do something)
   |Rgx "//[^\n]*" x  // single line comment
   |Rgx "/\*((?!\*/).)*\*/" x  // multiline comment
+    -> x.Tail
   |Rgx "[0-9]+\.[0-9]*\w?" x  // float
   |Rgx "[\w]+" x
   |Rgx "\"(\\\\\\\"|[^\"])*\"" x  // string
   |Rgx "'\\\\?.'" x   // char
-  |Rgx "(--|\+\+|>=|<=|==|!=|&)" x  // other tokens
+  |Rgx "(--|\+\+|>=|<=|==|!=|&&|\|\||&|\+=|-=|\*=|/=|&=|\|=)" x  // other tokens
   |Rgx "[{}();,=+\-*/%<>\[\]]" x
   |Rgx WHITESPACE x -> x
   |"" -> []

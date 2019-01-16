@@ -61,6 +61,8 @@
     <Compile Include="parser\AST.fs" />
     <Compile Include="parser\Combinators.fs" />
     <Compile Include="parser\Main.fs" />
+    <Compile Include="codegen\Tables.fs" />
+    <Compile Include="codegen\Main.fs" />
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
