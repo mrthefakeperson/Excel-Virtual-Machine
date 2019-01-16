@@ -338,5 +338,5 @@ let parse_tokens_to_ast tokens =
   match result with
   |Yes(parsed, []) -> parsed
   |Yes(_, fail::_) -> failwithf "unexpected token: %A" fail
-  |No(err, rest) -> failwithf "error: %s\n%A" err rest
+  |Error(err, rest) -> failwithf "error: %s\n%A" err rest
   

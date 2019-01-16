@@ -1,5 +1,6 @@
 ﻿module Parser.Combinators
 open System.Text.RegularExpressions
+open System.Collections.Generic
 open Lexer.Token
 
 // syntax:
@@ -10,7 +11,22 @@ open Lexer.Token
 
 type 'a Result =
   |Yes of 'a * Token list
-  |No of string * Token list  // fail message associates with longest successful parse path
+  |No of int * Token list  // fail message associates with longest successful parse path
+
+let match_symbols = ResizeArray()
+let symbol_code = Dictionary()
+let register_symbol s =
+  if not (symbol_code.ContainsKey s) then
+    symbol_code.[s] <- match_symbols.Count
+    match_symbols.Add s
+  symbol_code.[s]
+
+let (|Error|) = function
+  |No(code, rest) ->
+    let token_values = List.map (fun e -> e.value) rest
+    let error = sprintf "expected %s before %A" match_symbols.[code] token_values
+    Error(error, rest)
+  |_ -> failwith "not how this is used; match Yes(...) separately"
 
 type 'a rule = Token list -> 'a Result
 
@@ -39,8 +55,7 @@ let Equal(token: string) () : string rule = function
   |{value=v}::rest when v = token -> Yes(v, rest)
   |tokens ->
     let token_values = List.map (fun e -> e.value) tokens
-    let error = sprintf "expected %s before %A" token token_values
-    No(error, tokens)
+    No(register_symbol token, tokens)
 let (!) = Equal >> Pass
 let (~%) = Equal
 
@@ -48,16 +63,13 @@ let Match(xpr: string) () : string rule = function
   |{value=v}::rest when Regex.Match(v, xpr).Value = v -> Yes(Regex.Match(v, xpr).Value, rest)
   |tokens ->
     let token_values = List.map (fun e -> e.value) tokens
-    let error = sprintf "expected (%s) before %A" xpr token_values
-    No(error, tokens)
+    No(register_symbol (sprintf "(%s)" xpr), tokens)
 let (!!) = Match >> Pass
 let (~%%) = Match
 
 let EOF () : unit rule = function
   |[] -> Yes((), [])
-  |tokens ->
-    let token_values = List.map (fun e -> e.value) tokens
-    No(sprintf "expected EOF at %A" token_values, tokens)
+  |tokens -> No(register_symbol "EOF", tokens)
 
 let (+/) (x: 'a Rule) (y: 'b Rule) () : ('a * 'b) rule = fun tokens ->
   match x() tokens with
