@@ -1,0 +1,68 @@
+GlobalParse
+  [DeclareHelper
+     [Declare ("a",Int); Assign (Value (Var ("a",Int)),Value (Lit ("20",Int)))];
+   DeclareHelper
+     [Declare ("main",Function ([],Int));
+      Assign
+        (Value (Var ("main",Function ([],Int))),
+         Function
+           ([],
+            Block
+              [DeclareHelper
+                 [Declare ("a",Int);
+                  Assign (Value (Var ("a",Int)),Value (Lit ("10",Int)))];
+               DeclareHelper
+                 [Declare ("b",Int);
+                  Assign (Value (Var ("b",Int)),Value (Lit ("20",Int)))];
+               DeclareHelper
+                 [Declare ("c",Int);
+                  Assign (Value (Var ("c",Int)),Value (Lit ("0",Int)))];
+               Apply
+                 (Value (Var ("printf",Unknown [])),
+                  [Value
+                     (Lit
+                        (""value of a in main() = %d\n"",Pointer (Char,Some 30)));
+                   Value (Var ("a",Unknown []))]);
+               Assign
+                 (Value (Var ("c",Unknown [])),
+                  Apply
+                    (Value (Var ("sum",Unknown [])),
+                     [Value (Var ("a",Unknown [])); Value (Var ("b",Unknown []))]));
+               Apply
+                 (Value (Var ("printf",Unknown [])),
+                  [Value
+                     (Lit
+                        (""value of c in main() = %d\n"",Pointer (Char,Some 30)));
+                   Value (Var ("c",Unknown []))]);
+               Return (Value (Lit ("0",Int)))]))];
+   DeclareHelper
+     [Declare ("sum",Function ([Int; Int],Int));
+      Assign
+        (Value (Var ("sum",Function ([Int; Int],Int))),
+         Function
+           ([("a", Int); ("b", Int)],
+            Block
+              [Apply
+                 (Value (Var ("printf",Unknown [])),
+                  [Value
+                     (Lit
+                        (""value of a in sum() = %d\n"",Pointer (Char,Some 29)));
+                   Value (Var ("a",Unknown []))]);
+               Apply
+                 (Value (Var ("printf",Unknown [])),
+                  [Value
+                     (Lit
+                        (""value of b in sum() = %d\n"",Pointer (Char,Some 29)));
+                   Value (Var ("b",Unknown []))]);
+               Return
+                 (Apply
+                    (Value
+                       (Var
+                          ("+",
+                           Unknown
+                             [Function ([Char; Char],Char);
+                              Function ([Int; Int],Int);
+                              Function ([Long; Long],Long);
+                              Function ([Float; Float],Float);
+                              Function ([Double; Double],Double)])),
+                     [Value (Var ("a",Unknown [])); Value (Var ("b",Unknown []))]))]))]]

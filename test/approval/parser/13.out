@@ -1,0 +1,86 @@
+GlobalParse
+  [DeclareHelper
+     [Declare ("main",Function ([],Int));
+      Assign
+        (Value (Var ("main",Function ([],Int))),
+         Function
+           ([],
+            Block
+              [DeclareHelper [Declare ("n",Pointer (Int,Some 40))];
+               DeclareHelper [Declare ("i",Int); Declare ("j",Int)];
+               Block
+                 [Assign (Value (Var ("i",Unknown [])),Value (Lit ("0",Int)));
+                  While
+                    (Apply
+                       (Value
+                          (Var
+                             ("<",
+                              Unknown
+                                [Function ([Char; Char],Char);
+                                 Function ([Int; Int],Char);
+                                 Function ([Long; Long],Char);
+                                 Function ([Float; Float],Char);
+                                 Function ([Double; Double],Char)])),
+                        [Value (Var ("i",Unknown [])); Value (Lit ("10",Int))]),
+                     Block
+                       [Assign
+                          (Index
+                             (Value (Var ("n",Unknown [])),
+                              Value (Var ("i",Unknown []))),
+                           Apply
+                             (Value
+                                (Var
+                                   ("+",
+                                    Unknown
+                                      [Function ([Char; Char],Char);
+                                       Function ([Int; Int],Int);
+                                       Function ([Long; Long],Long);
+                                       Function ([Float; Float],Float);
+                                       Function ([Double; Double],Double)])),
+                              [Value (Var ("i",Unknown []));
+                               Value (Lit ("100",Int))]));
+                        Apply
+                          (Value
+                             (Var
+                                ("++suffix",
+                                 Unknown
+                                   [Function ([Char],Char); Function ([Int],Int);
+                                    Function ([Long],Long);
+                                    Function ([Float],Float);
+                                    Function ([Double],Double)])),
+                           [Value (Var ("i",Unknown []))])])];
+               Block
+                 [Assign (Value (Var ("j",Unknown [])),Value (Lit ("0",Int)));
+                  While
+                    (Apply
+                       (Value
+                          (Var
+                             ("<",
+                              Unknown
+                                [Function ([Char; Char],Char);
+                                 Function ([Int; Int],Char);
+                                 Function ([Long; Long],Char);
+                                 Function ([Float; Float],Char);
+                                 Function ([Double; Double],Char)])),
+                        [Value (Var ("j",Unknown [])); Value (Lit ("10",Int))]),
+                     Block
+                       [Apply
+                          (Value (Var ("printf",Unknown [])),
+                           [Value
+                              (Lit
+                                 (""Element[%d] = %d\n"",Pointer (Char,Some 21)));
+                            Value (Var ("j",Unknown []));
+                            Index
+                              (Value (Var ("n",Unknown [])),
+                               Value (Var ("j",Unknown [])))]);
+                        Apply
+                          (Value
+                             (Var
+                                ("++suffix",
+                                 Unknown
+                                   [Function ([Char],Char); Function ([Int],Int);
+                                    Function ([Long],Long);
+                                    Function ([Float],Float);
+                                    Function ([Double],Double)])),
+                           [Value (Var ("j",Unknown []))])])];
+               Return (Value (Lit ("0",Int)))]))]]

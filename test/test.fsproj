@@ -54,6 +54,8 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
+    <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="TestUtils.fs" />
     <Compile Include="..\src\lexer\Token.fs">
       <Link>lexer\Token.fs</Link>
     </Compile>
@@ -75,14 +77,34 @@
     <Compile Include="..\src\parser\Main.fs">
       <Link>parser\Main.fs</Link>
     </Compile>
-    <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="parser\TestParser.fs" />
+    <Compile Include="..\src\codegen\Tables.fs">
+      <Link>codegen\Tables.fs</Link>
+    </Compile>
+    <Compile Include="codegen\PAsm.fs" />
+    <Compile Include="..\src\codegen\TypeCheck.fs">
+      <Link>codegen\TypeCheck.fs</Link>
+    </Compile>
+    <Compile Include="codegen\TestTypeCheck.fs" />
+    <Compile Include="..\src\codegen\Interpreter.fs">
+      <Link>codegen\Interpreter.fs</Link>
+    </Compile>
+    <Compile Include="codegen\TestInterpreter.fs" />
+    <Compile Include="..\src\codegen\BuiltinFunctions.fs">
+      <Link>codegen\BuiltinFunctions.fs</Link>
+    </Compile>
+    <Compile Include="..\src\codegen\Main.fs">
+      <Link>codegen\Main.fs</Link>
+    </Compile>
+    <Compile Include="codegen\TestMain.fs" />
+    <Compile Include="E2e.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
-      <HintPath>packages\FSharp.Core.3.1.2.5\lib\net40\FSharp.Core.dll</HintPath>
+      <HintPath>packages\FSharp.Core.4.6.0\lib\net45\FSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="Fuchu">
       <HintPath>packages\Fuchu.1.0.3.0\lib\Fuchu.dll</HintPath>

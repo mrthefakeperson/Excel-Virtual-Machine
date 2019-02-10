@@ -1,0 +1,50 @@
+GlobalParse
+  [DeclareHelper
+     [Declare ("main",Function ([],Int));
+      Assign
+        (Value (Var ("main",Function ([],Int))),
+         Function
+           ([],
+            Block
+              [DeclareHelper
+                 [Declare ("str1",Pointer (Char,Some 12));
+                  Assign
+                    (Value (Var ("str1",Pointer (Char,Some 12))),
+                     Value (Lit (""Hello"",Pointer (Char,Some 8))))];
+               DeclareHelper
+                 [Declare ("str2",Pointer (Char,Some 12));
+                  Assign
+                    (Value (Var ("str2",Pointer (Char,Some 12))),
+                     Value (Lit (""World"",Pointer (Char,Some 8))))];
+               DeclareHelper [Declare ("str3",Pointer (Char,Some 12))];
+               DeclareHelper [Declare ("len",Int)];
+               Apply
+                 (Value (Var ("strcpy",Unknown [])),
+                  [Value (Var ("str3",Unknown []));
+                   Value (Var ("str1",Unknown []))]);
+               Apply
+                 (Value (Var ("printf",Unknown [])),
+                  [Value
+                     (Lit
+                        (""strcpy( str3, str1) :  %s\n"",Pointer (Char,Some 30)));
+                   Value (Var ("str3",Unknown []))]);
+               Apply
+                 (Value (Var ("strcat",Unknown [])),
+                  [Value (Var ("str1",Unknown []));
+                   Value (Var ("str2",Unknown []))]);
+               Apply
+                 (Value (Var ("printf",Unknown [])),
+                  [Value
+                     (Lit
+                        (""strcat( str1, str2):   %s\n"",Pointer (Char,Some 30)));
+                   Value (Var ("str1",Unknown []))]);
+               Assign
+                 (Value (Var ("len",Unknown [])),
+                  Apply
+                    (Value (Var ("strlen",Unknown [])),
+                     [Value (Var ("str1",Unknown []))]));
+               Apply
+                 (Value (Var ("printf",Unknown [])),
+                  [Value (Lit (""strlen(str1) :  %d\n"",Pointer (Char,Some 23)));
+                   Value (Var ("len",Unknown []))]);
+               Return (Value (Lit ("0",Int)))]))]]

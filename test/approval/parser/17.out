@@ -1,0 +1,40 @@
+GlobalParse
+  [DeclareHelper
+     [Declare ("main",Function ([],Int));
+      Assign
+        (Value (Var ("main",Function ([],Int))),
+         Function
+           ([],
+            Block
+              [DeclareHelper
+                 [Declare ("greeting",Pointer (Char,Some 6));
+                  Assign
+                    (Index
+                       (Value (Var ("greeting",Pointer (Char,Some 6))),
+                        Value (Lit ("0",Int))),Value (Lit ("'H'",Char)));
+                  Assign
+                    (Index
+                       (Value (Var ("greeting",Pointer (Char,Some 6))),
+                        Value (Lit ("1",Int))),Value (Lit ("'e'",Char)));
+                  Assign
+                    (Index
+                       (Value (Var ("greeting",Pointer (Char,Some 6))),
+                        Value (Lit ("2",Int))),Value (Lit ("'l'",Char)));
+                  Assign
+                    (Index
+                       (Value (Var ("greeting",Pointer (Char,Some 6))),
+                        Value (Lit ("3",Int))),Value (Lit ("'l'",Char)));
+                  Assign
+                    (Index
+                       (Value (Var ("greeting",Pointer (Char,Some 6))),
+                        Value (Lit ("4",Int))),Value (Lit ("'o'",Char)));
+                  Assign
+                    (Index
+                       (Value (Var ("greeting",Pointer (Char,Some 6))),
+                        Value (Lit ("5",Int))),Value (Lit ("'\0'",Char)))];
+               Apply
+                 (Value (Var ("printf",Unknown [])),
+                  [Value
+                     (Lit (""Greeting message: %s\n"",Pointer (Char,Some 25)));
+                   Value (Var ("greeting",Unknown []))]);
+               Return (Value (Lit ("0",Int)))]))]]

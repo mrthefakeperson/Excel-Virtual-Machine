@@ -1,0 +1,51 @@
+GlobalParse
+  [DeclareHelper
+     [Declare ("func",Function ([],Void));
+      Assign (Value (Var ("func",Function ([],Void))),Function ([],Value Unit))];
+   DeclareHelper
+     [Declare ("count",Int);
+      Assign (Value (Var ("count",Int)),Value (Lit ("5",Int)))];
+   DeclareHelper
+     [Declare ("main",Function ([],Void));
+      Assign
+        (Value (Var ("main",Function ([],Void))),
+         Function
+           ([],
+            Block
+              [While
+                 (Apply
+                    (Value
+                       (Var
+                          ("--suffix",
+                           Unknown
+                             [Function ([Char],Char); Function ([Int],Int);
+                              Function ([Long],Long); Function ([Float],Float);
+                              Function ([Double],Double)])),
+                     [Value (Var ("count",Unknown []))]),
+                  Block [Apply (Value (Var ("func",Unknown [])),[])]);
+               Return (Value (Lit ("0",Int)))]))];
+   DeclareHelper
+     [Declare ("func",Function ([],Void));
+      Assign
+        (Value (Var ("func",Function ([],Void))),
+         Function
+           ([],
+            Block
+              [DeclareHelper
+                 [Declare ("i",Int);
+                  Assign (Value (Var ("i",Int)),Value (Lit ("5",Int)))];
+               Apply
+                 (Value
+                    (Var
+                       ("++suffix",
+                        Unknown
+                          [Function ([Char],Char); Function ([Int],Int);
+                           Function ([Long],Long); Function ([Float],Float);
+                           Function ([Double],Double)])),
+                  [Value (Var ("i",Unknown []))]);
+               Apply
+                 (Value (Var ("printf",Unknown [])),
+                  [Value
+                     (Lit (""i is %d and count is %d\n"",Pointer (Char,Some 28)));
+                   Value (Var ("i",Unknown []));
+                   Value (Var ("count",Unknown []))])]))]]

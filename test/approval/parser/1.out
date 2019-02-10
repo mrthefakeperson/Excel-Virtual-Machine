@@ -1,0 +1,17 @@
+GlobalParse
+  [DeclareHelper
+     [Declare ("main",Function ([],Int));
+      Assign
+        (Value (Var ("main",Function ([],Int))),
+         Function
+           ([],
+            Block
+              [Apply
+                 (Value (Var ("printf",Unknown [])),
+                  [Value
+                     (Lit
+                        (""Storage size for int : %d \n"",Pointer (Char,Some 31)));
+                   Apply
+                     (Value (Var ("sizeof",Unknown [])),
+                      [Value (Var ("int",Unknown []))])]);
+               Return (Value (Lit ("0",Int)))]))]]

@@ -1,0 +1,60 @@
+GlobalParse
+  [DeclareHelper
+     [Declare ("max",Function ([Int; Int],Int));
+      Assign
+        (Value (Var ("max",Function ([Int; Int],Int))),
+         Function ([("num1", Int); ("num2", Int)],Value Unit))];
+   DeclareHelper
+     [Declare ("main",Function ([],Int));
+      Assign
+        (Value (Var ("main",Function ([],Int))),
+         Function
+           ([],
+            Block
+              [DeclareHelper
+                 [Declare ("a",Int);
+                  Assign (Value (Var ("a",Int)),Value (Lit ("100",Int)))];
+               DeclareHelper
+                 [Declare ("b",Int);
+                  Assign (Value (Var ("b",Int)),Value (Lit ("200",Int)))];
+               DeclareHelper [Declare ("ret",Int)];
+               Assign
+                 (Value (Var ("ret",Unknown [])),
+                  Apply
+                    (Value (Var ("max",Unknown [])),
+                     [Value (Var ("a",Unknown [])); Value (Var ("b",Unknown []))]));
+               Apply
+                 (Value (Var ("printf",Unknown [])),
+                  [Value (Lit (""Max value is : %d\n"",Pointer (Char,Some 22)));
+                   Value (Var ("ret",Unknown []))]);
+               Return (Value (Lit ("0",Int)))]))];
+   DeclareHelper
+     [Declare ("max",Function ([Int; Int],Int));
+      Assign
+        (Value (Var ("max",Function ([Int; Int],Int))),
+         Function
+           ([("num1", Int); ("num2", Int)],
+            Block
+              [DeclareHelper [Declare ("result",Int)];
+               If
+                 (Apply
+                    (Value
+                       (Var
+                          (">",
+                           Unknown
+                             [Function ([Char; Char],Char);
+                              Function ([Int; Int],Char);
+                              Function ([Long; Long],Char);
+                              Function ([Float; Float],Char);
+                              Function ([Double; Double],Char)])),
+                     [Value (Var ("num1",Unknown []));
+                      Value (Var ("num2",Unknown []))]),
+                  Block
+                    [Assign
+                       (Value (Var ("result",Unknown [])),
+                        Value (Var ("num1",Unknown [])))],
+                  Block
+                    [Assign
+                       (Value (Var ("result",Unknown [])),
+                        Value (Var ("num2",Unknown [])))]);
+               Return (Value (Var ("result",Unknown [])))]))]]

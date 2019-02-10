@@ -1,0 +1,50 @@
+GlobalParse
+  [DeclareHelper [Declare ("a",Int); Declare ("b",Int)];
+   DeclareHelper [Declare ("c",Int)]; DeclareHelper [Declare ("f",Float)];
+   DeclareHelper
+     [Declare ("main",Function ([],Int));
+      Assign
+        (Value (Var ("main",Function ([],Int))),
+         Function
+           ([],
+            Block
+              [DeclareHelper [Declare ("a",Int); Declare ("b",Int)];
+               DeclareHelper [Declare ("c",Int)];
+               DeclareHelper [Declare ("f",Float)];
+               Assign (Value (Var ("a",Unknown [])),Value (Lit ("10",Int)));
+               Assign (Value (Var ("b",Unknown [])),Value (Lit ("20",Int)));
+               Assign
+                 (Value (Var ("c",Unknown [])),
+                  Apply
+                    (Value
+                       (Var
+                          ("+",
+                           Unknown
+                             [Function ([Char; Char],Char);
+                              Function ([Int; Int],Int);
+                              Function ([Long; Long],Long);
+                              Function ([Float; Float],Float);
+                              Function ([Double; Double],Double)])),
+                     [Value (Var ("a",Unknown [])); Value (Var ("b",Unknown []))]));
+               Apply
+                 (Value (Var ("printf",Unknown [])),
+                  [Value (Lit (""value of c : %d \n"",Pointer (Char,Some 21)));
+                   Value (Var ("c",Unknown []))]);
+               Assign
+                 (Value (Var ("f",Unknown [])),
+                  Apply
+                    (Value
+                       (Var
+                          ("/",
+                           Unknown
+                             [Function ([Char; Char],Char);
+                              Function ([Int; Int],Int);
+                              Function ([Long; Long],Long);
+                              Function ([Float; Float],Float);
+                              Function ([Double; Double],Double)])),
+                     [Value (Lit ("70.0",Float)); Value (Lit ("3.0",Float))]));
+               Apply
+                 (Value (Var ("printf",Unknown [])),
+                  [Value (Lit (""value of f : %f \n"",Pointer (Char,Some 21)));
+                   Value (Var ("f",Unknown []))]);
+               Return (Value (Lit ("0",Int)))]))]]

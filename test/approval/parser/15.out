@@ -1,0 +1,50 @@
+GlobalParse
+  [DeclareHelper
+     [Declare ("main",Function ([],Int));
+      Assign
+        (Value (Var ("main",Function ([],Int))),
+         Function
+           ([],
+            Block
+              [DeclareHelper
+                 [Declare ("var",Int);
+                  Assign (Value (Var ("var",Int)),Value (Lit ("20",Int)))];
+               DeclareHelper [Declare ("ip",Pointer (Int,Some 4))];
+               Assign
+                 (Value (Var ("ip",Unknown [])),
+                  Apply
+                    (Value
+                       (Var
+                          ("&prefix",
+                           Function ([Unknown []],Pointer (Unknown [],None)))),
+                     [Value (Var ("var",Unknown []))]));
+               Apply
+                 (Value (Var ("printf",Unknown [])),
+                  [Value
+                     (Lit
+                        (""Address of var variable: %x\n"",
+                         Pointer (Char,Some 32)));
+                   Apply
+                     (Value
+                        (Var
+                           ("&prefix",
+                            Function ([Unknown []],Pointer (Unknown [],None)))),
+                      [Value (Var ("var",Unknown []))])]);
+               Apply
+                 (Value (Var ("printf",Unknown [])),
+                  [Value
+                     (Lit
+                        (""Address stored in ip variable: %x\n"",
+                         Pointer (Char,Some 38))); Value (Var ("ip",Unknown []))]);
+               Apply
+                 (Value (Var ("printf",Unknown [])),
+                  [Value
+                     (Lit
+                        (""Value of *ip variable: %d\n"",Pointer (Char,Some 30)));
+                   Apply
+                     (Value
+                        (Var
+                           ("*prefix",
+                            Function ([Pointer (Unknown [],None)],Unknown []))),
+                      [Value (Var ("ip",Unknown []))])]);
+               Return (Value (Lit ("0",Int)))]))]]

@@ -1,0 +1,20 @@
+GlobalParse
+  [DeclareHelper
+     [Declare ("main",Function ([],Int));
+      Assign
+        (Value (Var ("main",Function ([],Int))),
+         Function
+           ([],
+            Block
+              [DeclareHelper
+                 [Declare ("ptr",Pointer (Int,Some 4));
+                  Assign
+                    (Value (Var ("ptr",Pointer (Int,Some 4))),
+                     Value (Var ("NULL",Unknown [])))];
+               Apply
+                 (Value (Var ("printf",Unknown [])),
+                  [Value
+                     (Lit
+                        (""The value of ptr is : %x\n"",Pointer (Char,Some 29)));
+                   Value (Var ("ptr",Unknown []))]);
+               Return (Value (Lit ("0",Int)))]))]]

@@ -1,0 +1,35 @@
+GlobalParse
+  [DeclareHelper
+     [Declare ("main",Function ([],Int));
+      Assign
+        (Value (Var ("main",Function ([],Int))),
+         Function
+           ([],
+            Block
+              [DeclareHelper [Declare ("var1",Int)];
+               DeclareHelper [Declare ("var2",Pointer (Char,Some 10))];
+               Apply
+                 (Value (Var ("printf",Unknown [])),
+                  [Value
+                     (Lit
+                        (""Address of var1 variable: %x\n"",
+                         Pointer (Char,Some 33)));
+                   Apply
+                     (Value
+                        (Var
+                           ("&prefix",
+                            Function ([Unknown []],Pointer (Unknown [],None)))),
+                      [Value (Var ("var1",Unknown []))])]);
+               Apply
+                 (Value (Var ("printf",Unknown [])),
+                  [Value
+                     (Lit
+                        (""Address of var2 variable: %x\n"",
+                         Pointer (Char,Some 33)));
+                   Apply
+                     (Value
+                        (Var
+                           ("&prefix",
+                            Function ([Unknown []],Pointer (Unknown [],None)))),
+                      [Value (Var ("var2",Unknown []))])]);
+               Return (Value (Lit ("0",Int)))]))]]

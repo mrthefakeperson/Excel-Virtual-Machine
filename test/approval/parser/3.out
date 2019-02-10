@@ -1,0 +1,12 @@
+GlobalParse
+  [DeclareHelper
+     [Declare ("main",Function ([],Int));
+      Assign
+        (Value (Var ("main",Function ([],Int))),
+         Function
+           ([],
+            Block
+              [Apply
+                 (Value (Var ("printf",Unknown [])),
+                  [Value (Lit (""Hello\tWorld\n\n"",Pointer (Char,Some 19)))]);
+               Return (Value (Lit ("0",Int)))]))]]
