@@ -19,7 +19,7 @@ and tokenize: string -> string list = function
   |Rgx "\"(\\\\\\\"|[^\"])*\"" x  // string
   |Rgx "'\\\\?.'" x   // char
   |Rgx "(--|\+\+|>=|<=|==|!=|&&|\|\||&|\+=|-=|\*=|/=|&=|\|=)" x  // other tokens
-  |Rgx "[{}();,=+\-*/%<>\[\]]" x
+  |Rgx "[{}();,=+\-*/%<>\[\].]" x
   |Rgx WHITESPACE x -> x
   |"" -> []
   |unexpected -> failwithf "Lexer: unexpected %s" unexpected

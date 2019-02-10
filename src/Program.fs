@@ -41,13 +41,13 @@ int main () {
 open Parser.Combinators
 [<EntryPoint>]
 let main argv =
-  //let tokens = tokenize_text text
-  //List.iter (printfn "%O") tokens
-  //try
-  //  let ast = parse_tokens_to_ast tokens
-  //  printfn "\n\n\nparse:\n%A" ast
-  //with ex -> printfn "%A" ex
-  //System.Console.ReadLine() |> ignore
+  let tokens = tokenize_text text
+  List.iter (printfn "%O") tokens
+  try
+    let ast = parse_tokens_to_ast tokens
+    printfn "\n\n\nparse:\n%A" ast
+  with ex -> printfn "%A" ex
+  System.Console.ReadLine() |> ignore
 
   Directory.GetFiles("../../../samples")
    |> Array.sortBy (fun fname -> int(fname.Replace(".c", "").Replace("../../../samples\\", "")))
