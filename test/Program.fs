@@ -10,6 +10,7 @@ let main _ =
 
   TestInterpreter.test_declare()
   
+  TestCodegen.TestHooks.run_all()
   TestCodegen.TestTypeCheck.run_all()
   TestCodegen.TestMain.run_all()
 

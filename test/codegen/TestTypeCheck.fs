@@ -9,7 +9,7 @@ open Codegen.TypeCheck
 
 let test_check_type message ast expected_xpr expected_t =
   testCase message <|
-    fun () -> Assert.Equal(message, (expected_xpr, expected_t), check_type empty_symbol_table ast)
+    fun () -> Assert.Equal(message, (expected_xpr, expected_t), check_type (empty_symbol_table()) ast)
    |> run
    |> ignore
 
@@ -140,13 +140,13 @@ let test_parse_check message str expected_xpr =
       fun () ->
         //printfn "%A" (parse_global_scope () (tokenize_text str))
         match parse_global_scope () (tokenize_text str) with
-        |Yes(ast, []) -> Assert.Equal(message, (expected_xpr, Void), check_type empty_symbol_table ast)
+        |Yes(ast, []) -> Assert.Equal(message, (expected_xpr, Void), check_type (empty_symbol_table()) ast)
         |_ -> failwith "parse error"
    |> run
    |> ignore
 
 let test_check_parser_output() =
-  let str = "char a = 'a'; int f() { return a; }"
+  let str = "char a = 'a'; int f(void) { return a; }"
   let expected =
     GlobalParse [
       Declare ("a", Char)
@@ -163,7 +163,7 @@ let test_check_parser_output() =
      ]
   test_parse_check "cast return value" str expected
 
-  let str = "int f() { for (int e = 0; e < 5; e++) { if (e == 0) e = e + 1; } }"
+  let str = "int f(void) { for (int e = 0; e < 5; ++e) { if (e == 0) e = e + 1; } }"
   let expected =
     GlobalParse [
       Declare("f", Datatype.Function([], Int))
@@ -187,7 +187,9 @@ let test_check_parser_output() =
                      ],
                     Block []
                    )
-                  Apply(Value(Var("++suffix", Datatype.Function([Int], Int))), [Value(Var("e", Int))])
+                  Assign(Value(Var("e", Int)),
+                    Apply(Value(Var("+", Datatype.Function([Int; Int], Int))), [Value(Var("e", Int)); Value(Lit("1", Int))])
+                   )
                  ]
                )
              ]
@@ -215,15 +217,15 @@ let test_check_parser_output() =
      ]
   test_parse_check "various declarations" str expected
 
-  let str = "int f() {} \n void g() { f() + 3L; }"
+  let str = "int f(void) {} \n void g() { f() + 3L; }"
   let expected =
     GlobalParse [
       Declare("f", Datatype.Function([], Int))
       Assign(Value(Var("f", Datatype.Function([], Int))), Function([], Block []))
-      Declare("g", Datatype.Function([], Void))
+      Declare("g", Datatype.Function([t_any], Void))
       Assign(
-        Value(Var("g", Datatype.Function([], Void))),
-        Function([],
+        Value(Var("g", Datatype.Function([t_any], Void))),
+        Function([".", t_any],
           Block [
             Apply(
               Value(Var("+", Datatype.Function([Long; Long], Long))),
@@ -234,6 +236,25 @@ let test_check_parser_output() =
        )
      ]
   test_parse_check "function declaration" str expected
+
+  let str = "int f() {} \n void g(void) { f(); f(1); f(1, 2, 3); }"
+  let expected =
+    GlobalParse [
+      Declare("f", Datatype.Function([t_any], Int))
+      Assign(Value(Var("f", Datatype.Function([t_any], Int))), Function([".", t_any], Block []))
+      Declare("g", Datatype.Function([], Void))
+      Assign(
+        Value(Var("g", Datatype.Function([], Void))),
+        Function([],
+          Block [
+            Apply(Value(Var("f", Datatype.Function([t_any], Int))), [])
+            Apply(Value(Var("f", Datatype.Function([t_any], Int))), [Value(Lit("1", Int))])
+            Apply(Value(Var("f", Datatype.Function([t_any], Int))), [Value(Lit("1", Int)); Value(Lit("2", Int)); Value(Lit("3", Int))])
+           ]
+         )
+       )
+     ]
+  test_parse_check "function declaration with flexible args" str expected
 
 let run_all() =
   test_basics()

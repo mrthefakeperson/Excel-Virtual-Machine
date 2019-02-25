@@ -36,9 +36,13 @@ let test_parser_value() =
       [Value(Var("a", t_any))]
      )
   test_rule "value - prefix" value "*a" <| Yes(expected, [])
-
-  let expected_inner = Apply(Value(Var("++suffix", tf_arith_prefix)), [Value(Var("a", t_any))])
-  let expected = Apply(Value(Var("++suffix", tf_arith_prefix)), [expected_inner])
+  
+  let expected_inner = Apply(Value(Var("+", t_any)), [Value(Var("a", t_any)); Value (Lit ("1",Int))])
+  let expected =
+    Apply(
+      Value(Var("-", t_any)),
+      [Assign(Value(Var("a", t_any)), expected_inner); Value(Lit("1", Int))]
+     )
   test_rule "value - suffix" value "a++++" <| Yes(expected, [])
 
   let expected_left =
@@ -128,7 +132,12 @@ let test_parser_code() =
       [Value(Var("e", t_any)); Value(Lit("4", Int))]
      )
   let expected_loop_incr =
-    Apply(Value(Var("++suffix", tf_arith_prefix)), [Value(Var("e", t_any))])
+    Apply(
+      Value(Var("-", t_any)), [
+        Assign(Value(Var("e", t_any)), Apply(Value(Var("+", t_any)), [Value(Var("e", t_any)); Value(Lit("1", Int))]))
+        Value(Lit("1", Int))
+       ]
+     )
   let expected =
     Block [
       DeclareHelper [Declare("e", Int); Assign(Value(Var("e", Int)), Value(Lit("0", Int)))]
@@ -166,11 +175,11 @@ let test_parser_global() =
       Block []
       DeclareHelper [
         Declare("f", Datatype.Function([], Void))
-        Assign(Value(Var("f", Datatype.Function([], Void))), Function([], Value Unit))
+        Assign(Value(Var("f", Datatype.Function([], Void))), Function([], Block []))
        ]
       DeclareHelper [
-        Declare("main", Datatype.Function([], Void))
-        Assign(Value(Var("main", Datatype.Function([], Void))), Function([], Block []))
+        Declare("main", Datatype.Function([t_any], Int))
+        Assign(Value(Var("main", Datatype.Function([t_any], Int))), Function([".", t_any], Block []))
        ]
      ]
   test_rule "global parse" parse_global_scope "long x = 1; ; void f(void); main() {}" <| Yes(expected, [])

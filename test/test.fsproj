@@ -81,7 +81,13 @@
     <Compile Include="..\src\codegen\Tables.fs">
       <Link>codegen\Tables.fs</Link>
     </Compile>
-    <Compile Include="codegen\PAsm.fs" />
+    <Compile Include="..\src\codegen\PAsm.fs">
+      <Link>codegen\PAsm.fs</Link>
+    </Compile>
+    <Compile Include="..\src\codegen\Hooks.fs">
+      <Link>codegen\Hooks.fs</Link>
+    </Compile>
+    <Compile Include="codegen\TestHooks.fs" />
     <Compile Include="..\src\codegen\TypeCheck.fs">
       <Link>codegen\TypeCheck.fs</Link>
     </Compile>
@@ -97,6 +103,12 @@
       <Link>codegen\Main.fs</Link>
     </Compile>
     <Compile Include="codegen\TestMain.fs" />
+    <Compile Include="..\src\codewriters\Interpreter.fs">
+      <Link>codewriters\Interpreter.fs</Link>
+    </Compile>
+    <Compile Include="..\src\codewriters\Nasm.fs">
+      <Link>codewriters\Nasm.fs</Link>
+    </Compile>
     <Compile Include="E2e.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
