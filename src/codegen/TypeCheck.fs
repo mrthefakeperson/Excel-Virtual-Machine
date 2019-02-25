@@ -70,6 +70,9 @@ let rec check_type (symtbl: SymbolTable) = function
         |Some(a, b, _) -> a, b
         |None -> hda, hdb
       |[] -> failwithf "none of the possible function types for %A matched %A" fname discovered_arg_types
+    |f', Datatype.Function([Unknown []], ret) ->
+      let args' = List.map (fst << check_type symtbl) args
+      Apply(f', args'), ret
     |f', Datatype.Function(arg_types, ret) ->
       let args', discovered_arg_types = List.unzip (List.map (check_type symtbl) args)
       let args'' =
@@ -138,7 +141,8 @@ let rec check_type (symtbl: SymbolTable) = function
     While(cond'', body'), Void
   |Function(args, body) ->
     let arg_types = List.map snd args
-    let body', _ = check_type (List.fold (fun tbl (n, t) -> tbl.register_var n t) symtbl args) body
+    let args' = match args with [".", Unknown []] -> [] | _ -> args
+    let body', _ = check_type (List.fold (fun tbl (n, t) -> tbl.register_var n t) symtbl args') body
     Function(args, body'), Datatype.Function(arg_types, Unknown [])
   |GlobalParse xprs ->
     match check_type symtbl (Block xprs) with

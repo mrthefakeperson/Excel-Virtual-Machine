@@ -1,7 +1,7 @@
 ﻿module Codegen.Tables
 open Parser.AST
 
-let max_register = ref 0
+type VarInfo = Local of register: int * size: int | Global of size: int
 
 type SymbolTable = {
   next_register: int  // registers are 4-byte-aligned, next_register is the next multiple of 4 bytes to alloc from stack
@@ -10,23 +10,22 @@ type SymbolTable = {
   struct_type_to_properties: Map<string, (string * int) list>
   globals: Set<string>
   return_type: Datatype Option  // for typecheck, return type in current function
+
+  // mutables
+  mutable max_register: int
+  mutable next_label: int
  }
   with
     member x.register_var vname typ =
       match typ with Unknown _ -> failwithf "variable %s has ambiguous type?" vname | _ -> ()
       let next_register = x.next_register + (typ.sizeof + 3) / 4
-      max_register := max !max_register next_register
+      x.max_register <- max x.max_register next_register
       { x with
           next_register = next_register
           var_to_type = x.var_to_type.Add(vname, typ)
           var_to_register = (vname, x.next_register)::x.var_to_register }
 
-    member x.register_global_var vname t =
-      { x with
-          globals = Set.add vname x.globals
-          var_to_type = x.var_to_type.Add(vname, t) }
-
-    // assert correct parsing metadata about vname, get (register, size)
+    // assert correct parsing metadata about vname, get (register, size) or only size if global
     member x.check_var vname (typ: Datatype) =
       if not (Map.containsKey vname x.var_to_type) then
         failwithf "variable %s not registered" vname
@@ -35,12 +34,22 @@ type SymbolTable = {
       match List.tryFind (fst >> (=) vname) x.var_to_register with
       |Some(_, register) ->
         let size = x.var_to_type.[vname].sizeof
-        register, size
-      |None ->  // builtin
-        7777777, 0
+        Local(register, size)
+      |None when Set.contains vname x.globals ->
+        let size = x.var_to_type.[vname].sizeof
+        Global size
+      |None -> Global 0  // builtin
+
+    member x.register_global_var vname t =
+      { x with
+          globals = Set.add vname x.globals
+          var_to_type = x.var_to_type.Add(vname, t) }
 
     member x.check_global_var = x.globals.Contains
 
+    member x.get_label s =
+      try sprintf "%s_%i" s x.next_label
+      finally x.next_label <- x.next_label + 1
 
 let builtins = [
   "+", tf_arith_infix
@@ -61,18 +70,20 @@ let builtins = [
   ">", tf_logic_infix
   "<=", tf_logic_infix
   ">=", tf_logic_infix
-  "++prefix", tf_arith_prefix
-  "--prefix", tf_arith_prefix
-  "++suffix", tf_arith_prefix
-  "--suffix", tf_arith_prefix
+
+  // TEMP: this probably shouldn't be builtin
+  "printf", Datatype.Function([t_any], Void)
  ]
 
-let empty_symbol_table = {
+let empty_symbol_table() = {
   next_register = 1
   var_to_register = []
   var_to_type = Map builtins
   struct_type_to_properties = Map.empty
   globals = Set []
   return_type = None
+
+  max_register = 0
+  next_label = 1
  }
 

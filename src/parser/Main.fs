@@ -2,6 +2,7 @@
 open Parser.AST
 open Parser.Combinators
 
+let _null = (!"null" |/ !"NULL" |/ !"Null") ->/ fun () -> Value(Lit("0", Pointer(Void, Some 0)))
 let _var = Match "[a-z A-Z _][a-z 0-9 A-Z _]*" ->/ fun s -> Value(Var(s, t_any))
 let _string = Match "\"(\\\"|[^\"])*\"" ->/ fun s -> Value(Lit(s, Pointer(Char, Some(s.Length + 1))))
 let _int = Match "-?[0-9]+" ->/ fun s -> Value(Lit(s, Int))
@@ -52,7 +53,7 @@ let assignment = (%"=" |/ Match "[+\-*/&|]=") ->/ var_ast tf_arith_infix
 
 
 let rec value() =
-  let basic_value = OneOf [_var; _string; _int; _float; _char; _long; bracketed]
+  let basic_value = OneOf [_null; _var; _string; _int; _float; _char; _long; bracketed]
   let rec value_with_apply_and_index: AST Rule =
     basic_value
      +/ OptionalListOf (
@@ -65,10 +66,22 @@ let rec value() =
              |Index(Value Unit, i) -> Index(acc, i)
              |_ -> failwith "should never be reached"
             ) v ops
-  let rec prefixed_value() = () |> prefix +/ (value_with_apply_and_index |/ prefixed_value) ->/ fun (pf, v) -> Apply(pf, [v])
+  let op1 v op = Apply(Value(Var(op, t_any)), [v; Value(Lit("1", Int))])
+  let rec prefixed_value() =
+    () |>
+      prefix +/ (value_with_apply_and_index |/ prefixed_value)
+       ->/ function
+           |Value(Var("++", _)), v -> Assign(v, op1 v "+")
+           |Value(Var("--", _)), v -> Assign(v, op1 v "-")
+           |pf, v -> Apply(pf, [v])
   let suffixed_value =
     (prefixed_value |/ value_with_apply_and_index) +/ OptionalListOf suffix
-     ->/ fun (v, sfs) -> List.fold (fun acc sf -> Apply(sf, [acc])) v sfs
+     ->/ fun (v, sfs) ->
+           List.fold (fun acc -> function
+             |Value(Var("++suffix", _)) -> op1 (Assign(v, op1 v "+")) "-"
+             |Value(Var("--suffix", _)) -> op1 (Assign(v, op1 v "-")) "+"
+             |sf -> Apply(sf, [acc])
+            ) v sfs
   let value_with_infix =
     let ast_from_infixes (iv: AST, ops: ((AST * AST) list)) =
       List.fold (fun acc (op, oprnd) -> Apply(op, [acc; oprnd])) iv ops
@@ -181,12 +194,12 @@ and _for =
 
 let declare_function =
   let arg_list =  // TODO: update void args / no args - no args should accept any number of args, void should not accept any args
-    JoinedListOf (datatype +/ declarable_value ->/ fun (dtype, v) -> v dtype) !","
-     ->/ fun (a1, args) -> a1::List.map snd args |> List.map Declare
-     |/ Optional !"void" ->/ fun _ -> []
+    let csvalues = JoinedListOf (datatype +/ declarable_value ->/ fun (dtype, v) -> v dtype) !","
+    csvalues ->/ fun (a1, args) -> a1::List.map snd args |> List.map Declare
+     |/ Optional !"void" ->/ function Some() -> [] | None -> [Declare(".", t_any)]
   Optional (!"static" |/ !"extern")  // TODO: update static/extern
-   +/ (datatype +/ _var |/ !"main" ->/ fun () -> Void, Value(Var("main", t_any)))  // int main() and main() are both valid
-   +/ !"(" +/ arg_list +/ !")" +/ (code_block |/ !";" ->/ fun () -> Value Unit)
+   +/ (datatype +/ _var |/ !"main" ->/ fun () -> Int, Value(Var("main", t_any)))  // int main() and main() are both valid
+   +/ !"(" +/ arg_list +/ !")" +/ (code_block |/ !";" ->/ fun () -> Block [])
    ->/ fun (((((_, (dtype, name)), ()), args), ()), func_body) ->
          let name = match name with Value(Var(s, Unknown [])) -> s | _ -> failwith "should never be reached"
          let args, arg_types =
@@ -210,10 +223,15 @@ let parse_global_scope: AST Rule =
    ->/ (fst >> GlobalParse)
 
 
-let parse_tokens_to_ast tokens =
-  let result = parse_global_scope () tokens
+let parse_tokens_to_ast_with rule tokens =
+  let result = rule () tokens
   match result with
   |Yes(parsed, []) -> parsed
   |Yes(_, fail::_) -> failwithf "unexpected token: %A" fail
   |Error(err, rest) -> failwithf "error: %s\n%A" err rest
+
+let parse_tokens_to_ast = parse_tokens_to_ast_with parse_global_scope
+
+let parse_string_to_ast_with rule string = parse_tokens_to_ast_with rule (Lexer.Main.tokenize_text string)
+  
   

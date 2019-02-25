@@ -7,8 +7,6 @@ open Lexer.Token
 // let rec nameOfRule() = () |> buildRule()       <<-- the `() |> ` is for lazy eval. manipulation
 // and otherRule = () |> buildRule(nameOfRule)    <<-- don't pass `()` to nameOfRule
 
-//type ASTx = T of string * ASTx list
-
 type 'a Result =
   |Yes of 'a * Token list
   |No of int * Token list  // fail message associates with longest successful parse path
@@ -31,10 +29,6 @@ let (|Error|) = function
 type 'a rule = Token list -> 'a Result
 
 type 'a Rule = unit -> 'a rule
-//let transformASTx f (rule: ASTx Rule) e =
-//  match rule() e with
-//  |Yes(ast, rest) -> Yes(f ast, rest)
-//  |no -> no
 
 let Bind (binding: 'a -> 'b) (rule: 'a Rule) () : 'b rule =
   fun tokens ->
@@ -43,12 +37,6 @@ let Bind (binding: 'a -> 'b) (rule: 'a Rule) () : 'b rule =
     |No(e, r) -> No(e, r)
 let (<-/) = Bind
 let (->/) a b = Bind b a
-
-//let Clean (rule: ASTx Rule) () : ASTx rule =
-//  let rec clean = function
-//    T(name, ch) -> T(name, List.map clean ch |> List.collect (function T("", ch') -> ch' | e -> [e]))
-//  transformASTx clean rule
-//let (!!!) = Clean
 
 let Pass = Bind (fun _ -> ())
 let Equal(token: string) () : string rule = function
@@ -89,16 +77,6 @@ let (|/) (x: 'a Rule) (y: 'a Rule) () : 'a rule = fun tokens ->
     |yes -> yes
   |yes -> yes
 let OneOf(rules: #seq<'a Rule>) : 'a Rule = Seq.reduce (|/) rules
-//let OneOf(rules: #seq<Rule>) () : rule = fun tokens ->
-//  Seq.fold (fun acc x ->
-//    match acc with
-//    |No(err, r) ->
-//      match x() tokens with
-//      |No(err2, r2) when r2.Length < r.Length -> No(err2, r2)
-//      |No _ -> No(err, r)
-//      |yes -> yes
-//    |yes -> yes
-//   ) (No("placeholder", tokens)) rules
 
 let Optional(rule: 'a Rule) () : 'a Option rule =
   fun tokens ->

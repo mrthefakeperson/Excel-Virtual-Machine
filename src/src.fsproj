@@ -62,10 +62,14 @@
     <Compile Include="parser\Combinators.fs" />
     <Compile Include="parser\Main.fs" />
     <Compile Include="codegen\Tables.fs" />
+    <Compile Include="codegen\PAsm.fs" />
+    <Compile Include="codegen\Hooks.fs" />
     <Compile Include="codegen\TypeCheck.fs" />
     <Compile Include="codegen\Interpreter.fs" />
     <Compile Include="codegen\BuiltinFunctions.fs" />
     <Compile Include="codegen\Main.fs" />
+    <Compile Include="codewriters\Interpreter.fs" />
+    <Compile Include="codewriters\Nasm.fs" />
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />

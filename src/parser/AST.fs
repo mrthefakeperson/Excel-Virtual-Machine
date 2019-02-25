@@ -44,7 +44,9 @@ module TypeClasses =
   let real = [Char; Int; Long; Float; Double]
   let integral = [Char; Int; Long]
   // temp
-  let ptr_compatible = [Void; Char; Int; Long; Float; Double; Pointer (Unknown [], None)]
+  let ptr_compatible =
+    let basics = [Void; Char; Int; Long; Float; Double]
+    basics @ List.map (fun e -> Pointer (e, None)) basics
 
 let t_any = Unknown []
 let t_numeric = Unknown TypeClasses.real
