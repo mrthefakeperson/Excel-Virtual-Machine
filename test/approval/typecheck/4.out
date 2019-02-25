@@ -1,0 +1,224 @@
+GlobalParse
+  [Declare
+     ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+      Pointer (Char,Some 25));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("0",Int))),
+      Value (Lit ("'i'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("1",Int))),
+      Value (Lit ("' '",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("2",Int))),
+      Value (Lit ("'i'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("3",Int))),
+      Value (Lit ("'s'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("4",Int))),
+      Value (Lit ("' '",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("5",Int))),
+      Value (Lit ("'%'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("6",Int))),
+      Value (Lit ("'d'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("7",Int))),
+      Value (Lit ("' '",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("8",Int))),
+      Value (Lit ("'a'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("9",Int))),
+      Value (Lit ("'n'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("10",Int))),
+      Value (Lit ("'d'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("11",Int))),
+      Value (Lit ("' '",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("12",Int))),
+      Value (Lit ("'c'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("13",Int))),
+      Value (Lit ("'o'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("14",Int))),
+      Value (Lit ("'u'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("15",Int))),
+      Value (Lit ("'n'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("16",Int))),
+      Value (Lit ("'t'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("17",Int))),
+      Value (Lit ("' '",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("18",Int))),
+      Value (Lit ("'i'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("19",Int))),
+      Value (Lit ("'s'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("20",Int))),
+      Value (Lit ("' '",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("21",Int))),
+      Value (Lit ("'%'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("22",Int))),
+      Value (Lit ("'d'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("23",Int))),
+      Value (Lit ("'
+'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+               Pointer (Char,Some 25))),Value (Lit ("24",Int))),
+      Value (Lit ("'\0'",Char))); Declare ("func",Function ([],Void));
+   Assign (Value (Var ("func",Function ([],Void))),Function ([],Block []));
+   Declare ("count",Int);
+   Assign (Value (Var ("count",Int)),Value (Lit ("5",Int)));
+   Declare ("main",Function ([Unknown []],Int));
+   Assign
+     (Value (Var ("main",Function ([Unknown []],Int))),
+      Function
+        ([(".", Unknown [])],
+         Block
+           [While
+              (Apply
+                 (Value (Var ("\cast",Char)),
+                  [Apply
+                     (Value (Var ("+",Function ([Int; Int],Int))),
+                      [Assign
+                         (Value (Var ("count",Int)),
+                          Apply
+                            (Value (Var ("-",Function ([Int; Int],Int))),
+                             [Value (Var ("count",Int)); Value (Lit ("1",Int))]));
+                       Value (Lit ("1",Int))])]),
+               Block [Apply (Value (Var ("func",Function ([],Void))),[])]);
+            Return (Value (Lit ("0",Int)))]));
+   Assign
+     (Value (Var ("func",Function ([],Void))),
+      Function
+        ([],
+         Block
+           [Declare ("i",Int);
+            Assign (Value (Var ("i",Int)),Value (Lit ("5",Int)));
+            Apply
+              (Value (Var ("-",Function ([Int; Int],Int))),
+               [Assign
+                  (Value (Var ("i",Int)),
+                   Apply
+                     (Value (Var ("+",Function ([Int; Int],Int))),
+                      [Value (Var ("i",Int)); Value (Lit ("1",Int))]));
+                Value (Lit ("1",Int))]);
+            Apply
+              (Value (Var ("printf",Function ([Unknown []],Void))),
+               [Value
+                  (Var
+                     ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+                      Pointer (Char,Some 25))); Value (Var ("i",Int));
+                Value (Var ("count",Int))])]))]

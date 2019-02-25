@@ -1,12 +1,17 @@
 GlobalParse
   [DeclareHelper
+     [Declare ("sum",Function ([Int; Int],Int));
+      Assign
+        (Value (Var ("sum",Function ([Int; Int],Int))),
+         Function ([("a", Int); ("b", Int)],Block []))];
+   DeclareHelper
      [Declare ("a",Int); Assign (Value (Var ("a",Int)),Value (Lit ("20",Int)))];
    DeclareHelper
-     [Declare ("main",Function ([],Int));
+     [Declare ("main",Function ([Unknown []],Int));
       Assign
-        (Value (Var ("main",Function ([],Int))),
+        (Value (Var ("main",Function ([Unknown []],Int))),
          Function
-           ([],
+           ([(".", Unknown [])],
             Block
               [DeclareHelper
                  [Declare ("a",Int);

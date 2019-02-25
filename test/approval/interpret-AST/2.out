@@ -1,0 +1,4 @@
+(Int 0,
+ "value of c : %d 
+ (fmt [Int 30])value of f : %f 
+ (fmt [Float 23.333334f])")

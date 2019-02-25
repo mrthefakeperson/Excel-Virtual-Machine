@@ -1,0 +1,13 @@
+GlobalParse
+  [Declare ("count",Int); Declare ("write_extern",Function ([Unknown []],Void));
+   Assign
+     (Value (Var ("write_extern",Function ([Unknown []],Void))),
+      Function ([(".", Unknown [])],Block []));
+   Declare ("main",Function ([Unknown []],Int));
+   Assign
+     (Value (Var ("main",Function ([Unknown []],Int))),
+      Function
+        ([(".", Unknown [])],
+         Block
+           [Assign (Value (Var ("count",Int)),Value (Lit ("5",Int)));
+            Apply (Value (Var ("write_extern",Function ([Unknown []],Void))),[])]))]

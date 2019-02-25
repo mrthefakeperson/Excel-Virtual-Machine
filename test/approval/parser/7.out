@@ -1,10 +1,10 @@
 GlobalParse
   [DeclareHelper
-     [Declare ("main",Function ([],Int));
+     [Declare ("main",Function ([Unknown []],Int));
       Assign
-        (Value (Var ("main",Function ([],Int))),
+        (Value (Var ("main",Function ([Unknown []],Int))),
          Function
-           ([],
+           ([(".", Unknown [])],
             Block
               [Block
                  [Value (Lit ("1",Char));

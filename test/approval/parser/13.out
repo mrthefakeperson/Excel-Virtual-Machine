@@ -1,10 +1,10 @@
 GlobalParse
   [DeclareHelper
-     [Declare ("main",Function ([],Int));
+     [Declare ("main",Function ([Unknown []],Int));
       Assign
-        (Value (Var ("main",Function ([],Int))),
+        (Value (Var ("main",Function ([Unknown []],Int))),
          Function
-           ([],
+           ([(".", Unknown [])],
             Block
               [DeclareHelper [Declare ("n",Pointer (Int,Some 40))];
                DeclareHelper [Declare ("i",Int); Declare ("j",Int)];
@@ -40,15 +40,14 @@ GlobalParse
                               [Value (Var ("i",Unknown []));
                                Value (Lit ("100",Int))]));
                         Apply
-                          (Value
-                             (Var
-                                ("++suffix",
-                                 Unknown
-                                   [Function ([Char],Char); Function ([Int],Int);
-                                    Function ([Long],Long);
-                                    Function ([Float],Float);
-                                    Function ([Double],Double)])),
-                           [Value (Var ("i",Unknown []))])])];
+                          (Value (Var ("-",Unknown [])),
+                           [Assign
+                              (Value (Var ("i",Unknown [])),
+                               Apply
+                                 (Value (Var ("+",Unknown [])),
+                                  [Value (Var ("i",Unknown []));
+                                   Value (Lit ("1",Int))]));
+                            Value (Lit ("1",Int))])])];
                Block
                  [Assign (Value (Var ("j",Unknown [])),Value (Lit ("0",Int)));
                   While
@@ -74,13 +73,12 @@ GlobalParse
                               (Value (Var ("n",Unknown [])),
                                Value (Var ("j",Unknown [])))]);
                         Apply
-                          (Value
-                             (Var
-                                ("++suffix",
-                                 Unknown
-                                   [Function ([Char],Char); Function ([Int],Int);
-                                    Function ([Long],Long);
-                                    Function ([Float],Float);
-                                    Function ([Double],Double)])),
-                           [Value (Var ("j",Unknown []))])])];
+                          (Value (Var ("-",Unknown [])),
+                           [Assign
+                              (Value (Var ("j",Unknown [])),
+                               Apply
+                                 (Value (Var ("+",Unknown [])),
+                                  [Value (Var ("j",Unknown []));
+                                   Value (Lit ("1",Int))]));
+                            Value (Lit ("1",Int))])])];
                Return (Value (Lit ("0",Int)))]))]]

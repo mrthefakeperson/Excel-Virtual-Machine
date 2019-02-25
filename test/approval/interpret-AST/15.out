@@ -1,0 +1,5 @@
+(Int 0,
+ "Address of var variable: %x
+ (fmt [Ptr (5,Int)])Address stored in ip variable: %x
+ (fmt [Ptr (5,Int)])Value of *ip variable: %d
+ (fmt [Int 20])")

@@ -1,27 +1,26 @@
 GlobalParse
   [DeclareHelper
      [Declare ("func",Function ([],Void));
-      Assign (Value (Var ("func",Function ([],Void))),Function ([],Value Unit))];
+      Assign (Value (Var ("func",Function ([],Void))),Function ([],Block []))];
    DeclareHelper
      [Declare ("count",Int);
       Assign (Value (Var ("count",Int)),Value (Lit ("5",Int)))];
    DeclareHelper
-     [Declare ("main",Function ([],Void));
+     [Declare ("main",Function ([Unknown []],Int));
       Assign
-        (Value (Var ("main",Function ([],Void))),
+        (Value (Var ("main",Function ([Unknown []],Int))),
          Function
-           ([],
+           ([(".", Unknown [])],
             Block
               [While
                  (Apply
-                    (Value
-                       (Var
-                          ("--suffix",
-                           Unknown
-                             [Function ([Char],Char); Function ([Int],Int);
-                              Function ([Long],Long); Function ([Float],Float);
-                              Function ([Double],Double)])),
-                     [Value (Var ("count",Unknown []))]),
+                    (Value (Var ("+",Unknown [])),
+                     [Assign
+                        (Value (Var ("count",Unknown [])),
+                         Apply
+                           (Value (Var ("-",Unknown [])),
+                            [Value (Var ("count",Unknown []));
+                             Value (Lit ("1",Int))])); Value (Lit ("1",Int))]),
                   Block [Apply (Value (Var ("func",Unknown [])),[])]);
                Return (Value (Lit ("0",Int)))]))];
    DeclareHelper
@@ -35,14 +34,13 @@ GlobalParse
                  [Declare ("i",Int);
                   Assign (Value (Var ("i",Int)),Value (Lit ("5",Int)))];
                Apply
-                 (Value
-                    (Var
-                       ("++suffix",
-                        Unknown
-                          [Function ([Char],Char); Function ([Int],Int);
-                           Function ([Long],Long); Function ([Float],Float);
-                           Function ([Double],Double)])),
-                  [Value (Var ("i",Unknown []))]);
+                 (Value (Var ("-",Unknown [])),
+                  [Assign
+                     (Value (Var ("i",Unknown [])),
+                      Apply
+                        (Value (Var ("+",Unknown [])),
+                         [Value (Var ("i",Unknown [])); Value (Lit ("1",Int))]));
+                   Value (Lit ("1",Int))]);
                Apply
                  (Value (Var ("printf",Unknown [])),
                   [Value

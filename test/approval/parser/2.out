@@ -2,11 +2,11 @@ GlobalParse
   [DeclareHelper [Declare ("a",Int); Declare ("b",Int)];
    DeclareHelper [Declare ("c",Int)]; DeclareHelper [Declare ("f",Float)];
    DeclareHelper
-     [Declare ("main",Function ([],Int));
+     [Declare ("main",Function ([Unknown []],Int));
       Assign
-        (Value (Var ("main",Function ([],Int))),
+        (Value (Var ("main",Function ([Unknown []],Int))),
          Function
-           ([],
+           ([(".", Unknown [])],
             Block
               [DeclareHelper [Declare ("a",Int); Declare ("b",Int)];
                DeclareHelper [Declare ("c",Int)];

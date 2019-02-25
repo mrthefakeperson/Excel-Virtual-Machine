@@ -1,0 +1,139 @@
+GlobalParse
+  [Declare
+     ("$76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a",Pointer (Char,Some 17));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a",
+               Pointer (Char,Some 17))),Value (Lit ("0",Int))),
+      Value (Lit ("'v'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a",
+               Pointer (Char,Some 17))),Value (Lit ("1",Int))),
+      Value (Lit ("'a'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a",
+               Pointer (Char,Some 17))),Value (Lit ("2",Int))),
+      Value (Lit ("'l'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a",
+               Pointer (Char,Some 17))),Value (Lit ("3",Int))),
+      Value (Lit ("'u'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a",
+               Pointer (Char,Some 17))),Value (Lit ("4",Int))),
+      Value (Lit ("'e'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a",
+               Pointer (Char,Some 17))),Value (Lit ("5",Int))),
+      Value (Lit ("' '",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a",
+               Pointer (Char,Some 17))),Value (Lit ("6",Int))),
+      Value (Lit ("'o'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a",
+               Pointer (Char,Some 17))),Value (Lit ("7",Int))),
+      Value (Lit ("'f'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a",
+               Pointer (Char,Some 17))),Value (Lit ("8",Int))),
+      Value (Lit ("' '",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a",
+               Pointer (Char,Some 17))),Value (Lit ("9",Int))),
+      Value (Lit ("'g'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a",
+               Pointer (Char,Some 17))),Value (Lit ("10",Int))),
+      Value (Lit ("' '",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a",
+               Pointer (Char,Some 17))),Value (Lit ("11",Int))),
+      Value (Lit ("'='",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a",
+               Pointer (Char,Some 17))),Value (Lit ("12",Int))),
+      Value (Lit ("' '",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a",
+               Pointer (Char,Some 17))),Value (Lit ("13",Int))),
+      Value (Lit ("'%'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a",
+               Pointer (Char,Some 17))),Value (Lit ("14",Int))),
+      Value (Lit ("'d'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a",
+               Pointer (Char,Some 17))),Value (Lit ("15",Int))),
+      Value (Lit ("'
+'",Char)));
+   Assign
+     (Index
+        (Value
+           (Var
+              ("$76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a",
+               Pointer (Char,Some 17))),Value (Lit ("16",Int))),
+      Value (Lit ("'\0'",Char))); Declare ("g",Int);
+   Assign (Value (Var ("g",Int)),Value (Lit ("20",Int)));
+   Declare ("main",Function ([Unknown []],Int));
+   Assign
+     (Value (Var ("main",Function ([Unknown []],Int))),
+      Function
+        ([(".", Unknown [])],
+         Block
+           [Declare ("g",Int);
+            Assign (Value (Var ("g",Int)),Value (Lit ("10",Int)));
+            Apply
+              (Value (Var ("printf",Function ([Unknown []],Void))),
+               [Value
+                  (Var
+                     ("$76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a",
+                      Pointer (Char,Some 17))); Value (Var ("g",Int))]);
+            Return (Value (Lit ("0",Int)))]))]

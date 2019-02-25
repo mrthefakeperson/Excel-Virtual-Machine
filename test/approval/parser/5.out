@@ -1,16 +1,16 @@
 GlobalParse
   [DeclareHelper [Declare ("count",Int)];
    DeclareHelper
-     [Declare ("write_extern",Function ([],Void));
+     [Declare ("write_extern",Function ([Unknown []],Void));
       Assign
-        (Value (Var ("write_extern",Function ([],Void))),
-         Function ([],Value Unit))];
+        (Value (Var ("write_extern",Function ([Unknown []],Void))),
+         Function ([(".", Unknown [])],Block []))];
    DeclareHelper
-     [Declare ("main",Function ([],Void));
+     [Declare ("main",Function ([Unknown []],Int));
       Assign
-        (Value (Var ("main",Function ([],Void))),
+        (Value (Var ("main",Function ([Unknown []],Int))),
          Function
-           ([],
+           ([(".", Unknown [])],
             Block
               [Assign (Value (Var ("count",Unknown [])),Value (Lit ("5",Int)));
                Apply (Value (Var ("write_extern",Unknown [])),[])]))]]

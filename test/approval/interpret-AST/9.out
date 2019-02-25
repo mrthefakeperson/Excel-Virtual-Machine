@@ -1,0 +1,2 @@
+(Int 0, "value of a = %d, b = %d and c = %d
+ (fmt [Int 10; Int 20; Int 30])")

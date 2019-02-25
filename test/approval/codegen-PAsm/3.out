@@ -1,0 +1,7 @@
+[Br "main"; Label "$48_65_6c_6c_6f_9_57_6f_72_6c_64_5c_6e_5c_6e";
+ Data
+   [|Byte 72uy; Byte 101uy; Byte 108uy; Byte 108uy; Byte 111uy; Byte 9uy;
+     Byte 87uy; Byte 111uy; Byte 114uy; Byte 108uy; Byte 100uy; Byte 92uy;
+     Byte 110uy; Byte 92uy; Byte 110uy; Byte 0uy|]; Label "main"; PushRealRs;
+ MovRM (R 0,Lbl "$48_65_6c_6c_6f_9_57_6f_72_6c_64_5c_6e_5c_6e"); Push (R 0);
+ MovRR (BP,SP); Call "printf"; PopRealRs; MovRC (R 0,Int 0); Ret; Ret]

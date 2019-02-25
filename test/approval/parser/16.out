@@ -1,16 +1,16 @@
 GlobalParse
   [DeclareHelper
-     [Declare ("main",Function ([],Int));
+     [Declare ("main",Function ([Unknown []],Int));
       Assign
-        (Value (Var ("main",Function ([],Int))),
+        (Value (Var ("main",Function ([Unknown []],Int))),
          Function
-           ([],
+           ([(".", Unknown [])],
             Block
               [DeclareHelper
                  [Declare ("ptr",Pointer (Int,Some 4));
                   Assign
                     (Value (Var ("ptr",Pointer (Int,Some 4))),
-                     Value (Var ("NULL",Unknown [])))];
+                     Value (Lit ("0",Pointer (Void,Some 0))))];
                Apply
                  (Value (Var ("printf",Unknown [])),
                   [Value

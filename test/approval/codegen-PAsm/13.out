@@ -1,0 +1,20 @@
+[Br "main"; Label "$45_6c_65_6d_65_6e_74_5b_25_64_5d_20_3d_20_25_64_a";
+ Data
+   [|Byte 69uy; Byte 108uy; Byte 101uy; Byte 109uy; Byte 101uy; Byte 110uy;
+     Byte 116uy; Byte 91uy; Byte 37uy; Byte 100uy; Byte 93uy; Byte 32uy;
+     Byte 61uy; Byte 32uy; Byte 37uy; Byte 100uy; Byte 10uy; Byte 0uy|];
+ Label "main"; AddC (SP,Int 3); Alloc 40; MovRR (R 1,R 0); MovRC (R 2,Int 0);
+ Br "enter_loop_1"; Label "loop_2"; MovRR (R 0,R 2); AddC (R 0,Int 100);
+ Push (R 0); Push (R 1); MovRR (R 0,R 2); Add (R 0,SP); SubC (SP,Int 1);
+ MovMR (Indirect (R 0),SP); Pop (R 0); MovRR (R 0,R 2); AddC (R 0,Int 1);
+ MovRR (R 2,R 0); SubC (R 0,Int 1); Label "enter_loop_1"; Push (R 2);
+ MovRC (R 0,Int 10); Cmp (R 0,SP); SubC (SP,Int 1); MovRR (R 0,PSR_LT);
+ CmpC (R 0,Byte 0uy); BrT "loop_2"; MovRC (R 3,Int 0); Br "enter_loop_3";
+ Label "loop_4"; PushRealRs;
+ MovRM (R 0,Lbl "$45_6c_65_6d_65_6e_74_5b_25_64_5d_20_3d_20_25_64_a");
+ Push (R 0); Push (R 3); Push (R 1); MovRR (R 0,R 3); Add (R 0,SP);
+ SubC (SP,Int 1); MovRM (R 0,Indirect (R 0)); Push (R 0); MovRR (BP,SP);
+ Call "printf"; PopRealRs; MovRR (R 0,R 3); AddC (R 0,Int 1); MovRR (R 3,R 0);
+ SubC (R 0,Int 1); Label "enter_loop_3"; Push (R 3); MovRC (R 0,Int 10);
+ Cmp (R 0,SP); SubC (SP,Int 1); MovRR (R 0,PSR_LT); CmpC (R 0,Byte 0uy);
+ BrT "loop_4"; MovRC (R 0,Int 0); SubC (SP,Int 3); Ret; SubC (SP,Int 3); Ret]

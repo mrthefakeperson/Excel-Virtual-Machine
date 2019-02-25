@@ -3,13 +3,13 @@ GlobalParse
      [Declare ("max",Function ([Int; Int],Int));
       Assign
         (Value (Var ("max",Function ([Int; Int],Int))),
-         Function ([("num1", Int); ("num2", Int)],Value Unit))];
+         Function ([("num1", Int); ("num2", Int)],Block []))];
    DeclareHelper
-     [Declare ("main",Function ([],Int));
+     [Declare ("main",Function ([Unknown []],Int));
       Assign
-        (Value (Var ("main",Function ([],Int))),
+        (Value (Var ("main",Function ([Unknown []],Int))),
          Function
-           ([],
+           ([(".", Unknown [])],
             Block
               [DeclareHelper
                  [Declare ("a",Int);

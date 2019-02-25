@@ -1,0 +1,4 @@
+(Int 0,
+ "Address of var1 variable: %x
+ (fmt [Ptr (4,Int)])Address of var2 variable: %x
+ (fmt [Ptr (5,Pointer (Char,Some 10))])")

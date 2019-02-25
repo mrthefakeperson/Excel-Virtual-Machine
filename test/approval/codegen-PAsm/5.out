@@ -1,0 +1,3 @@
+[Br "main"; Label "count"; Data [|Int 0|]; Label "write_extern"; Ret;
+ Label "main"; MovRC (R 0,Int 5); MovMR (Lbl "count",R 0); PushRealRs;
+ MovRR (BP,SP); Call "write_extern"; PopRealRs; Ret]
