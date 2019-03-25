@@ -1,21 +1,19 @@
 GlobalParse
   [DeclareHelper
-     [Declare ("main",Function ([Unknown []],Int));
+     [Declare ("main",Function2 Int);
       Assign
-        (Value (Var ("main",Function ([Unknown []],Int))),
+        (Value (Var ("main",Function2 Int)),
          Function
-           ([(".", Unknown [])],
+           ([],
             Block
               [Block
-                 [Value (Lit ("1",Char));
+                 [Value (Lit ("'1'",Byte));
                   While
-                    (Value (Lit ("1",Char)),
+                    (Value (Lit ("'1'",Byte)),
                      Block
                        [Apply
-                          (Value (Var ("printf",Unknown [])),
+                          (Value (Var ("printf",T (0,[Byte; Int; Int64; ... ]))),
                            [Value
-                              (Lit
-                                 (""This loop will run forever.\n"",
-                                  Pointer (Char,Some 32)))]);
-                        Value (Lit ("1",Char))])];
+                              (Lit (""This loop will run forever.\n"",Ptr Byte))]);
+                        Value (Lit ("'1'",Byte))])];
                Return (Value (Lit ("0",Int)))]))]]

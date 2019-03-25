@@ -1,84 +1,90 @@
 GlobalParse
   [DeclareHelper
-     [Declare ("main",Function ([Unknown []],Int));
+     [Declare ("main",Function2 Int);
       Assign
-        (Value (Var ("main",Function ([Unknown []],Int))),
+        (Value (Var ("main",Function2 Int)),
          Function
-           ([(".", Unknown [])],
+           ([],
             Block
-              [DeclareHelper [Declare ("n",Pointer (Int,Some 40))];
+              [DeclareHelper
+                 [Declare ("n",Ptr Int);
+                  Assign
+                    (Value (Var ("n",T (0,[Byte; Int; Int64; ... ]))),
+                     Apply
+                       (Value (Var ("\stack_alloc",Function ([Int],Ptr Int))),
+                        [Value (Lit ("10",Int))]))];
                DeclareHelper [Declare ("i",Int); Declare ("j",Int)];
                Block
-                 [Assign (Value (Var ("i",Unknown [])),Value (Lit ("0",Int)));
+                 [Assign
+                    (Value (Var ("i",T (0,[Byte; Int; Int64; ... ]))),
+                     Value (Lit ("0",Int)));
                   While
                     (Apply
                        (Value
                           (Var
                              ("<",
-                              Unknown
-                                [Function ([Char; Char],Char);
-                                 Function ([Int; Int],Char);
-                                 Function ([Long; Long],Char);
-                                 Function ([Float; Float],Char);
-                                 Function ([Double; Double],Char)])),
-                        [Value (Var ("i",Unknown [])); Value (Lit ("10",Int))]),
+                              Function
+                                ([T (0,Value is not created.);
+                                  T (0,[Byte; Int; Int64; ... ])],Byte))),
+                        [Value (Var ("i",T (0,[Byte; Int; Int64; ... ])));
+                         Value (Lit ("10",Int))]),
                      Block
                        [Assign
                           (Index
-                             (Value (Var ("n",Unknown [])),
-                              Value (Var ("i",Unknown []))),
+                             (Value (Var ("n",T (0,[Byte; Int; Int64; ... ]))),
+                              Value (Var ("i",T (0,[Byte; Int; Int64; ... ])))),
                            Apply
                              (Value
                                 (Var
                                    ("+",
-                                    Unknown
-                                      [Function ([Char; Char],Char);
-                                       Function ([Int; Int],Int);
-                                       Function ([Long; Long],Long);
-                                       Function ([Float; Float],Float);
-                                       Function ([Double; Double],Double)])),
-                              [Value (Var ("i",Unknown []));
+                                    Function
+                                      ([T (0,Value is not created.);
+                                        T (0,[Byte; Int; Int64; ... ])],
+                                       T (0,[Byte; Int; Int64; ... ])))),
+                              [Value (Var ("i",T (0,[Byte; Int; Int64; ... ])));
                                Value (Lit ("100",Int))]));
                         Apply
-                          (Value (Var ("-",Unknown [])),
+                          (Value (Var ("-",T (0,[Byte; Int; Int64; ... ]))),
                            [Assign
-                              (Value (Var ("i",Unknown [])),
+                              (Value (Var ("i",T (0,[Byte; Int; Int64; ... ]))),
                                Apply
-                                 (Value (Var ("+",Unknown [])),
-                                  [Value (Var ("i",Unknown []));
+                                 (Value
+                                    (Var ("+",T (0,[Byte; Int; Int64; ... ]))),
+                                  [Value
+                                     (Var ("i",T (0,[Byte; Int; Int64; ... ])));
                                    Value (Lit ("1",Int))]));
                             Value (Lit ("1",Int))])])];
                Block
-                 [Assign (Value (Var ("j",Unknown [])),Value (Lit ("0",Int)));
+                 [Assign
+                    (Value (Var ("j",T (0,[Byte; Int; Int64; ... ]))),
+                     Value (Lit ("0",Int)));
                   While
                     (Apply
                        (Value
                           (Var
                              ("<",
-                              Unknown
-                                [Function ([Char; Char],Char);
-                                 Function ([Int; Int],Char);
-                                 Function ([Long; Long],Char);
-                                 Function ([Float; Float],Char);
-                                 Function ([Double; Double],Char)])),
-                        [Value (Var ("j",Unknown [])); Value (Lit ("10",Int))]),
+                              Function
+                                ([T (0,Value is not created.);
+                                  T (0,[Byte; Int; Int64; ... ])],Byte))),
+                        [Value (Var ("j",T (0,[Byte; Int; Int64; ... ])));
+                         Value (Lit ("10",Int))]),
                      Block
                        [Apply
-                          (Value (Var ("printf",Unknown [])),
-                           [Value
-                              (Lit
-                                 (""Element[%d] = %d\n"",Pointer (Char,Some 21)));
-                            Value (Var ("j",Unknown []));
+                          (Value (Var ("printf",T (0,[Byte; Int; Int64; ... ]))),
+                           [Value (Lit (""Element[%d] = %d\n"",Ptr Byte));
+                            Value (Var ("j",T (0,[Byte; Int; Int64; ... ])));
                             Index
-                              (Value (Var ("n",Unknown [])),
-                               Value (Var ("j",Unknown [])))]);
+                              (Value (Var ("n",T (0,[Byte; Int; Int64; ... ]))),
+                               Value (Var ("j",T (0,[Byte; Int; Int64; ... ]))))]);
                         Apply
-                          (Value (Var ("-",Unknown [])),
+                          (Value (Var ("-",T (0,[Byte; Int; Int64; ... ]))),
                            [Assign
-                              (Value (Var ("j",Unknown [])),
+                              (Value (Var ("j",T (0,[Byte; Int; Int64; ... ]))),
                                Apply
-                                 (Value (Var ("+",Unknown [])),
-                                  [Value (Var ("j",Unknown []));
+                                 (Value
+                                    (Var ("+",T (0,[Byte; Int; Int64; ... ]))),
+                                  [Value
+                                     (Var ("j",T (0,[Byte; Int; Int64; ... ])));
                                    Value (Lit ("1",Int))]));
                             Value (Lit ("1",Int))])])];
                Return (Value (Lit ("0",Int)))]))]]

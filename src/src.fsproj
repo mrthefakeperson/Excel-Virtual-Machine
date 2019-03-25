@@ -58,6 +58,7 @@
     <Compile Include="lexer\Tokenize.fs" />
     <Compile Include="lexer\Preprocessor.fs" />
     <Compile Include="lexer\Main.fs" />
+    <Compile Include="parser\Datatype.fs" />
     <Compile Include="parser\AST.fs" />
     <Compile Include="parser\Combinators.fs" />
     <Compile Include="parser\Main.fs" />
@@ -70,6 +71,7 @@
     <Compile Include="codegen\Main.fs" />
     <Compile Include="codewriters\Interpreter.fs" />
     <Compile Include="codewriters\Nasm.fs" />
+    <Compile Include="codewriters\Xlsx.fs" />
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />

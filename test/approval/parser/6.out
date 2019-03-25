@@ -8,6 +8,6 @@ GlobalParse
            ([],
             Block
               [Apply
-                 (Value (Var ("printf",Unknown [])),
-                  [Value (Lit (""count is %d\n"",Pointer (Char,Some 16)));
-                   Value (Var ("count",Unknown []))])]))]]
+                 (Value (Var ("printf",T (0,[Byte; Int; Int64; ... ]))),
+                  [Value (Lit (""count is %d\n"",Ptr Byte));
+                   Value (Var ("count",T (0,[Byte; Int; Int64; ... ])))])]))]]

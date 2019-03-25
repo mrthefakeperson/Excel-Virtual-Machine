@@ -1,6 +1,6 @@
 ﻿module Codegen.BuiltinFunctions
 open Codegen.PAsm
-open Codegen.Interpreter
+open Codegen.PAsm.Flat
 
 let replace_r0 instrs f_append_reg f_append_const append_r0 =
   match List.rev instrs with
@@ -33,4 +33,5 @@ let generate f arg_instrs =
   |">", [a; b] -> push_r0 a @ b @ [Cmp(R 0, SP); SubC(SP, Int 1); MovRR(R 0, PSR_GT)]
   |"<", [a; b] -> push_r0 a @ b @ [Cmp(R 0, SP); SubC(SP, Int 1); MovRR(R 0, PSR_LT)]
   |"printf", args -> [PushRealRs] @ List.collect push_r0 args @ [MovRR(BP, SP); Call "printf"; PopRealRs]
+  |"\stack_alloc", [sz] -> sz @ [MovRR(RX, SP); Add(SP, R 0); MovRR(R 0, SP)]
   |_ -> failwithf "builtin function %s (%i args) not found" f (List.length arg_instrs)

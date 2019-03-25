@@ -1,6 +1,6 @@
 ﻿module Codewriters.Nasm
-open Codegen.PAsm
-open Codegen.Interpreter
+//open Codegen.PAsm
+//open Codegen.PAsm.Flat
 
-let write_nasm (instrs: Boxed Asm list) : string =
-  ""
+//let write_nasm (instrs: Asm list) : string =
+//  ""

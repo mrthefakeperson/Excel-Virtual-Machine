@@ -68,6 +68,9 @@
     <Compile Include="..\src\lexer\Main.fs">
       <Link>lexer\Main.fs</Link>
     </Compile>
+    <Compile Include="..\src\parser\Datatype.fs">
+      <Link>parser\Datatype.fs</Link>
+    </Compile>
     <Compile Include="..\src\parser\AST.fs">
       <Link>parser\AST.fs</Link>
     </Compile>
@@ -106,8 +109,12 @@
     <Compile Include="..\src\codewriters\Interpreter.fs">
       <Link>codewriters\Interpreter.fs</Link>
     </Compile>
+    <Compile Include="codewriters\TestInterpreter.fs" />
     <Compile Include="..\src\codewriters\Nasm.fs">
       <Link>codewriters\Nasm.fs</Link>
+    </Compile>
+    <Compile Include="..\src\codewriters\Xlsx.fs">
+      <Link>codewriters\Xlsx.fs</Link>
     </Compile>
     <Compile Include="E2e.fs" />
     <Compile Include="Program.fs" />

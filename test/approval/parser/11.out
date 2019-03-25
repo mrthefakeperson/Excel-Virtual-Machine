@@ -1,18 +1,22 @@
 GlobalParse
   [DeclareHelper
-     [Declare ("g",Int); Assign (Value (Var ("g",Int)),Value (Lit ("20",Int)))];
-   DeclareHelper
-     [Declare ("main",Function ([Unknown []],Int));
+     [Declare ("g",Int);
       Assign
-        (Value (Var ("main",Function ([Unknown []],Int))),
+        (Value (Var ("g",T (0,[Byte; Int; Int64; ... ]))),Value (Lit ("20",Int)))];
+   DeclareHelper
+     [Declare ("main",Function2 Int);
+      Assign
+        (Value (Var ("main",Function2 Int)),
          Function
-           ([(".", Unknown [])],
+           ([],
             Block
               [DeclareHelper
                  [Declare ("g",Int);
-                  Assign (Value (Var ("g",Int)),Value (Lit ("10",Int)))];
+                  Assign
+                    (Value (Var ("g",T (0,[Byte; Int; Int64; ... ]))),
+                     Value (Lit ("10",Int)))];
                Apply
-                 (Value (Var ("printf",Unknown [])),
-                  [Value (Lit (""value of g = %d\n"",Pointer (Char,Some 20)));
-                   Value (Var ("g",Unknown []))]);
+                 (Value (Var ("printf",T (0,[Byte; Int; Int64; ... ]))),
+                  [Value (Lit (""value of g = %d\n"",Ptr Byte));
+                   Value (Var ("g",T (0,[Byte; Int; Int64; ... ])))]);
                Return (Value (Lit ("0",Int)))]))]]

@@ -1,9 +1,10 @@
 ﻿module TestCodegen.TestMain
 open Fuchu
+open Parser.Datatype
 open Parser.AST
 open Parser.Main
 open Codegen.PAsm
-open Codegen.Interpreter
+open Codegen.PAsm.Flat
 open Codegen.Main
 
 let test_codegen_direct message ast expected_code =
@@ -13,7 +14,7 @@ let test_codegen_direct message ast expected_code =
    |> ignore
 
 let test_basics() =
-  test_codegen_direct "single value" (Value(Lit("1", Datatype.Int))) [MovRC(R 0, Int 1)]
+  test_codegen_direct "single value" (Value(Lit("1", DT.Int))) [MovRC(R 0, Int 1)]
   
   let expr = parse_string_to_ast_with code_body "{ char a = 'a'; a; }"
   test_codegen_direct "declare single value" expr [MovRC(R 1, Byte(byte 'a'))]
@@ -23,16 +24,17 @@ let test_basics() =
 
   let expr = parse_string_to_ast_with code_body "{ long a[2]; *a = 11L; a[1] = 22L; }"
   let expected = [
-    Alloc 16; MovRR(R 1, R 0)
-    MovRC(R 0, Int64 11L); Push (R 0); MovRR(R 0, R 1); MovMR(Indirect (R 0), SP); Pop (R 0)
-    MovRC(R 0, Int64 22L); Push (R 0); MovRR(R 0, R 1); AddC(R 0, Int 1); MovMR(Indirect (R 0), SP); Pop (R 0)
+    //Alloc 16; MovRR(R 1, R 0)
+    MovRC(R 0, Int 2); MovRR(RX, SP); Add(SP, R 0); MovRR(R 1, SP)
+    MovRC(R 0, Int64 11L); Push (R 0); MovRR(R 0, R 1); Pop RX; MovMR(Indirect (R 0), RX)
+    MovRC(R 0, Int64 22L); Push (R 0); MovRR(R 0, R 1); AddC(R 0, Int 1); Pop RX; MovMR(Indirect (R 0), RX)
    ]
   test_codegen_direct "declare array (local)" expr expected
 
   let expr =
     Block [
-      Apply(Value(Var("+", t_any)), [Value(Lit("1", Datatype.Int)); Value(Lit("2", Datatype.Long))])
-      Apply(Value(Var("+", t_any)), [Value(Lit("3", Datatype.Int)); Value(Lit(string (char 4), Datatype.Char))])
+      Apply(Value(Var("+", TypeClasses.any)), [Value(Lit("1", DT.Int)); Value(Lit("2", DT.Int64))])
+      Apply(Value(Var("+", TypeClasses.any)), [Value(Lit("3", DT.Int)); Value(Lit(sprintf "'%c'" (char 4), DT.Byte))])
      ]
   let expected = [
     MovRC(R 0, Int 1); AddC(R 0, Int64 0L)
@@ -42,7 +44,7 @@ let test_basics() =
    ]
   test_codegen_direct "implicit casting with arithmetic" expr expected
 
-  let expr = If(Value(Lit("'a'", Datatype.Char)), Value(Lit("1", Datatype.Int)), Value(Lit("2", Datatype.Int)))
+  let expr = If(Value(Lit("'a'", DT.Byte)), Value(Lit("1", DT.Int)), Value(Lit("2", DT.Int)))
   let expected = [
     MovRC(R 0, Byte 97uy); CmpC(R 0, Byte 0uy); Br0 "else_1"; MovRC(R 0, Int 1); Br "cont_2"; Label "else_1"; MovRC(R 0, Int 2); Label "cont_2"
    ]

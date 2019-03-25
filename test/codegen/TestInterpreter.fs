@@ -1,10 +1,10 @@
-﻿module TestInterpreter
+﻿module TestCodegen.TestInterpreter
 open Fuchu
+open Parser.Datatype
 open Parser.AST
-open Codegen.TypeCheck
-open Codegen.Interpreter
 open Parser.Main
-open Codegen.Tables
+open Codegen.PAsm
+open Codegen.Interpreter
 
 let test_xpr message ast expected_output =
   testCase message <| fun () ->
@@ -24,12 +24,12 @@ let test_declare() =
   test_xpr "builtins 1" xpr expected
 
   let expected = Int 30, ""
-  let x = Value(Var("x", Datatype.Int))
-  let body_xpr = Apply(Value(Var("+", t_any)), [x; Apply(Value(Var("*", t_any)), [x; x])])
-  let func_type = Datatype.Function([Datatype.Int], Datatype.Int)
+  let x = Value(Var("x", DT.Int))
+  let body_xpr = Apply(Value(Var("+", TypeClasses.any)), [x; Apply(Value(Var("*", TypeClasses.any)), [x; x])])
+  let func_type = DT.Function([DT.Int], DT.Int)
   let decl_func_xpr = Declare("f", func_type)
-  let assign_func_xpr = Assign(Value(Var("f", func_type)), Function(["x", Datatype.Int], Return body_xpr))
-  let xpr = Block [decl_func_xpr; assign_func_xpr; Return(Apply(Value(Var("f", t_any)), [Value(Lit("5", Datatype.Int))]))]
+  let assign_func_xpr = Assign(Value(Var("f", func_type)), Function(["x", DT.Int], Return body_xpr))
+  let xpr = Block [decl_func_xpr; assign_func_xpr; Return(Apply(Value(Var("f", TypeClasses.any)), [Value(Lit("5", DT.Int))]))]
   test_xpr "function call 1" xpr expected
 
   let expected = Int 20, ""
@@ -38,15 +38,18 @@ let test_declare() =
 
   let xpr =
     GlobalParse [
-      DeclareHelper
-     [Declare ("main",Datatype.Function ([Unknown []],Datatype.Int));
-      Assign
-        (Value (Var ("main",Datatype.Function ([Unknown []],Datatype.Int))),
-         Function
-           ([(".", Unknown [])],
-            Block
-              [Apply
-                 (Value (Var ("printf",Unknown [])),
-                  [Value (Lit ("\"Hello, World! \n\"",Pointer (Char,Some 19)))]);
-               Return (Value (Lit ("0",Datatype.Int)))]))]]
+      DeclareHelper [
+        Declare("main", DT.Function2 DT.Int)
+        Assign(Value (Var("main", DT.Function2 DT.Int)),
+          Function([],
+            Block [
+              Apply(Value (Var("printf", TypeClasses.any)),
+                [Value (Lit("\"Hello, World! \n\"", DT.Ptr DT.Byte))]
+               )
+              Return (Value(Lit("0", DT.Int)))
+             ]
+           )
+         )
+       ]
+     ]
   test_xpr "hello world" xpr (Int 0, "Hello, World! \n (fmt [])")

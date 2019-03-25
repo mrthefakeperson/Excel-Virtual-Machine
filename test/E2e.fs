@@ -37,15 +37,16 @@ let ast_process_stage: AST list -> AST list =
      >> apply_mapping_hook prototype_hook
      >> check_type (Codegen.Tables.empty_symbol_table()) >> fst
    )
-
+   
+open Codegen.PAsm
 open Codegen.Interpreter
 let interpret_ast_stage: AST list -> (Boxed * string) list = test_stage "interpret-AST" Codegen.Interpreter.preprocess_eval_ast
 
-open Codegen.PAsm
-let codegen_stage: AST list -> Boxed Asm list list = test_stage "codegen-PAsm" Codegen.Main.generate_from_ast
+open Codegen.PAsm.Flat
+let codegen_stage: AST list -> Asm list list = test_stage "codegen-PAsm" Codegen.Main.generate_from_ast
 
-let interpret_pasm_stage: Boxed Asm list list -> Codewriters.Interpreter.AsmMemory list =
-  test_stage "interpret-PAsm" Codewriters.Interpreter.eval_pasm
+//let interpret_pasm_stage: Asm list list -> Codewriters.Interpreter.State list =
+//  test_stage "interpret-PAsm" Codewriters.Interpreter.eval
 
 let test() =
   testCase "End to end test" <|

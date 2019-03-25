@@ -1,0 +1,135 @@
+﻿module Parser.Datatype
+
+type DT =
+  |Int | Byte | Int64 | Void | Float | Double
+  |Ptr of DT
+  |Function of args: DT list * ret: DT
+  |Function2 of ret: DT  // non-explicit args; symbolizes any function when used in type parameter
+  |T of identifier: int * valid_types: Lazy<DT list>  // type parameter
+  with
+    member x.sizeof =
+      match x with
+      |Int -> 4
+      |Byte -> 1
+      |Int64 -> 8
+      |Void -> 0
+      |Float -> 4
+      |Double -> 8
+      |Ptr _ -> 4
+      |Function _ -> 4
+      |Function2 _ -> 4
+      |T _ -> failwith "cannot get size of T _"
+
+    static member can_promote from to_ =
+      let hierarchy = [Byte; Int; Int64; Float; Double]
+      if from = to_ then true
+      else
+        match List.tryFindIndex ((=) from) hierarchy, List.tryFindIndex ((=) to_) hierarchy with
+        |Some ai, Some bi when ai < bi -> true
+        |_ -> false
+    static member supertype a b =  // automatic casting: when some type wants to be both a and b, choose one of them
+      if DT.can_promote a b then b
+      elif DT.can_promote b a then a
+      else failwithf "cannot decide between type %A and %A" a b
+
+    static member valid_types_map = function
+      |T(x, ts) -> Map [(x, ts)]
+      |Ptr t -> DT.valid_types_map t
+      |Function(args, ret) ->
+        let combine = Map.fold (fun acc k v -> Map.add k v acc)
+        ret::args |> List.map DT.valid_types_map |> List.reduce combine
+      |Function2 ret -> DT.valid_types_map ret
+      |_ -> Map.empty
+
+    static member inference_map model concrete : Map<int, DT list> =  // identifier -> inferred types
+      match model, concrete with
+      |T(x, _), T _ -> Map [(x, [])]  // put an abstract type in concrete to allow other inferences to take priority (eg. unknown return value)
+      //|_, T _ -> failwith "inferring from non-concrete type"
+      |T(x, _), _ -> Map [(x, [concrete])]
+      |Ptr t, Ptr t' -> DT.inference_map t t'
+      |Function(args, ret), Function(args', ret') ->
+        let combine =
+          Map.fold (fun acc k v ->
+            let v' = Option.defaultValue [] (Map.tryFind k acc) @ v
+            Map.add k v' acc
+           )
+        List.map2 DT.inference_map (ret::args) (ret'::args') |> List.reduce combine
+      |Function2 ret, (Function2 ret' | Function(_, ret')) -> DT.inference_map ret ret'
+      |_ -> Map.empty
+
+    static member infer_type' model concrete : DT =
+      let valid_types = DT.valid_types_map model
+      let inferences =
+        DT.inference_map model concrete
+         |> Map.map (fun identifier types ->
+              if types = [] then failwithf "type %A has no concrete candidates" identifier
+              let inferred = List.reduce DT.supertype types
+              if List.exists (fun t -> try ignore (DT.infer_type' t inferred); true with _ -> false) (valid_types.[identifier].Force())
+               then inferred
+               else failwithf "type %A cannot be constrained to %A" identifier inferred
+             )
+      let rec replace = function  // fill in all T parameters
+        |T(x, _) -> inferences.[x]
+        |Ptr t -> Ptr (replace t)
+        |Function(args, ret) -> Function(List.map replace args, replace ret)
+        |Function2 ret -> Function2 (replace ret)
+        |t -> t
+      let rec cast = function  // promote types if possible
+        |T _, _ -> failwith "should never be reached"
+        |t, (T _ as t') -> DT.infer_type' t' t  // now t should be the concrete type, so infer t' into it
+        |(Ptr _ as model), (Ptr _ | Int | Byte | Int64 | Void | Float | Double)
+        |(Int | Byte | Int64 | Float | Double as model), Ptr _ -> model
+        |Function(args, ret), Function(args', ret') -> Function(List.map cast (List.zip args args'), cast (ret, ret'))
+        |Function2 ret, Function2 ret' -> Function2 (cast (ret, ret'))
+        |Function2 ret, Function(args', ret') -> Function(args', cast (ret, ret'))
+        |model, target when DT.can_promote target model -> model
+        |x -> failwithf "cannot resolve cast: %A" x
+      cast (replace model, concrete)
+
+    static member infer_type model concrete : DT =
+     //match model, concrete with
+     //|_ when model = concrete -> model
+     //|_ ->
+      let rec cast = function  // demote types in concrete if possible
+        |T _, t -> t
+        |Ptr t, Ptr t' -> Ptr (cast (t, t'))
+        |Function(args, ret), Function(args', ret') -> Function(List.map cast (List.zip args args'), cast (ret, ret'))
+        |Function2 ret, Function2 ret' -> Function2 (cast (ret, ret'))
+        |Function2 ret, Function(args', ret') -> Function(args', cast (ret, ret'))
+        |model, target when DT.can_promote model target -> model
+        |_, t -> t
+      DT.infer_type' model (cast (model, concrete))
+
+module TypeClasses =
+  let integral n = T(n, lazy [Byte; Int; Int64])
+  let real n = T(n, lazy [Byte; Int; Int64; Float; Double])
+  let rec any' n = T(n, lazy [Byte; Int; Int64; Float; Double; Void; Ptr (any' (n + 1)); Function2 (any' (n + 1))])
+  let any = any' 0
+  let ptr = Ptr any
+  let f_unary x1 r = Function([x1], r)
+  let f_arith_prefix = f_unary (real 0) (real 0)
+  let f_logic_prefix = f_unary (real 0) Byte
+  let f_binary x1 x2 r = Function([x1; x2], r)
+  let f_arith_infix = f_binary (real 0) (real 0) (real 0)
+  let f_logic_infix = f_binary (real 0) (real 0) Byte
+
+  let cast_hierarchies = [
+    [Void]
+    [Byte; Int; Int64; Float; Double]
+    [ptr]
+   ]
+
+
+//open TypeClasses
+//let (Function([Int; Int], Int)) = DT.infer_type f_arith_infix (Function([Int; Int], Int))
+//let (Ptr Int) = DT.infer_type ptr (Ptr Int)
+//let (Ptr (Ptr (Ptr (Ptr Void)))) = DT.infer_type ptr (Ptr (Ptr (Ptr (Ptr Void))))
+//let (Function([Int64; Int64], Byte)) = DT.infer_type f_logic_infix (Function([Int; Int64], Byte))
+//let (Function([Int64; Int64], Byte)) = DT.infer_type f_logic_infix (Function([Int64; Int], Byte))
+//let (Function([Float; Float], Float)) = DT.infer_type f_arith_infix (Function([Int; Float], Int64))
+//let (Function([Float; Float], Byte)) = DT.infer_type f_logic_infix (Function([Int; Float], Int64))
+//let (Ptr Byte) = DT.infer_type any (Ptr Byte)
+//let (Function([Int], Double)) = DT.infer_type any (Function([Int], Double))
+//let (Function([], Int)) = DT.infer_type (Function2 Int) (Function([], Int64))
+//let (Ptr (Function([], Ptr Void))) = DT.infer_type ptr (Ptr (Function([], Ptr Void)))
+//let (Function([Int; Int], Int)) = DT.infer_type f_arith_infix (Function([Int; Int], real 0))

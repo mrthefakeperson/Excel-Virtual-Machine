@@ -24,8 +24,7 @@
      Byte 32uy; Byte 118uy; Byte 97uy; Byte 114uy; Byte 105uy; Byte 97uy;
      Byte 98uy; Byte 108uy; Byte 101uy; Byte 58uy; Byte 32uy; Byte 37uy;
      Byte 100uy; Byte 10uy; Byte 0uy|]; Label "main"; AddC (SP,Int 2);
- MovRC (R 1,Int 20); Alloc 4; MovRR (R 2,R 0); MovRHandle (R 0,HandleReg 1);
- AddC (R 0,Ptr (0,Int)); MovRR (R 2,R 0); PushRealRs;
+ MovRC (R 1,Int 20); MovRHandle (R 0,HandleReg 1); MovRR (R 2,R 0); PushRealRs;
  MovRM
    (R 0,
     Lbl

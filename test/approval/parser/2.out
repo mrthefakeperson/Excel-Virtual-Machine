@@ -2,49 +2,50 @@ GlobalParse
   [DeclareHelper [Declare ("a",Int); Declare ("b",Int)];
    DeclareHelper [Declare ("c",Int)]; DeclareHelper [Declare ("f",Float)];
    DeclareHelper
-     [Declare ("main",Function ([Unknown []],Int));
+     [Declare ("main",Function2 Int);
       Assign
-        (Value (Var ("main",Function ([Unknown []],Int))),
+        (Value (Var ("main",Function2 Int)),
          Function
-           ([(".", Unknown [])],
+           ([],
             Block
               [DeclareHelper [Declare ("a",Int); Declare ("b",Int)];
                DeclareHelper [Declare ("c",Int)];
                DeclareHelper [Declare ("f",Float)];
-               Assign (Value (Var ("a",Unknown [])),Value (Lit ("10",Int)));
-               Assign (Value (Var ("b",Unknown [])),Value (Lit ("20",Int)));
                Assign
-                 (Value (Var ("c",Unknown [])),
+                 (Value (Var ("a",T (0,[Byte; Int; Int64; ... ]))),
+                  Value (Lit ("10",Int)));
+               Assign
+                 (Value (Var ("b",T (0,[Byte; Int; Int64; ... ]))),
+                  Value (Lit ("20",Int)));
+               Assign
+                 (Value (Var ("c",T (0,[Byte; Int; Int64; ... ]))),
                   Apply
                     (Value
                        (Var
                           ("+",
-                           Unknown
-                             [Function ([Char; Char],Char);
-                              Function ([Int; Int],Int);
-                              Function ([Long; Long],Long);
-                              Function ([Float; Float],Float);
-                              Function ([Double; Double],Double)])),
-                     [Value (Var ("a",Unknown [])); Value (Var ("b",Unknown []))]));
+                           Function
+                             ([T (0,Value is not created.);
+                               T (0,[Byte; Int; Int64; ... ])],
+                              T (0,[Byte; Int; Int64; ... ])))),
+                     [Value (Var ("a",T (0,[Byte; Int; Int64; ... ])));
+                      Value (Var ("b",T (0,[Byte; Int; Int64; ... ])))]));
                Apply
-                 (Value (Var ("printf",Unknown [])),
-                  [Value (Lit (""value of c : %d \n"",Pointer (Char,Some 21)));
-                   Value (Var ("c",Unknown []))]);
+                 (Value (Var ("printf",T (0,[Byte; Int; Int64; ... ]))),
+                  [Value (Lit (""value of c : %d \n"",Ptr Byte));
+                   Value (Var ("c",T (0,[Byte; Int; Int64; ... ])))]);
                Assign
-                 (Value (Var ("f",Unknown [])),
+                 (Value (Var ("f",T (0,[Byte; Int; Int64; ... ]))),
                   Apply
                     (Value
                        (Var
                           ("/",
-                           Unknown
-                             [Function ([Char; Char],Char);
-                              Function ([Int; Int],Int);
-                              Function ([Long; Long],Long);
-                              Function ([Float; Float],Float);
-                              Function ([Double; Double],Double)])),
+                           Function
+                             ([T (0,Value is not created.);
+                               T (0,[Byte; Int; Int64; ... ])],
+                              T (0,[Byte; Int; Int64; ... ])))),
                      [Value (Lit ("70.0",Float)); Value (Lit ("3.0",Float))]));
                Apply
-                 (Value (Var ("printf",Unknown [])),
-                  [Value (Lit (""value of f : %f \n"",Pointer (Char,Some 21)));
-                   Value (Var ("f",Unknown []))]);
+                 (Value (Var ("printf",T (0,[Byte; Int; Int64; ... ]))),
+                  [Value (Lit (""value of f : %f \n"",Ptr Byte));
+                   Value (Var ("f",T (0,[Byte; Int; Int64; ... ])))]);
                Return (Value (Lit ("0",Int)))]))]]

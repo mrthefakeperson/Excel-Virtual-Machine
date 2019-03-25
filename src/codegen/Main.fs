@@ -1,13 +1,15 @@
 ﻿module Codegen.Main
+open Parser.Datatype
 open Parser.AST
 open Codegen.Tables
 open Codegen.PAsm
+open Codegen.PAsm.Flat
 open Codegen.Hooks
 open Codegen.TypeCheck
 open Codegen.Interpreter
 open Codegen.BuiltinFunctions
 
-let get_highest_register: Boxed Asm list -> int =
+let get_highest_register: Asm list -> int =
   List.fold (fun acc_max -> function
     |MovRR(r1, r2) | MovRM(r1, Indirect r2) | MovMR(Indirect r1, r2) ->
       let acc_max' = match r1 with R n -> max n acc_max | _ -> acc_max
@@ -27,8 +29,8 @@ let rec addr_of (symtbl: SymbolTable) = function
     |Local(reg, sz) -> [MovRHandle(R 0, HandleReg reg)]
     |Global sz -> [MovRHandle(R 0, HandleLbl name)]
   |Apply(Value(Var("*prefix", _)), [addr]) -> generate symtbl addr
-  |Apply(Value(Var("\cast", t)), [xpr]) -> addr_of symtbl xpr @ [AddC(R 0, Ptr(0, Datatype.Pointer(t, None)))]
-  |Index(a, i) -> generate symtbl (Apply(Value(Var("+", tf_arith_infix)), [a; i]))
+  |Apply(Value(Var("\cast", t)), [xpr]) -> addr_of symtbl xpr @ [AddC(R 0, Ptr(0, DT.Ptr t))]
+  |Index(a, i) -> generate symtbl (Apply(Value(Var("+", TypeClasses.f_arith_infix)), [a; i]))  // probably doesn't work
   |unexpected -> failwithf "cannot deference %A" unexpected
 
 // after each expression, the result should be in R0 (if there is one)
@@ -49,9 +51,9 @@ and generate (symtbl: SymbolTable) = function
     match addr_of symtbl a with
     |[MovRHandle(R 0, HandleLbl lbl)] -> generate symtbl b @ [MovMR(Lbl lbl, R 0)]
     |[MovRHandle(R 0, HandleReg reg)] -> to_rn_from_r0 (R reg) (generate symtbl b)
-    |instrs -> generate symtbl b @ [Push (R 0)] @ instrs @ [MovMR(Indirect(R 0), SP); Pop (R 0)]
+    |instrs -> generate symtbl b @ [Push (R 0)] @ instrs @ [Pop RX; MovMR(Indirect(R 0), RX); MovRR(R 0, RX)]
   |Index(a, i) ->
-    generate symtbl (Apply(Value(Var("*prefix", t_any)), [Apply(Value(Var("+", tf_arith_infix)), [a; i])]))
+    generate symtbl (Apply(Value(Var("*prefix", TypeClasses.any)), [Apply(Value(Var("+", TypeClasses.any)), [a; i])]))  // probably doesn't work
   |Declare _ | DeclareHelper _ -> failwith "should never be reached; handled in block"
   |Return ast ->
     match ast with
@@ -64,11 +66,11 @@ and generate (symtbl: SymbolTable) = function
   |Block xprs ->
     let rec gen_block (symtbl: SymbolTable) = function
       |DeclareHelper decls::rest -> gen_block symtbl (decls @ rest)
-      |Declare(name, (Pointer(_, Some sz) as t))::rest ->  // TODO: dynamic alloc
-        let symtbl' = symtbl.register_var name t
-        match symtbl'.check_var name t with
-        |Local(reg, _) -> [Alloc sz; MovRR(R reg, R 0)] @ gen_block symtbl' rest
-        |_ -> failwith "should never be reached"
+      //|Declare(name, (Ptr(_, Some sz) as t))::rest ->  // TODO: dynamic alloc
+      //  let symtbl' = symtbl.register_var name t
+      //  match symtbl'.check_var name t with
+      //  |Local(reg, _) -> [Alloc sz; MovRR(R reg, R 0)] @ gen_block symtbl' rest
+      //  |_ -> failwith "should never be reached"
       |Declare(name, t)::rest -> gen_block (symtbl.register_var name t) rest
       |xpr::rest -> drop_r0 (generate symtbl xpr) @ gen_block symtbl rest
       |[] -> []
@@ -76,8 +78,10 @@ and generate (symtbl: SymbolTable) = function
   |If(cond, thn, els) ->
     let els_label, cont_label = symtbl.get_label "else", symtbl.get_label "cont"
     match thn, els with
-    |_, (Value Unit | Block []) -> generate symtbl cond @ [CmpC(R 0, Byte 0uy); Br0 els_label] @ generate symtbl thn @ [Label els_label]
-    |(Value Unit | Block []), _ -> generate symtbl cond @ [CmpC(R 0, Byte 0uy); BrT cont_label] @ generate symtbl els @ [Label cont_label]
+    |_, (Value(Lit(_, DT.Void)) | Block []) ->
+      generate symtbl cond @ [CmpC(R 0, Byte 0uy); Br0 els_label] @ generate symtbl thn @ [Label els_label]
+    |(Value(Lit(_, DT.Void)) | Block []), _ ->
+      generate symtbl cond @ [CmpC(R 0, Byte 0uy); BrT cont_label] @ generate symtbl els @ [Label cont_label]
     |_ ->
       generate symtbl cond @ [CmpC(R 0, Byte 0uy); Br0 els_label]
        @ generate symtbl thn @ [Br cont_label; Label els_label]
@@ -85,7 +89,7 @@ and generate (symtbl: SymbolTable) = function
   |While(cond, body) ->
     let enter_loop_label, loop_label = symtbl.get_label "enter_loop", symtbl.get_label "loop"
     match body with
-    |Value Unit | Block [] -> [Label loop_label] @ generate symtbl cond @ [CmpC(R 0, Byte 0uy); BrT loop_label]
+    |Value(Lit(_, DT.Void)) | Block [] -> [Label loop_label] @ generate symtbl cond @ [CmpC(R 0, Byte 0uy); BrT loop_label]
     |_ ->
       [Br enter_loop_label; Label loop_label] @ generate symtbl body
        @ [Label enter_loop_label] @ generate symtbl cond @ [CmpC(R 0, Byte 0uy); BrT loop_label]
@@ -94,10 +98,10 @@ and generate (symtbl: SymbolTable) = function
     match symtbl.check_var name typ with
     |Local(reg, sz) -> [MovRR(R 0, R reg)]
     |Global sz -> [MovRM(R 0, Lbl name)]
+  |Value(Lit(_, DT.Void)) -> []
   |Value(Lit _) as v ->
     let x = eval_ast (default_memory()) v
     [MovRC(R 0, x)]
-  |Value Unit -> []
   |GlobalParse xprs ->
     let rec gen_global (symtbl: SymbolTable) = function
       |Declare(name, t)::Assign(Value(Var(n2, t2)), Function(args, (Block _ as body)))::rest when name = n2 && t = t2 ->
@@ -134,13 +138,15 @@ and generate (symtbl: SymbolTable) = function
           |Assign(Value(Var(n2, t2)), _) | Assign(Index(Value(Var(n2, t2)), _), _) when name = n2 && t = t2 -> true
           |Assign _ as x -> failwithf "invalid global value initialization: %A" x
           |_ -> false
-        let assigns, rest = Array.takeWhile grouped_assign (Array.ofList rest), List.skipWhile grouped_assign rest
-        let data =
-          Array.map (function
-            |Assign(_, xpr) -> eval_ast (default_memory()) xpr  // TODO: don't use default memory, import definitions
-            |_ -> failwith "should never be reached"
-           ) assigns
-        [Label name] @ [Data data] @ gen_global (symtbl.register_global_var name t) rest
+        let assigns, rest = List.takeWhile grouped_assign rest, List.skipWhile grouped_assign rest
+        match assigns with
+        |Assign(_, Apply(Value(Var("\stack_alloc", _)), _))::assigns | assigns ->
+          let data =
+            Array.map (function
+              |Assign(_, xpr) -> eval_ast (default_memory()) xpr  // TODO: don't use default memory, import definitions
+              |_ -> failwith "should never be reached"
+             ) (Array.ofList assigns)
+          [Label name] @ [Data data] @ gen_global (symtbl.register_global_var name t) rest
       |Declare(name, t)::rest ->
         [Label name] @ [Data [|Boxed.default_value t|]] @ gen_global (symtbl.register_global_var name t) rest
       |[] -> []

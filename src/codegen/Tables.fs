@@ -1,15 +1,15 @@
 ﻿module Codegen.Tables
-open Parser.AST
+open Parser.Datatype
 
 type VarInfo = Local of register: int * size: int | Global of size: int
 
 type SymbolTable = {
   next_register: int  // registers are 4-byte-aligned, next_register is the next multiple of 4 bytes to alloc from stack
   var_to_register: (string * int) list  // register allocation tracked using a stack
-  var_to_type: Map<string, Datatype>
+  var_to_type: Map<string, DT>
   struct_type_to_properties: Map<string, (string * int) list>
   globals: Set<string>
-  return_type: Datatype Option  // for typecheck, return type in current function
+  return_type: DT Option  // for typecheck, return type in current function
 
   // mutables
   mutable max_register: int
@@ -17,7 +17,7 @@ type SymbolTable = {
  }
   with
     member x.register_var vname typ =
-      match typ with Unknown _ -> failwithf "variable %s has ambiguous type?" vname | _ -> ()
+      match typ with T _ -> failwithf "variable %s has ambiguous type?" vname | _ -> ()
       let next_register = x.next_register + (typ.sizeof + 3) / 4
       x.max_register <- max x.max_register next_register
       { x with
@@ -26,11 +26,11 @@ type SymbolTable = {
           var_to_register = (vname, x.next_register)::x.var_to_register }
 
     // assert correct parsing metadata about vname, get (register, size) or only size if global
-    member x.check_var vname (typ: Datatype) =
+    member x.check_var vname dt =
       if not (Map.containsKey vname x.var_to_type) then
         failwithf "variable %s not registered" vname
-      if not (typ.is_superset_of x.var_to_type.[vname]) then
-        failwithf "variable %s (type %A) is not of type %A" vname x.var_to_type.[vname] typ
+      //try ignore <| DT.infer_type dt x.var_to_type.[vname]
+      //with _ -> failwithf "variable %s (type %A) is not of type %A" vname x.var_to_type.[vname] dt
       match List.tryFind (fst >> (=) vname) x.var_to_register with
       |Some(_, register) ->
         let size = x.var_to_type.[vname].sizeof
@@ -52,27 +52,29 @@ type SymbolTable = {
       finally x.next_label <- x.next_label + 1
 
 let builtins = [
-  "+", tf_arith_infix
-  "-", tf_arith_infix
-  "*", tf_arith_infix
-  "/", tf_arith_infix
-  "%", tf_arith_infix
+  "+", TypeClasses.f_arith_infix
+  "-", TypeClasses.f_arith_infix
+  "*", TypeClasses.f_arith_infix
+  "/", TypeClasses.f_arith_infix
+  "%", TypeClasses.f_arith_infix
   // TODO: named type parameters (eg. Function([Unknown([], name = "t")], Ptr("t", "t".sizeof)))
   //                               or Function([Unknown([], name = "t"); "t"], "t")
   // the following are temporary
-  "&prefix", Unknown [for t in TypeClasses.ptr_compatible -> Datatype.Function([t], Pointer(t, None))]  //Unknown [for t in [Int; Char; Long; Void; Float; Double; Pointer(Unknown [], None)] -> Datatype.Function([t], Pointer(t, None))]
-  "*prefix", Unknown [for t in TypeClasses.ptr_compatible -> Datatype.Function([Pointer(t, None)], t)] //Unknown [for t in [Int; Char; Long; Void; Float; Double; Pointer(Unknown [], None)] -> Datatype.Function([Pointer(t, None)], t)]
+  "&prefix", DT.Function([TypeClasses.any' 0], Ptr (TypeClasses.any' 0))
+  "*prefix", DT.Function([Ptr (TypeClasses.any' 0)], TypeClasses.any' 0)
 
-  "&&", tf_logic_infix
-  "||", tf_logic_infix
-  "==", tf_logic_infix
-  "<", tf_logic_infix
-  ">", tf_logic_infix
-  "<=", tf_logic_infix
-  ">=", tf_logic_infix
+  "&&", TypeClasses.f_logic_infix
+  "||", TypeClasses.f_logic_infix
+  "==", TypeClasses.f_logic_infix
+  "<", TypeClasses.f_logic_infix
+  ">", TypeClasses.f_logic_infix
+  "<=", TypeClasses.f_logic_infix
+  ">=", TypeClasses.f_logic_infix
+
+  "\stack_alloc", DT.Function([Int], TypeClasses.ptr)
 
   // TEMP: this probably shouldn't be builtin
-  "printf", Datatype.Function([t_any], Void)
+  "printf", DT.Function2 Void
  ]
 
 let empty_symbol_table() = {

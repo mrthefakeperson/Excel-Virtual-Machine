@@ -1,7 +1,0 @@
-parser implementation / error selection	none	second	combined	priority	longest parse	longest with codes instead of strings
-functional	0.03852692	16.5167342			16.18415942	0.03527454
-quotation generator						
-parse tree & lookup table						
-combinator tree traversal						
-						
-conclusion: passing error strings makes it slow						

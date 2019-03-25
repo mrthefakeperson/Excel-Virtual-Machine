@@ -5,40 +5,45 @@ GlobalParse
         (Value (Var ("sum",Function ([Int; Int],Int))),
          Function ([("a", Int); ("b", Int)],Block []))];
    DeclareHelper
-     [Declare ("a",Int); Assign (Value (Var ("a",Int)),Value (Lit ("20",Int)))];
-   DeclareHelper
-     [Declare ("main",Function ([Unknown []],Int));
+     [Declare ("a",Int);
       Assign
-        (Value (Var ("main",Function ([Unknown []],Int))),
+        (Value (Var ("a",T (0,[Byte; Int; Int64; ... ]))),Value (Lit ("20",Int)))];
+   DeclareHelper
+     [Declare ("main",Function2 Int);
+      Assign
+        (Value (Var ("main",Function2 Int)),
          Function
-           ([(".", Unknown [])],
+           ([],
             Block
               [DeclareHelper
                  [Declare ("a",Int);
-                  Assign (Value (Var ("a",Int)),Value (Lit ("10",Int)))];
+                  Assign
+                    (Value (Var ("a",T (0,[Byte; Int; Int64; ... ]))),
+                     Value (Lit ("10",Int)))];
                DeclareHelper
                  [Declare ("b",Int);
-                  Assign (Value (Var ("b",Int)),Value (Lit ("20",Int)))];
+                  Assign
+                    (Value (Var ("b",T (0,[Byte; Int; Int64; ... ]))),
+                     Value (Lit ("20",Int)))];
                DeclareHelper
                  [Declare ("c",Int);
-                  Assign (Value (Var ("c",Int)),Value (Lit ("0",Int)))];
+                  Assign
+                    (Value (Var ("c",T (0,[Byte; Int; Int64; ... ]))),
+                     Value (Lit ("0",Int)))];
                Apply
-                 (Value (Var ("printf",Unknown [])),
-                  [Value
-                     (Lit
-                        (""value of a in main() = %d\n"",Pointer (Char,Some 30)));
-                   Value (Var ("a",Unknown []))]);
+                 (Value (Var ("printf",T (0,[Byte; Int; Int64; ... ]))),
+                  [Value (Lit (""value of a in main() = %d\n"",Ptr Byte));
+                   Value (Var ("a",T (0,[Byte; Int; Int64; ... ])))]);
                Assign
-                 (Value (Var ("c",Unknown [])),
+                 (Value (Var ("c",T (0,[Byte; Int; Int64; ... ]))),
                   Apply
-                    (Value (Var ("sum",Unknown [])),
-                     [Value (Var ("a",Unknown [])); Value (Var ("b",Unknown []))]));
+                    (Value (Var ("sum",T (0,[Byte; Int; Int64; ... ]))),
+                     [Value (Var ("a",T (0,[Byte; Int; Int64; ... ])));
+                      Value (Var ("b",T (0,[Byte; Int; Int64; ... ])))]));
                Apply
-                 (Value (Var ("printf",Unknown [])),
-                  [Value
-                     (Lit
-                        (""value of c in main() = %d\n"",Pointer (Char,Some 30)));
-                   Value (Var ("c",Unknown []))]);
+                 (Value (Var ("printf",T (0,[Byte; Int; Int64; ... ]))),
+                  [Value (Lit (""value of c in main() = %d\n"",Ptr Byte));
+                   Value (Var ("c",T (0,[Byte; Int; Int64; ... ])))]);
                Return (Value (Lit ("0",Int)))]))];
    DeclareHelper
      [Declare ("sum",Function ([Int; Int],Int));
@@ -48,26 +53,21 @@ GlobalParse
            ([("a", Int); ("b", Int)],
             Block
               [Apply
-                 (Value (Var ("printf",Unknown [])),
-                  [Value
-                     (Lit
-                        (""value of a in sum() = %d\n"",Pointer (Char,Some 29)));
-                   Value (Var ("a",Unknown []))]);
+                 (Value (Var ("printf",T (0,[Byte; Int; Int64; ... ]))),
+                  [Value (Lit (""value of a in sum() = %d\n"",Ptr Byte));
+                   Value (Var ("a",T (0,[Byte; Int; Int64; ... ])))]);
                Apply
-                 (Value (Var ("printf",Unknown [])),
-                  [Value
-                     (Lit
-                        (""value of b in sum() = %d\n"",Pointer (Char,Some 29)));
-                   Value (Var ("b",Unknown []))]);
+                 (Value (Var ("printf",T (0,[Byte; Int; Int64; ... ]))),
+                  [Value (Lit (""value of b in sum() = %d\n"",Ptr Byte));
+                   Value (Var ("b",T (0,[Byte; Int; Int64; ... ])))]);
                Return
                  (Apply
                     (Value
                        (Var
                           ("+",
-                           Unknown
-                             [Function ([Char; Char],Char);
-                              Function ([Int; Int],Int);
-                              Function ([Long; Long],Long);
-                              Function ([Float; Float],Float);
-                              Function ([Double; Double],Double)])),
-                     [Value (Var ("a",Unknown [])); Value (Var ("b",Unknown []))]))]))]]
+                           Function
+                             ([T (0,Value is not created.);
+                               T (0,[Byte; Int; Int64; ... ])],
+                              T (0,[Byte; Int; Int64; ... ])))),
+                     [Value (Var ("a",T (0,[Byte; Int; Int64; ... ])));
+                      Value (Var ("b",T (0,[Byte; Int; Int64; ... ])))]))]))]]

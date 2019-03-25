@@ -1,193 +1,146 @@
 ﻿module Codewriters.Interpreter
-open Parser.AST
-open Codegen.PAsm
-open Codegen.Interpreter
+//open Parser.AST
+//open Codegen.PAsm.Simple
+//open Codegen.PAsm
 
-type AsmMemory = {
-  code: Lazy<Boxed>[]
-  pc: int
-  reg_sp: Boxed
-  reg_bp: Boxed
-  reg_psr: Boxed * Boxed * Boxed
-  real_regs: Boxed[]
-  labels: Map<string, int>
-  stack: Boxed[]
-  mem: Boxed[]
-  alloc_ptr: int
- }
-   with
-    member x.deref v =
-      match v with
-      |Ptr(addr, t) ->
-        let value = if addr >= STACK_START then x.stack.[addr - STACK_START] else x.mem.[addr]
-        // type check here
-        value
-      |_ -> failwith "can't deref a non-pointer value"
+////open Codegen.PAsm.Flat
 
-    member x.read_register reg =
-      match reg with
-      |SP -> x.reg_sp
-      |BP -> x.reg_bp
-      |R 0 -> x.real_regs.[0]
-      |RX -> x.real_regs.[1]
-      |R n when 0 < n && n < NUM_REAL_REGS - 1 -> x.real_regs.[n + 1]
-      |R n ->
-        match x.reg_bp, x.reg_sp with
-        |Ptr(base_addr, _), Ptr _ ->
-          let sp_offset = if n < 0 then n else n - NUM_REAL_REGS
-          x.stack.[base_addr + sp_offset]
-        |_ -> failwith "bp and sp should be Ptr's"
-      |PSR_EQ -> x.reg_psr |> fun (a, _, _) -> a
-      |PSR_GT -> x.reg_psr |> fun (_, a, _) -> a
-      |PSR_LT -> x.reg_psr |> fun (_, _, a) -> a
+//let inline (|Strict|) x = failwithf "failed irrefutable pattern with %A" x
 
-    member x.write_register reg v =
-      match reg with
-      |SP -> {x with reg_sp = v}
-      |BP -> {x with reg_bp = v}
-      |R 0 -> x.real_regs.[0] <- v; x
-      |RX -> x.real_regs.[1] <- v; x
-      |R n when 0 < n && n < NUM_REAL_REGS - 1 -> x.real_regs.[n + 1] <- v; x
-      |R n ->
-        match x.reg_bp, x.reg_sp with
-        |Ptr(base_addr, _), Ptr _ ->
-          let sp_offset = if n < 0 then n else n - NUM_REAL_REGS
-          x.stack.[base_addr + sp_offset] <- v; x
-        |_ -> failwith "bp and sp should be Ptr's"
-      |PSR_EQ | PSR_LT | PSR_GT -> failwith "can't write to PSR"
+//let REAL_REGS = [R 0; RX; BP; SP; PSR_EQ; PSR_GT; PSR_LT]
 
-    member x.stack_push v =
-      match x.read_register SP with Ptr(addr, _) -> x.mem.[addr] <- v | _ -> failwith "SP should be a Ptr"
-      x.write_register SP (x.read_register SP + Int 1)
+//type State = {
+//  mem: Boxed[]
+//  pc: int
+//  regs: Map<Register, Boxed>
+//  next_alloc: int
+// }
+//  with
+//    static member initialize (code: #(Asm seq)) =
+//      let initial = {
+//        mem = Array.create (max STACK_START CODE_START * 2) Void
+//        pc = CODE_START
+//        regs = Map (List.map (fun r -> (r, Void)) REAL_REGS)
+//        next_alloc = 1
+//       }
+//      let code_as_boxed = Array.ofSeq code |> Array.collect (function Data data -> data | _ -> [|Void|])
+//      Array.blit initial.mem CODE_START code_as_boxed 0 code_as_boxed.Length
+//      let init_registers = [(BP, Ptr(STACK_START, Datatype.Char)); (SP, Ptr(STACK_START, Datatype.Char))]
+//      { initial with
+//          regs = List.fold (fun acc (k, v) -> Map.add k v acc) initial.regs init_registers }
+//    static member branch pc' state = {state with pc = pc'}
+//    static member to_next_pc state = State.branch (state.pc + 1) state
+//    static member current_pc (state: State) = Ptr(state.pc, Datatype.Char)
 
-    member x.stack_pop =
-      match x.read_register SP with
-      |Ptr(addr, _) when addr - 1 < STACK_START -> failwith "stack underflow?"
-      |Ptr(addr, _) -> x.mem.[addr], x.write_register SP (x.read_register SP - Int 1)
-      |_ -> failwith "SP should be a Ptr"
+//    static member read_register reg (state: State) =
+//      if state.regs.ContainsKey reg
+//       then state.regs.[reg]
+//       else state.mem.[Option.get (reg_addr reg)]
+//    static member write_register reg value (state: State) =
+//      if state.regs.ContainsKey reg
+//       then { state with regs = Map.add reg value state.regs }
+//       else state.mem.[Option.get (reg_addr reg)] <- value; state
+//    static member read_mem (Ptr(addr, _) | Strict addr) (state: State) = state.mem.[addr]
+//    static member write_mem (Ptr(addr, _) | Strict addr) value (state: State) =
+//      state.mem.[addr] <- value; state
+      
+//    static member stack_pop state =
+//      try State.read_mem (State.read_register SP state) state
+//      finally State.write_register SP (State.read_register SP state - Int 1) state |> ignore
+//    static member stack_push value state =
+//      let sp = State.read_register SP state
+//      State.write_mem sp value state
+//       |> State.write_register SP (sp + Int 1)
 
-    member x.compare (a: Boxed) b =
-      { x with reg_psr = (a.equals b, a.greater_than b, a.less_than b) }
+//    static member compare (a: Boxed) (b: Boxed) state =
+//      State.write_register PSR_EQ (a.equals b) state
+//       |> State.write_register PSR_LT (a.less_than b)
+//       |> State.write_register PSR_GT (a.greater_than b)
 
-    member x.all_real_regs = BP::SP::R 0::RX::[for n in 1..NUM_REAL_REGS - 1 -> R n]
-    member x.next = {x with pc = x.pc + 1}
+//    static member current_alloc (state: State) = Ptr(state.next_alloc, Datatype.Char)
+//    static member alloc n state = {state with next_alloc = state.next_alloc + n}
 
-let init_memory = {
-  code = [||]
-  pc = 0
-  reg_sp = Ptr(STACK_START, Datatype.Void)
-  reg_bp = Ptr(STACK_START, Datatype.Void)
-  reg_psr = Byte 0uy, Byte 0uy, Byte 0uy
-  real_regs = Array.create NUM_REAL_REGS Void
-  labels = Map.empty
-  stack = Array.create 10000 Void
-  mem = Array.create 10000 Void
-  alloc_ptr = 0
- }
+//    static member trace {pc = pc; mem = mem; regs = regs; next_alloc = next_alloc} =
+//      String.concat "\n" [
+//        sprintf "pc: %i" pc
+//        sprintf "psr: (eq %A, lt %A, gt %A)" regs.[PSR_EQ] regs.[PSR_LT] regs.[PSR_GT]
+//        sprintf "sp: %A, bp: %A, stack: %A" regs.[SP] regs.[BP] mem.[STACK_START..STACK_START + 30]
+//        sprintf "next alloc: %A, mem: %A" next_alloc mem.[..50]
+//       ]
 
-let eval_pasm pasm_instructions =
-  let instructions = Array.ofList pasm_instructions
+//let inline ( *>> ) f1 f2 x = f2 (f1 x) x
+//let inline ( <<* ) f2 f1 = f1 *>> f2
+//let inline ( <<*. ) f f1 c x = f (f1 x) c x  // feed 1st arg of 2
+//let inline lift x _ = x
+//let rec eval': Asm -> State -> State = function
+//  |Data _ -> failwith "tried to execute data as code"
+//  |Label _ -> id
+//  |Push rc -> State.stack_push <<* match rc with RC.R r -> State.read_register r | RC.C c -> lift c
+//  |PushRealRs -> List.fold (fun acc real_reg -> acc >> eval' (Push (RC.R real_reg))) id REAL_REGS
+//  |Pop r -> State.stack_pop *>> State.write_register r
+//  |PopRealRs -> List.fold (fun acc real_reg -> acc >> eval' (Pop real_reg)) id REAL_REGS
+//  |ShiftStackDown(off, len) ->
+//    [1..len]
+//     |> List.fold (fun acc i ->
+//          let shift_position_i = 
+//            State.write_mem
+//             <<*. (State.read_register SP >> ((+) (Int i)))
+//             <<* (State.read_register SP >> ((+) (Int (i - off))))
+//          acc >> shift_position_i
+//         ) id
+//  |Mov(rm, rmc) ->
+//    let write =
+//      match rm with
+//      |RM.R r -> State.write_register r
+//      |RM.M addr -> State.write_mem (Ptr(addr, Datatype.Void))
+//      |RM.I r -> State.write_mem <<*. State.read_register r
+//    let read =
+//      match rmc with
+//      |RMC.C c -> fun _ -> c
+//      |RMC.R r -> State.read_register r
+//      |RMC.M addr -> State.read_mem (Ptr(addr, Datatype.Void))
+//      |RMC.I r -> State.read_register r *>> State.read_mem
+//    read *>> write
+//  |Cmp(r, rc) ->
+//    State.compare <<*. State.read_register r
+//     <<* match rc with RC.R r' -> State.read_register r' | RC.C c -> lift c
+//  |Br(br_t, addr) ->
+//    let apply_branch flag = if flag then State.branch (addr - 1) else id
+//    let read_psr r = State.read_register r >> function Byte 0uy -> false | _ -> true
+//    match br_t with
+//    |B -> State.branch (addr - 1)
+//    |Z -> read_psr PSR_EQ *>> apply_branch
+//    |T -> read_psr PSR_EQ *>> (not >> apply_branch)
+//    |LT -> read_psr PSR_LT *>> apply_branch
+//    |GT -> read_psr PSR_GT *>> apply_branch
+//  |Call addr ->
+//    State.stack_push <<* State.current_pc
+//     >> State.branch (addr - 1)
+//  |Ret -> let extract (Ptr(x, _) | Strict x) = x in (State.stack_pop >> extract) *>> State.branch
+//  |Alloc n -> (State.stack_push <<* State.current_alloc) >> State.alloc n
+//  |Arith(arith_t, sz, reg, rc) ->
+//    let check (v: Boxed) = if v.datatype.sizeof = sz then id else failwith "data size mismatch"
+//    let opnd1 = State.read_register reg
+//    let opnd2 = match rc with RC.R r -> State.read_register r | RC.C c -> lift c
+//    let op a b =
+//      match arith_t with
+//      |Add -> State.write_register (R 0) (a + b)
+//      |Sub -> State.write_register (R 0) (a - b)
+//      |Mul -> State.write_register (R 0) (a * b)
+//      |DivMod -> State.write_register (R 0) (a / b) >> State.write_register RX (a % b)
+//    check <<* opnd1
+//     >> (op <<*. opnd1 <<* opnd2)
 
-  let code = ResizeArray<Lazy<Boxed>>()
-  let labels: Map<string, int> =
-    List.fold (fun labels -> function
-      |Data(data: Boxed[]) ->
-        code.AddRange(Array.map (fun e -> lazy e) data)
-        labels
-      |Label name -> labels.Add(name, code.Count)
-      |_ ->
-        code.Add(lazy failwith "tried to use code as data")
-        labels
-     ) Map.empty pasm_instructions
-
-  let init_memory = {
-    init_memory with
-      code = Array.ofSeq code
-      labels = labels
-      pc = Map.find "main" labels
-   }
-   
-  let rec eval (mem: AsmMemory) =  // pc - program counter / instruction register
-    match instructions.[mem.pc] with
-    |Data _ -> failwith "tried to execute data as code"
-    |Label _ -> eval mem.next
-    |Push r -> eval (mem.stack_push(mem.read_register r).next)
-    |PushC x -> eval (mem.stack_push(x).next)
-    |PushRealRs ->
-      let mem' =
-        List.fold (fun (acc_mem: AsmMemory) r ->
-          acc_mem.stack_push(acc_mem.read_register r)
-         ) mem mem.all_real_regs
-      eval mem'.next
-    |Pop r ->
-      let x, mem' = mem.stack_pop
-      (mem'.write_register r x).next
-    |PopRealRs ->
-      let mem' =
-        List.fold (fun (acc_mem: AsmMemory) r ->
-          let x, acc_mem' = acc_mem.stack_pop
-          acc_mem'.write_register r x
-         ) mem (List.rev mem.all_real_regs)
-      eval mem'.next
-    |MovRR(r1, r2) -> eval (mem.write_register r1 (mem.read_register r2)).next
-    |MovRM(r, ptr) ->
-      match ptr with
-      |Indirect rx -> eval (mem.write_register r (mem.deref (mem.read_register rx))).next
-      |Lbl name -> eval (mem.write_register r (mem.deref (Ptr(mem.labels.[name], Datatype.Void)))).next  // TODO: labels should have assoc. type too
-    |MovMR(ptr, r) ->
-      match ptr with
-      |Indirect rx ->
-        match mem.read_register rx, mem.read_register r with
-        |Ptr(addr, dt), v -> mem.mem.[addr] <- v  // TODO: check datatype
-        |_ -> failwith "cannot deref non-Ptr register"
-      |Lbl name -> mem.code.[mem.labels.[name]] <- lazy mem.read_register r  // TODO: check datatype, code/data integrity
-      eval mem.next
-    |MovRC(r, x) -> eval (mem.write_register r x).next
-    |MovRHandle(r, h) ->
-      match h with
-      |HandleLbl lbl -> eval (mem.write_register r (Ptr(labels.[lbl], Datatype.Pointer(Datatype.Void, None)))).next
-      |HandleReg reg -> eval (mem.write_register r Void).next  // TODO: decipher handle
-    |Cmp(r1, r2) -> eval (mem.compare (mem.read_register r1) (mem.read_register r2)).next
-    |CmpC(r, x) -> eval (mem.compare (mem.read_register r) x).next
-    |Br label -> eval {mem with pc = mem.labels.[label]}
-    |Br0 label ->
-      match mem.read_register PSR_EQ with
-      |Int 0 | Byte 0uy | Int64 0L -> eval {mem.stack_push(Ptr(mem.labels.[label] + CODE_START, Datatype.Void)) with pc = mem.labels.[label]}
-      |_ -> eval mem.next
-    |BrT label ->
-      match mem.read_register PSR_EQ with
-      |Int 0 | Byte 0uy | Int64 0L -> eval mem.next
-      |_ -> eval {mem.stack_push(Ptr(mem.labels.[label] + CODE_START, Datatype.Void)) with pc = mem.labels.[label]}
-    |BrGT label ->
-      match mem.read_register PSR_GT with
-      |Int 0 | Byte 0uy | Int64 0L -> eval mem.next
-      |_ -> eval {mem.stack_push(Ptr(mem.labels.[label] + CODE_START, Datatype.Void)) with pc = mem.labels.[label]}
-    |BrLT label ->
-      match mem.read_register PSR_LT with
-      |Int 0 | Byte 0uy | Int64 0L -> eval mem.next
-      |_ -> eval {mem.stack_push(Ptr(mem.labels.[label] + CODE_START, Datatype.Void)) with pc = mem.labels.[label]}
-    |Call label -> eval {mem.stack_push(Ptr(mem.labels.[label] + CODE_START, Datatype.Void)) with pc = mem.labels.[label]}
-    |Ret ->
-      match mem.stack_pop with
-      |Ptr(addr, Datatype.Void), mem' when addr >= CODE_START -> eval {mem' with pc = addr - CODE_START}
-      |_ -> failwith "failed to return"
-    // operations
-    |Alloc n -> eval {mem.write_register (R 0) (Int mem.alloc_ptr) with alloc_ptr = mem.alloc_ptr + n}
-    |Add(r1, r2) -> eval (mem.write_register r1 (mem.read_register r1 + mem.read_register r2)).next
-    // TODO: implement cast here
-    |AddC(r, x) -> eval (mem.write_register r (mem.read_register r + x)).next
-    |Sub(r1, r2) -> eval (mem.write_register r1 (mem.read_register r1 - mem.read_register r2)).next
-    |SubC(r, x) -> eval (mem.write_register r (mem.read_register r - x)).next
-    |Mul(r1, r2) -> eval (mem.write_register r1 (mem.read_register r1 * mem.read_register r2)).next
-    |MulC(r, x) -> eval (mem.write_register r (mem.read_register r * x)).next
-    |DivMod(r1, r2) ->
-      let mem' =
-        (mem.write_register r1 (mem.read_register r1 / mem.read_register r2))
-          .write_register RX (mem.read_register r1 % mem.read_register r2)
-      eval mem'.next
-    |DivModC(r, x) ->
-      let mem' =
-        (mem.write_register r (mem.read_register r / x))
-          .write_register RX (mem.read_register r % x)
-      eval mem'.next
-  eval init_memory
+//let eval: Asm list -> State = fun instrs ->
+//  let instrs = Array.ofList instrs
+//  let extern_call_addr = CODE_START - 1
+//  let rec eval = function
+//    |state when state.pc = extern_call_addr -> state
+//    |state when not (CODE_START <= state.pc && state.pc < CODE_START + instrs.Length) ->
+//      failwithf "executing non-code as code: pc = %A" state.pc
+//    |state ->
+//      let state' = eval' (instrs.[state.pc]) state in eval (State.to_next_pc state')
+//  State.initialize instrs
+//   // initially, push a magic number onto the stack; returning from main will return here, and the interpreter stops running
+//   |> State.stack_push (Ptr(extern_call_addr, Datatype.Void))
+//   |> eval

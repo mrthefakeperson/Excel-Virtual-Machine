@@ -1,7 +1,8 @@
 ﻿module Codegen.Hooks
 // module for preprocessing functionality during AST -> Pseudo-Asm stage
-open System.Text.RegularExpressions
+open Parser.Datatype
 open Parser.AST
+open System.Text.RegularExpressions
 
 // active pattern mapping:
 // takes (|P|): AST -> 'state such that, when P x is matched, x is the state returned by recursive application of the hook (Q x is for lists)
@@ -35,7 +36,7 @@ let transform_sizeof_hook: MappingASTHook = fun (|P|) (|Q|) -> function
   |Apply(Value(Var("sizeof", _)), [Value(Var(dt, _))]) ->
     let datatype =
       match dt with
-      |"int" -> Int | "long" -> Long | "char" -> Char | "float" -> Float | "double" -> Double
+      |"int" -> Int | "long" -> Int64 | "char" -> Byte | "float" -> Float | "double" -> Double
       |_ -> failwithf "sizeof %A not found" dt
     Some (Value(Lit(string datatype.sizeof, Int)))
   |Apply(Value(Var("sizeof", _)), _) -> failwith "invalid sizeof expression"
@@ -62,7 +63,7 @@ let get_raw_string (s: string) =
 
 // get string literals
 let find_strings_hook: (string * string) seq ASTHook = fun (|P|) (|Q|) -> function
-  |Value(Lit(s, Pointer(Char, _))) when Regex.Match(s, "\"(\\\"|[^\"])*\"").Value = s ->
+  |Value(Lit(s, Ptr Byte)) when Regex.Match(s, "\"(\\\"|[^\"])*\"").Value = s ->
     let raw_string = get_raw_string s
     seq [label_from_string raw_string, raw_string]
   |Value _ | Declare _ -> Seq.empty
@@ -82,28 +83,31 @@ let extract_strings_to_global_hook: MappingASTHook =
          |> Map.toList
          |> List.sortBy snd
          |> List.collect (fun (vname, str_value) ->
+              let length = str_value.Length + 1  // + 1 for null terminator
+              // TODO: data_alloc instead of stack_alloc
+              let alloc = Apply(Value(Var("\stack_alloc", DT.Function([Int], Ptr Byte))), [Value(Lit(string length, Int))])
               let assigns =
                 List.ofArray (str_value.ToCharArray()) @ [char 0]
                  |> List.mapi (fun i c ->
-                      Assign(Index(Value(Var(vname, t_any)), Value(Lit(string i, Int))),
-                        Value(Lit((match c with '\000' -> "'\\0'" | _ -> sprintf "'%c'" c), Char))
+                      Assign(Index(Value(Var(vname, TypeClasses.any)), Value(Lit(string i, Int))),
+                        Value(Lit((match c with '\000' -> "'\\0'" | _ -> sprintf "'%c'" c), Byte))
                        )
                      )
-              Declare(vname, Pointer(Char, Some(str_value.Length + 1)))::assigns
+              Declare(vname, Ptr Byte)::Assign(Value(Var(vname, Ptr Byte)), alloc)::assigns
              )
       Some(GlobalParse(decls @ xprs))
-    |Value(Lit(s, (Pointer(Char, _)))) when Regex.Match(s, "\"(\\\"|[^\"])*\"").Value = s ->
-      Some(Value(Var(label_from_string (get_raw_string s), t_any)))
+    |Value(Lit(s, (Ptr Byte))) when Regex.Match(s, "\"(\\\"|[^\"])*\"").Value = s ->
+      Some(Value(Var(label_from_string (get_raw_string s), TypeClasses.any)))
     |_ -> None
 
 // convert logic functions to a subset to simplify code generation
 let convert_logic_hook: MappingASTHook =
-  let apply infix a b = Apply(Value(Var(infix, t_any)), [a; b])
-  let apply_not a = apply "==" a (Value(Lit("\\0", Char)))
+  let apply infix a b = Apply(Value(Var(infix, TypeClasses.any)), [a; b])
+  let apply_not a = apply "==" a (Value(Lit("\\0", Byte)))
   let (|Builtin|_|) x = function Apply(Value(Var(x', _)), args) when x = x' -> Some args | _ -> None
   fun (|P|) (|Q|) -> function
-    |Builtin "&&" [a; b] -> Some (If(a, b, Value(Lit("\\0", Char))))
-    |Builtin "||" [a; b] -> Some (If(a, Value(Lit("\\0", Char)), b))
+    |Builtin "&&" [a; b] -> Some (If(a, b, Value(Lit("\\0", Byte))))
+    |Builtin "||" [a; b] -> Some (If(a, Value(Lit("\\0", Byte)), b))
     |Builtin "!=" [a; b] -> Some (apply_not (apply "==" a b))
     |Builtin "<=" [a; b] -> Some (apply_not (apply ">" a b))
     |Builtin ">=" [a; b] -> Some (apply_not (apply "<" a b))
