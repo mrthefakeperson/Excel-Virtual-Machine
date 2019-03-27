@@ -182,11 +182,6 @@ module Simple =
     |Arith of ArithType * sz: int * Register * RC
 
   and BrType = B | Z | T | LT | GT
-    with
-      member x.should_br: Boxed -> bool = function
-        |Byte case ->
-          x = B || (x = Z && case = 0uy) || (x = T && case <> 0uy) || (x = T && case < 0uy) || (x = T && case > 0uy)
-        |not_byte -> failwithf "expecting Boxed.Byte for BrType, got %A" not_byte
   and ArithType = Add | Sub | Mul | DivMod
   
   let NUM_REAL_REGS = 4  // unused; TODO: convert some virtual registers into real ones
