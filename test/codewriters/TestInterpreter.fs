@@ -95,22 +95,22 @@ let unit_tests() =
   test_single "ret" Ret state expected
 
   let state = State.initialize [] |> State.write_register RX (Int 7)
-  let expected = state |> State.write_register (Register.R 0) (Int 77)
+  let expected = state |> State.write_register (Register.RX) (Int 77)
   test_single "add" (Arith(Add, 4, RX, RC.C (Int 70))) state expected
 
-  let state = State.initialize [] |> State.write_register RX (Int 7)
+  let state = State.initialize [] |> State.write_register (Register.R 0) (Int 7)
   let expected =
     state
      |> State.write_register (Register.R 0) (Int 2)
      |> State.write_register RX (Int 1)
-  test_single "divmod int" (Arith(DivMod, 4, RX, RC.C (Int 3))) state expected
+  test_single "divmod int" (Arith(DivMod, 4, Register.R 0, RC.C (Int 3))) state expected
 
-  let state = State.initialize [] |> State.write_register RX (Double 3.3)
+  let state = State.initialize [] |> State.write_register (Register.R 0) (Double 3.3)
   let expected =
     state
      |> State.write_register (Register.R 0) (Double (3.3 / 2.2))
      |> State.write_register RX (Double (3.3 % 2.2))
-  test_single "divmod double" (Arith(DivMod, 8, RX, RC.C (Double 2.2))) state expected
+  test_single "divmod double" (Arith(DivMod, 8, Register.R 0, RC.C (Double 2.2))) state expected
 
 let test_instrs message instrs verifier =
   testCase message <| fun () -> Assert.Equal(message, true, verifier (eval instrs))
@@ -127,15 +127,58 @@ let asm_samples() =
       result.regs.[RX] = Int 7 && result.regs.[Register.R 0] = Int 7
        && result.mem.[STACK_START + 1..STACK_START + 4] = [|Int 7; Int 7; Void; Void|])
 
-let test_full_pipeline message code verifier =
-  let pipeline = Lexer.Main.tokenize_text >> Parser.Main.parse_tokens_to_ast >> Codegen.Main.generate_from_ast >> convert_from_flat
+let test_ast message code verifier =
+  let pipeline = Codegen.Main.generate_from_ast >> convert_from_flat >> eval
   testCase message <| fun () -> Assert.Equal(message, true, verifier (pipeline code))
    |> run |> ignore
 
-let e2e() =
+let from_ast() =
   ()
+
+let test_full_pipeline message code expected_ret =
+  let pipeline =
+    Lexer.Main.tokenize_text
+     >> Parser.Main.parse_tokens_to_ast
+     >> Codegen.Main.generate_from_ast >> convert_from_flat
+     >> trace
+     >> eval
+  testCase message <| fun () ->
+        let result = pipeline code
+        Assert.Equal(message, EXTERN_CALL_ADDR, result.pc)
+        Assert.Equal(message, expected_ret, result.regs.[Register.R 0])
+   |> run |> ignore
+
+let e2e() =
+  test_full_pipeline "basic" "int main() { return 7; }" (Int 7)
+
+  test_full_pipeline "local variables 1" "int main() { char x = 'a'; return x + 1; }" (Int 98)
+
+  test_full_pipeline "local variables 2" "int main() { int x = 2, y = -3; return -x + y * x; }" (Int -8)
+
+  // "int main() { int x[3] = { 1, 2, 3 }; return 2 * *x + x[2]; }" is bugged because the stack space is not being properly allocated
+  //test_full_pipeline "local variables 3" "int main() { int x[3] = { 1, 2, 3 }, x2, x3, x4 = 7777777; return 2 * *x + x[2]; }" (Int 5)
+
+  test_full_pipeline "local variables 4" "int main() { int x = 4, *y = &x; return *y; }" (Int 4)
+
+  test_full_pipeline "if 1" "int main() { int a = 1, b = 2; if (a > 2) return -1; else if (b >= 2) b++; return b; }" (Int 3)
+
+  test_full_pipeline "while 1" "int main() { int x = 1; while (1) if (x++ == 3) return x; }" (Int 4)
+
+  test_full_pipeline "for 1" "int main() { int y = 1; for (int x = 0; x < 5; x++) y *= 2; return y; }" (Int 32)
+
+  test_full_pipeline "global variables 1" "int x = 1, y = 7; int main() { int x = 7; return x + y; }" (Int 14)
+
+  // bugged: (uninitialized?) global arrays don't work, types don't match
+  //test_full_pipeline "global variables 2" "int x[50]; int main() { x[2] = 3; return x[2]; }" (Int 3)
+
+  test_full_pipeline "function call 1" "int f(int a, int b) { return a + b; } int main(void) { return f(7, 70); }" (Int 77)
+
+  // bugged?
+  test_full_pipeline "function call 2 (recursion)" "int f(int a) { if (a == 2) return a; else return f(a - 1) + 2; } int main() { return f(4); }"
+   (Int 6)
 
 let run_all() =
   unit_tests()
   asm_samples()
+  from_ast()
   e2e()

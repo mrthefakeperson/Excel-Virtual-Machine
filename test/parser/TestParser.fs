@@ -92,7 +92,7 @@ let test_parser_declare() =
   let expected =
     DeclareHelper [
       Declare("a", Ptr Int)
-      Assign(Value(Var("a", TypeClasses.any)), Apply(Value(Var("\stack_alloc", DT.Function([Int], Ptr Int))), [Value(Lit("2", Int))]))
+      Assign(Value(Var("a", TypeClasses.any)), BuiltinASTs.stack_alloc Int (Value(Lit("2", Int))))
       Declare("b", Int)
       Assign(Value(Var("b", TypeClasses.any)), Value(Lit("2", Int)))
       Declare("c", Ptr Int)
@@ -105,7 +105,7 @@ let test_parser_declare() =
     DeclareHelper [
       Declare("a", Ptr (Ptr Int))
       Declare("b", Ptr Int)
-      Assign(Value(Var("b", TypeClasses.any)), Apply(Value(Var("\stack_alloc", DT.Function([Int], Ptr Int))), [Value(Lit("2", Int))]))
+      Assign(Value(Var("b", TypeClasses.any)), BuiltinASTs.stack_alloc Int (Value(Lit("2", Int))))
       Assign(Index(Value(Var("b", TypeClasses.any)), Value(Lit("0", Int))), Value(Lit("0", Int)))
       Assign(Index(Value(Var("b", TypeClasses.any)), Value(Lit("1", Int))), Value(Lit("1", Int)))
      ]

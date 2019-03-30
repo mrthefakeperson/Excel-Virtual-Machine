@@ -23,7 +23,7 @@
      Byte 111uy; Byte 102uy; Byte 32uy; Byte 42uy; Byte 105uy; Byte 112uy;
      Byte 32uy; Byte 118uy; Byte 97uy; Byte 114uy; Byte 105uy; Byte 97uy;
      Byte 98uy; Byte 108uy; Byte 101uy; Byte 58uy; Byte 32uy; Byte 37uy;
-     Byte 100uy; Byte 10uy; Byte 0uy|]; Label "main"; AddC (SP,Int 2);
+     Byte 100uy; Byte 10uy; Byte 0uy|]; Label "main"; AddC (4,SP,Int 2);
  MovRC (R 1,Int 20); MovRHandle (R 0,HandleReg 1); MovRR (R 2,R 0); PushRealRs;
  MovRM
    (R 0,
@@ -41,5 +41,5 @@
     Lbl
       "$56_61_6c_75_65_20_6f_66_20_2a_69_70_20_76_61_72_69_61_62_6c_65_3a_20_25_64_a");
  Push (R 0); MovRR (R 0,R 2); MovRM (R 0,Indirect (R 0)); Push (R 0);
- MovRR (BP,SP); Call "printf"; PopRealRs; MovRC (R 0,Int 0); SubC (SP,Int 2);
- Ret; SubC (SP,Int 2); Ret]
+ MovRR (BP,SP); Call "printf"; PopRealRs; MovRC (R 0,Int 0); SubC (4,SP,Int 2);
+ Ret; SubC (4,SP,Int 2); Ret]

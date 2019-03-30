@@ -6,12 +6,12 @@ open Parser.Combinators
 module Types = TypeClasses
 
 let _null = (!"null" |/ !"NULL" |/ !"Null") ->/ fun () -> Value(Lit("0", Ptr Void))
-let _var = Match "[a-z A-Z _][a-z 0-9 A-Z _]*" ->/ fun s -> Value(Var(s, Types.any))
-let _string = Match "\"(\\\"|[^\"])*\"" ->/ fun s -> Value(Lit(s, Ptr Byte))
-let _int = Match "-?[0-9]+" ->/ fun s -> Value(Lit(s, Int))
-let _float = Match "-?[0-9]+\.[0-9]*\w?" ->/ fun s -> Value(Lit(s, Float))
-let _char = Match "'\\\\?.'" ->/ fun s -> Value(Lit(s, Byte))
-let _long = Match "-?[0-9]+(L|l){1,2}" ->/ fun s -> Value(Lit(s, Int64))
+let _var = Match RegexUtils.VAR ->/ fun s -> Value(Var(s, Types.any))
+let _string = Match RegexUtils.STRING ->/ fun s -> Value(Lit(s, Ptr Byte))
+let _int = Match RegexUtils.NUM_INT32 ->/ fun s -> Value(Lit(s, Int))
+let _float = Match RegexUtils.NUM_FLOAT ->/ fun s -> Value(Lit(s, Float))
+let _char = Match RegexUtils.CHAR ->/ fun s -> Value(Lit(s, Byte))
+let _long = Match RegexUtils.NUM_INT64 ->/ fun s -> Value(Lit(s, Int64))
 
 
 let var_ast t s = Value(Var(s, t))
@@ -117,22 +117,19 @@ let declarable_value: DeclBuilder Rule =
   let _var =
     let builder name: DeclBuilder = fun dt initials ->
       Declare(name, dt)::List.map (fun v -> Assign(Value(Var(name, Types.any)), v)) initials
-    _var ->/ function Value(Var(name, _)) -> builder name | _ -> failwith "should never be reached"
+    _var ->/ function Value(Var(name, _)) | Strict name -> builder name
   let rec ptr() =
     () |>
       !"*" +/ (_var |/ ptr) ->/ fun ((), builder) dt initials ->
-        match builder dt initials with
-        |Declare(name, dt)::rest -> Declare(name, Ptr dt)::rest
-        |_ -> failwith "should never be reached"
+        let (Declare(name, dt)::rest | Strict(name, dt, rest)) = builder dt initials
+        Declare(name, Ptr dt)::rest
   OneOf [
     _var +/ square_bracketed ->/ fun (builder, sz_ast) dt initials ->
-      match builder dt initials with
-      |Declare(name, dt)::_ ->
-        let assign_index_ast value i e = Assign(Index(value, Value(Lit(string i, Int))), e)
-        Declare(name, Ptr dt)
-         :: Assign(Value(Var(name, Types.any)), Apply(Value(Var("\stack_alloc", DT.Function([Int], Ptr dt))), [sz_ast]))
-         :: List.mapi (assign_index_ast (Value(Var(name, Types.any)))) initials
-      |_ -> failwith "should never be reached"
+      let (Declare(name, dt)::_ | Strict(name, dt)) = builder dt initials
+      let assign_index_ast value i e = Assign(Index(value, Value(Lit(string i, Int))), e)
+      Declare(name, Ptr dt)
+       :: Assign(Value(Var(name, Types.any)), BuiltinASTs.stack_alloc dt sz_ast)
+       :: List.mapi (assign_index_ast (Value(Var(name, Types.any)))) initials
     ptr
     _var
    ]
@@ -205,7 +202,7 @@ let declare_function: AST Rule =
    +/ (datatype +/ _var |/ !"main" ->/ fun () -> Int, Value(Var("main", Types.any)))  // int main() and main() are both valid
    +/ !"(" +/ arg_list +/ !")" +/ (code_block |/ !";" ->/ fun () -> Block [])
    ->/ fun (((((_, (ret_dt, name)), ()), args), ()), func_body) ->
-         let name = match name with Value(Var(s, _)) -> s | _ -> failwith "should never be reached"
+         let (Value(Var(name, _)) | Strict name) = name
          let args, func_dtype =
            // not looking for init lists, so all elements should be Declare
            Option.map (List.map (function Declare(name, t) -> (name, t), t | _ -> failwith "invalid function definition") >> List.unzip) args

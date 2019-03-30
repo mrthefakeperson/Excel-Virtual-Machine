@@ -27,6 +27,7 @@ let lexer_stage: string list -> Token list list = test_stage "lexer" Lexer.Main.
 open Parser.AST
 let parser_stage: Token list list -> AST list = test_stage "parser" Parser.Main.parse_tokens_to_ast
 
+open Parser.AST.Hooks
 open Codegen.Hooks
 open Codegen.TypeCheck
 let ast_process_stage: AST list -> AST list =

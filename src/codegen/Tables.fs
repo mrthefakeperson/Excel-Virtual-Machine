@@ -57,11 +57,10 @@ let builtins = [
   "*", TypeClasses.f_arith_infix
   "/", TypeClasses.f_arith_infix
   "%", TypeClasses.f_arith_infix
-  // TODO: named type parameters (eg. Function([Unknown([], name = "t")], Ptr("t", "t".sizeof)))
-  //                               or Function([Unknown([], name = "t"); "t"], "t")
-  // the following are temporary
+
   "&prefix", DT.Function([TypeClasses.any' 0], Ptr (TypeClasses.any' 0))
   "*prefix", DT.Function([Ptr (TypeClasses.any' 0)], TypeClasses.any' 0)
+  "-prefix", TypeClasses.f_arith_prefix
 
   "&&", TypeClasses.f_logic_infix
   "||", TypeClasses.f_logic_infix

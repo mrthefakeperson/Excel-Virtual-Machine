@@ -56,6 +56,9 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="TestUtils.fs" />
+    <Compile Include="..\src\Utils.fs">
+      <Link>Utils.fs</Link>
+    </Compile>
     <Compile Include="..\src\lexer\Token.fs">
       <Link>lexer\Token.fs</Link>
     </Compile>

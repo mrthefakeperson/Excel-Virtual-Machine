@@ -57,7 +57,6 @@ type Boxed =  // constant value
             |"\\n" -> '\n' | "\\\\" -> '\\' | "\\0" -> '\000'
             |x' -> char x'
           Some <| Byte (byte c)
-        |DT.Byte -> failwithf "f: %s %A" x x.Length
         |DT.Int64 -> Boxed.from_t dt (x.TrimEnd 'L')
         |_ -> Boxed.from_t dt x
       with :? System.FormatException -> None
@@ -84,15 +83,8 @@ type Boxed =  // constant value
       match Boxed.make_binary_op f_int f_dbl a b with
       |Choice1Of2 i64 -> Option.get <| Boxed.from_int64 a.datatype i64
       |Choice2Of2 dbl -> Option.get <| Boxed.from_double b.datatype dbl
-    static member (+) (a, b) =
-      match a, b with
-      |Ptr(addr, dt), Int i | Int i, Ptr(addr, dt) -> Ptr(addr + i * dt.sizeof, dt)
-      |_ -> Boxed.make_arith_op (+) (+) a b
-    static member (-) (a, b) =
-      match a, b with
-      |Ptr(addr, dt), Ptr(addr2, dt2) when dt = dt2 -> Int((addr - addr2) / dt.sizeof)
-      |Ptr(addr, dt), Int i | Int i, Ptr(addr, dt) -> Ptr(addr, dt) + (Int -i)
-      |_ -> Boxed.make_arith_op (-) (-) a b
+    static member (+) (a, b) = Boxed.make_arith_op (+) (+) a b
+    static member (-) (a, b) = Boxed.make_arith_op (-) (-) a b
     static member ( * ) (a, b) = Boxed.make_arith_op ( * ) ( * ) a b
     static member (/) (a, b) = Boxed.make_arith_op (/) (/) a b
     static member (%) (a, b) = Boxed.make_arith_op (%) (%) a b
@@ -142,23 +134,16 @@ module Flat =
     |Call of label: string
     |Ret
     // operations
+    |Cast of DT * Register
     |Alloc of bytes: int  // alloc an address into R0
-    |Add of Register * Register
-    |AddC of Register * Boxed
-    |Sub of Register * Register
-    |SubC of Register * Boxed
-    |Mul of Register * Register
-    |MulC of Register * Boxed
-    |DivMod of Register * Register
-    |DivModC of Register * Boxed
-    //|Add of sz: int * Register * Register
-    //|AddC of sz: int * Register * Boxed
-    //|Sub of sz: int * Register * Register
-    //|SubC of sz: int * Register * Boxed
-    //|Mul of sz: int * Register * Register
-    //|MulC of sz: int * Register * Boxed
-    //|DivMod of sz: int * Register * Register
-    //|DivModC of sz: int * Register * Boxed
+    |Add of sz: int * Register * Register
+    |AddC of sz: int * Register * Boxed
+    |Sub of sz: int * Register * Register
+    |SubC of sz: int * Register * Boxed
+    |Mul of sz: int * Register * Register
+    |MulC of sz: int * Register * Boxed
+    |DivMod of sz: int * Register * Register
+    |DivModC of sz: int * Register * Boxed
     
 module Simple =
   type RC = R of Register | C of Boxed
@@ -178,6 +163,7 @@ module Simple =
     |Br of BrType * label: int
     |Call of label: int
     |Ret
+    |Cast of DT * Register
     |Alloc of bytes: int
     |Arith of ArithType * sz: int * Register * RC
 
@@ -188,24 +174,21 @@ module Simple =
   let STACK_START = 100000
   let CODE_START = 200000
 
-  let reg_addr = function
-    |Register.R n when n > 0 -> Some (STACK_START + n - 1)
-    |Register.R n when n < 0 -> Some (STACK_START + n)
-    |_ -> None
-
   let convert_from_flat (instrs: Flat.Asm list) : Asm list =
     let labels_map =
-      List.mapi (fun i e -> (e, i)) instrs
-       |> List.choose (function Flat.Label lbl, i -> Some (lbl, i) | _ -> None)
+      List.fold (fun (i, acc) -> function
+        |Flat.Label lbl -> (i, (lbl, i)::acc)
+        |_ -> (i + 1, acc)  // TODO: instruction size
+       ) (0, []) instrs |> snd
        |> dict
 
     let label_addr lbl =
       if labels_map.ContainsKey lbl then CODE_START + labels_map.[lbl] else failwithf "label not declared: %s" lbl
-    let handle_addr = function
-      |HandleLbl lbl -> label_addr lbl
+    let mov_rh reg: Handle -> Asm List = function
+      |HandleLbl lbl -> [Mov(RM.R reg, RMC.C (Ptr(label_addr lbl, TypeClasses.any)))]  // requires a hack when adding to other pointers
+      |HandleReg 0 -> failwith "code generation error: handle of R0?"
       |HandleReg n ->
-        Option.defaultWith (fun () -> failwith "code generation error: handle of R0?")
-         (reg_addr (Register.R n))
+        [Mov(RM.R reg, RMC.R BP); Arith(Add, 4, reg, RC.C (if n > 0 then Ptr(n - 1, DT.Byte) else Ptr(n, DT.Byte)))]
     let convert_memory_rm = function
       |Memory.Lbl lbl -> RM.M (label_addr lbl)
       |Memory.Indirect r -> RM.I r
@@ -213,27 +196,24 @@ module Simple =
       |Memory.Lbl lbl -> RMC.M (label_addr lbl)
       |Memory.Indirect r -> RMC.I r
     
-    List.map (function
-      |Flat.Label lbl -> Label (label_addr lbl)
-      |Flat.Call lbl -> Call (label_addr lbl)
-      |Flat.Push r -> Push (RC.R r) | Flat.PushC c -> Push (RC.C c)
-      |Flat.MovRR(r1, r2) -> Mov(RM.R r1, RMC.R r2)
-      | Flat.MovRM(r, m) -> Mov(RM.R r, convert_memory_rmc m)
-      | Flat.MovMR(m, r) -> Mov(convert_memory_rm m, RMC.R r)
-      | Flat.MovRC(r, c) -> Mov(RM.R r, RMC.C c)
-      | Flat.MovRHandle(r, h) -> Mov(RM.R r, RMC.C (Ptr(handle_addr h, DT.Void)))  // TODO: does this work? Ptr to Void
-      |Flat.Cmp(r1, r2) -> Cmp(r1, RC.R r2) | Flat.CmpC(r1, c) -> Cmp(r1, RC.C c)
-      |Flat.Br lbl -> Br(B, label_addr lbl) | Flat.Br0 lbl -> Br(Z, label_addr lbl) | Flat.BrT lbl -> Br(T, label_addr lbl)
-      | Flat.BrLT lbl -> Br(LT, label_addr lbl) | Flat.BrGT lbl -> Br(GT, label_addr lbl)
-      |Flat.Add(r1, r2) -> Arith(Add, 0, r1, RC.R r2) | Flat.AddC(r, c) -> Arith(Add, 0, r, RC.C c)
-      |Flat.Sub(r1, r2) -> Arith(Sub, 0, r1, RC.R r2) | Flat.SubC(r, c) -> Arith(Sub, 0, r, RC.C c)
-      |Flat.Mul(r1, r2) -> Arith(Mul, 0, r1, RC.R r2) | Flat.MulC(r, c) -> Arith(Mul, 0, r, RC.C c)
-      |Flat.DivMod(r1, r2) -> Arith(DivMod, 0, r1, RC.R r2) | Flat.DivModC(r, c) -> Arith(DivMod, 0, r, RC.C c)
-      //|Flat.Add(sz, r1, r2) -> Arith(Add, sz, r1, RC.R r2) | Flat.AddC(sz, r, c) -> Arith(Add, sz, r, RC.C c)
-      //|Flat.Sub(sz, r1, r2) -> Arith(Sub, sz, r1, RC.R r2) | Flat.SubC(sz, r, c) -> Arith(Sub, sz, r, RC.C c)
-      //|Flat.Mul(sz, r1, r2) -> Arith(Mul, sz, r1, RC.R r2) | Flat.MulC(sz, r, c) -> Arith(Mul, sz, r, RC.C c)
-      //|Flat.DivMod(sz, r1, r2) -> Arith(DivMod, sz, r1, RC.R r2) | Flat.DivModC(sz, r, c) -> Arith(DivMod, sz, r, RC.C c)
+    List.collect (function
+      |Flat.Label lbl -> [Label (label_addr lbl)]
+      |Flat.Call lbl -> [Call (label_addr lbl)]
+      |Flat.Push r -> [Push (RC.R r)] | Flat.PushC c -> [Push (RC.C c)]
+      |Flat.MovRR(r1, r2) -> [Mov(RM.R r1, RMC.R r2)]
+      | Flat.MovRM(r, m) -> [Mov(RM.R r, convert_memory_rmc m)]
+      | Flat.MovMR(m, r) -> [Mov(convert_memory_rm m, RMC.R r)]
+      | Flat.MovRC(r, c) -> [Mov(RM.R r, RMC.C c)]
+      | Flat.MovRHandle(r, h) -> mov_rh r h  // TODO: does this work? Ptr to Void
+      |Flat.Cmp(r1, r2) -> [Cmp(r1, RC.R r2)] | Flat.CmpC(r1, c) -> [Cmp(r1, RC.C c)]
+      |Flat.Br lbl -> [Br(B, label_addr lbl)] | Flat.Br0 lbl -> [Br(Z, label_addr lbl)] | Flat.BrT lbl -> [Br(T, label_addr lbl)]
+      | Flat.BrLT lbl -> [Br(LT, label_addr lbl)] | Flat.BrGT lbl -> [Br(GT, label_addr lbl)]
+      |Flat.Add(sz, r1, r2) -> [Arith(Add, sz, r1, RC.R r2)] | Flat.AddC(sz, r, c) -> [Arith(Add, sz, r, RC.C c)]
+      |Flat.Sub(sz, r1, r2) -> [Arith(Sub, sz, r1, RC.R r2)] | Flat.SubC(sz, r, c) -> [Arith(Sub, sz, r, RC.C c)]
+      |Flat.Mul(sz, r1, r2) -> [Arith(Mul, sz, r1, RC.R r2)] | Flat.MulC(sz, r, c) -> [Arith(Mul, sz, r, RC.C c)]
+      |Flat.DivMod(sz, r1, r2) -> [Arith(DivMod, sz, r1, RC.R r2)] | Flat.DivModC(sz, r, c) -> [Arith(DivMod, sz, r, RC.C c)]
 
-      |Flat.Data x -> Data x | Flat.PushRealRs -> PushRealRs | Flat.Pop r -> Pop r | Flat.PopRealRs -> PopRealRs
-      | Flat.ShiftStackDown(off, len) -> ShiftStackDown(off, len) | Flat.Ret -> Ret | Flat.Alloc n -> Alloc n
+      |Flat.Data x -> [Data x] | Flat.PushRealRs -> [PushRealRs] | Flat.Pop r -> [Pop r] | Flat.PopRealRs -> [PopRealRs]
+      | Flat.ShiftStackDown(off, len) -> [ShiftStackDown(off, len)] | Flat.Ret -> [Ret] | Flat.Cast(dt, r) -> [Cast(dt, r)]
+      | Flat.Alloc n -> [Alloc n]
      ) instrs

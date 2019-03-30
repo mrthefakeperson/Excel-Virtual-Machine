@@ -15,8 +15,6 @@ let test_check_type message ast expected_xpr expected_t =
    |> ignore
 
 let test_basics() =
-  let cast dtype ast = Apply(Value(Var("\cast", dtype)), [ast])
-
   let expected = Value(Lit("1.f", Float))
   test_check_type "value - identity" expected expected Float
 
@@ -32,7 +30,7 @@ let test_basics() =
   let expected =
     Block [
       Declare("f", DT.Function([Byte], Double))
-      Apply(Value(Var("f", DT.Function([Byte], Double))), [cast Byte (Value(Lit("1", Int)))])
+      Apply(Value(Var("f", DT.Function([Byte], Double))), [BuiltinASTs.cast Byte (Value(Lit("1", Int)))])
      ]
   test_check_type "cast when applying function (known signature)" xpr expected Void
 
@@ -60,15 +58,15 @@ let test_basics() =
   let expected =
     Block [
       Declare("x", Ptr Int)
-      Assign(Index(Value(Var("x", Ptr Int)), cast Int (Value(Lit("0L", Int64)))), cast Int (Value(Lit("'c'", Byte))))
+      Assign(Index(Value(Var("x", Ptr Int)), BuiltinASTs.cast Int (Value(Lit("0L", Int64)))), BuiltinASTs.cast Int (Value(Lit("'c'", Byte))))
       Declare("y", Byte)
       If(
-        cast Byte (Value(Lit("1", Int))),
-        cast Int64 (Value(Lit("2", Int))),
+        BuiltinASTs.cast Byte (Value(Lit("1", Int))),
+        BuiltinASTs.cast Int64 (Value(Lit("2", Int))),
         Value(Lit("3L", Int64))
        )
       While(
-        cast Byte (Value(Lit("1", Int))),
+        BuiltinASTs.cast Byte (Value(Lit("1", Int))),
         Block [
           Declare("y", Int)
           Value(Var("y", Int))
@@ -116,7 +114,7 @@ let test_basics() =
         Function(["_", DT.Float],
           Block [
             Apply(Value(Var("f", DT.Function([DT.Float], DT.Void))),
-              [cast DT.Float (Value(Lit("1", DT.Int)))]
+              [BuiltinASTs.cast DT.Float (Value(Lit("1", DT.Int)))]
              )
            ]
          )
@@ -157,7 +155,7 @@ let test_check_parser_output() =
         Value (Var ("f", DT.Function ([],Int))),
         Function ([],
           Block [
-            Return (cast Int (Value (Var ("a",Byte))))
+            Return (BuiltinASTs.cast Int (Value (Var ("a",Byte))))
            ]
          )
        )
@@ -211,9 +209,7 @@ let test_check_parser_output() =
             Declare("c", Ptr (Ptr (Ptr Int)))
             Declare("d", Ptr Int)
             Assign(Value (Var ("d", Ptr Int)),
-              Apply(Value (Var("\stack_alloc", DT.Function([Int], Ptr Int))),
-                [Value (Lit("10", Int))]
-               )
+              BuiltinASTs.stack_alloc Int (Value (Lit("10", Int)))
              )
             Value(Var("a", Int64)); Value(Var("b", Ptr Byte))
             Value(Var("c", Ptr (Ptr (Ptr Int)))); Value(Var("d", Ptr Int))
@@ -235,7 +231,7 @@ let test_check_parser_output() =
           Block [
             Apply(
               Value(Var("+", DT.Function([Int64; Int64], Int64))),
-              [cast Int64 (Apply(Value(Var("f", DT.Function([], Int))), [])); Value(Lit("3L", Int64))]
+              [BuiltinASTs.cast Int64 (Apply(Value(Var("f", DT.Function([], Int))), [])); Value(Lit("3L", Int64))]
              )
            ]
          )

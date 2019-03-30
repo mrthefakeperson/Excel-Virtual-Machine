@@ -1,8 +1,7 @@
 ﻿module Lexer.Tokenize
 open System.Text.RegularExpressions
+open RegexUtils
 open Lexer.Token
-
-let WHITESPACE = "[ \t\n\r]*"
 
 let rec (|Rgx|_|) pattern txt =
   match Regex.Match(txt, "^" + WHITESPACE + pattern).Value with
@@ -10,21 +9,20 @@ let rec (|Rgx|_|) pattern txt =
   |matched -> Some(matched :: tokenize (txt.Substring(matched.Length)))
 
 and tokenize: string -> string list = function
-  |Rgx "#[^\n]*" x  // preprocessor (TODO: do something)
-  |Rgx "//[^\n]*" x  // single line comment
-  |Rgx "/\*((?!\*/).)*\*/" x  // multiline comment
-    -> x.Tail
-  |Rgx "[0-9]+\.[0-9]*\w?" x  // float
+  |Rgx PREPROCESSOR_LINE x  // TODO: do something
+  |Rgx COMMENT_LINE x
+  |Rgx COMMENT_BLOCK x -> x.Tail
+  |Rgx NUM_FLOAT x
   |Rgx "[\w]+" x
-  |Rgx "\"(\\\\\\\"|[^\"])*\"" x  // string
-  |Rgx "'\\\\?.'" x   // char
+  |Rgx STRING x
+  |Rgx CHAR x
   |Rgx "(--|\+\+|>=|<=|==|!=|&&|\|\||&|\+=|-=|\*=|/=|&=|\|=)" x  // other tokens
   |Rgx "[{}();,=+\-*/%<>\[\].]" x
   |Rgx WHITESPACE x -> x
   |"" -> []
   |unexpected -> failwithf "Lexer: unexpected %s" unexpected
 
-let clean_pass =
+let clean_pass: string list -> Token list =
   List.fold (fun (acc, (r, c)) (s: string) ->
     let leading_whitespace = s.Substring(0, s.Length - s.TrimStart().Length)
     let trimmed_length = s.TrimStart().Length

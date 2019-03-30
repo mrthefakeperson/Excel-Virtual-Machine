@@ -26,6 +26,7 @@ type DT =
       else
         match List.tryFindIndex ((=) from) hierarchy, List.tryFindIndex ((=) to_) hierarchy with
         |Some ai, Some bi when ai < bi -> true
+        |Some _, None -> match to_ with Ptr _ -> true | _ -> false
         |_ -> false
     static member supertype a b =  // automatic casting: when some type wants to be both a and b, choose one of them
       if DT.can_promote a b then b
@@ -102,22 +103,16 @@ type DT =
 
 module TypeClasses =
   let integral n = T(n, lazy [Byte; Int; Int64])
-  let real n = T(n, lazy [Byte; Int; Int64; Float; Double])
   let rec any' n = T(n, lazy [Byte; Int; Int64; Float; Double; Void; Ptr (any' (n + 1)); Function2 (any' (n + 1))])
   let any = any' 0
   let ptr = Ptr any
+  let real n = T(n, lazy [Byte; Int; Int64; Float; Double; ptr])
   let f_unary x1 r = Function([x1], r)
   let f_arith_prefix = f_unary (real 0) (real 0)
   let f_logic_prefix = f_unary (real 0) Byte
   let f_binary x1 x2 r = Function([x1; x2], r)
   let f_arith_infix = f_binary (real 0) (real 0) (real 0)
   let f_logic_infix = f_binary (real 0) (real 0) Byte
-
-  let cast_hierarchies = [
-    [Void]
-    [Byte; Int; Int64; Float; Double]
-    [ptr]
-   ]
 
 
 //open TypeClasses

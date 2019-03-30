@@ -8,12 +8,12 @@
      Byte 32uy; Byte 61uy; Byte 32uy; Byte 37uy; Byte 100uy; Byte 32uy;
      Byte 97uy; Byte 110uy; Byte 100uy; Byte 32uy; Byte 99uy; Byte 32uy;
      Byte 61uy; Byte 32uy; Byte 37uy; Byte 100uy; Byte 10uy; Byte 0uy|];
- Label "main"; AddC (SP,Int 3); MovRC (R 1,Int 10); MovRC (R 2,Int 20);
- Push (R 1); MovRR (R 0,R 2); Add (R 0,SP); SubC (SP,Int 1); MovRR (R 3,R 0);
+ Label "main"; AddC (4,SP,Int 3); MovRC (R 1,Int 10); MovRC (R 2,Int 20);
+ Push (R 1); MovRR (R 0,R 2); Pop RX; Add (4,RX,R 0); MovRR (R 3,R 0);
  PushRealRs;
  MovRM
    (R 0,
     Lbl
       "$76_61_6c_75_65_20_6f_66_20_61_20_3d_20_25_64_2c_20_62_20_3d_20_25_64_20_61_6e_64_20_63_20_3d_20_25_64_a");
  Push (R 0); Push (R 1); Push (R 2); Push (R 3); MovRR (BP,SP); Call "printf";
- PopRealRs; MovRC (R 0,Int 0); SubC (SP,Int 3); Ret; SubC (SP,Int 3); Ret]
+ PopRealRs; MovRC (R 0,Int 0); SubC (4,SP,Int 3); Ret; SubC (4,SP,Int 3); Ret]

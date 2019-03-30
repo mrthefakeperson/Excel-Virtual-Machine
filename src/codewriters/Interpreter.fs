@@ -3,8 +3,6 @@ open Parser.Datatype
 open Codegen.PAsm.Simple
 open Codegen.PAsm
 
-let inline (|Strict|) x = failwithf "failed irrefutable pattern with %A" x
-
 let REAL_REGS = [R 0; RX; BP; SP; PSR_EQ; PSR_GT; PSR_LT]
 
 type State = {
@@ -22,23 +20,27 @@ type State = {
         regs = Map (List.map (fun r -> (r, Void)) REAL_REGS)
         next_alloc = 1
        }
-      let code_as_boxed = Array.ofSeq code |> Array.collect (function Data data -> data | _ -> [|Void|])
-      Array.blit initial.mem CODE_START code_as_boxed 0 code_as_boxed.Length
-      let init_registers = [(BP, Ptr(STACK_START - 1, DT.Byte)); (SP, Ptr(STACK_START - 1, DT.Byte))]
+      let code_as_boxed = Array.ofSeq code |> Array.collect (function Data data -> data | Label _ -> [||] | _ -> [|Void|])
+      Array.blit code_as_boxed 0 initial.mem CODE_START code_as_boxed.Length
+      let init_registers = [(BP, Ptr(STACK_START + 1, DT.Byte)); (SP, Ptr(STACK_START, DT.Byte))]
       { initial with
           regs = List.fold (fun acc (k, v) -> Map.add k v acc) initial.regs init_registers }
     static member branch pc' state = {state with pc = pc'}
     static member to_next_pc state = State.branch (state.pc + 1) state
     static member current_pc (state: State) = Ptr(state.pc, DT.Void)
-
+    
     static member read_register reg (state: State) =
-      if state.regs.ContainsKey reg
-       then state.regs.[reg]
-       else state.mem.[Option.get (reg_addr reg)]
+      match reg with
+      |_ when state.regs.ContainsKey reg -> state.regs.[reg]
+      |Register.R n | Strict n ->
+        let Ptr(bp, DT.Byte) | Strict bp = state.regs.[BP]
+        state.mem.[bp + (if n > 0 then n - 1 else n)]
     static member write_register reg value (state: State) =
-      if state.regs.ContainsKey reg
-       then { state with regs = Map.add reg value state.regs }
-       else state.mem.[Option.get (reg_addr reg)] <- value; state
+      match reg with
+      |_ when state.regs.ContainsKey reg -> { state with regs = Map.add reg value state.regs }
+      |Register.R n | Strict n ->
+        let Ptr(bp, DT.Byte) | Strict bp = state.regs.[BP]
+        state.mem.[bp + (if n > 0 then n - 1 else n)] <- value; state
     static member read_mem (Ptr(addr, _) | Strict addr) (state: State) = state.mem.[addr]
     static member write_mem (Ptr(addr, _) | Strict addr) value (state: State) =
       state.mem.[addr] <- value; state
@@ -47,9 +49,9 @@ type State = {
     static member stack_peek state =
       State.read_mem (State.read_register SP state) state
     static member stack_pop state =
-      State.write_register SP (State.read_register SP state - Int 1) state
+      State.write_register SP (State.read_register SP state - Ptr(1, DT.Byte)) state
     static member stack_push value state =
-      let sp' = State.read_register SP state + Int 1
+      let sp' = State.read_register SP state + Ptr(1, DT.Byte)
       State.write_mem sp' value state
        |> State.write_register SP sp'
 
@@ -67,6 +69,8 @@ type State = {
         sprintf "psr: (eq %A, lt %A, gt %A)" regs.[PSR_EQ] regs.[PSR_LT] regs.[PSR_GT]
         sprintf "sp: %A, bp: %A, stack: %A" regs.[SP] regs.[BP] mem.[STACK_START..STACK_START + 30]
         sprintf "next alloc: %A, mem: %A" next_alloc mem.[..50]
+        sprintf "code: %A" mem.[CODE_START..CODE_START + 50]
+        sprintf "R0: %A, RX: %A" regs.[Register.R 0] regs.[RX]
        ]
        |> printfn "%s"
       state
@@ -87,8 +91,8 @@ let rec eval': Asm -> State -> State = function
      |> List.fold (fun acc i ->
           let shift_position_i = 
             State.write_mem
-             <<*. (State.read_register SP >> ((+) (Int (i - off))))
-             <<* (State.read_mem <<* (State.read_register SP >> ((+) (Int i))))
+             <<*. (State.read_register SP >> ((+) (Ptr(i - off, DT.Byte))))
+             <<* (State.read_mem <<* (State.read_register SP >> ((+) (Ptr(i, DT.Byte)))))
           acc >> shift_position_i
          ) id
   |Mov(rm, rmc) ->
@@ -122,6 +126,7 @@ let rec eval': Asm -> State -> State = function
   |Ret ->
     let extract (Ptr(x, _) | Strict x) = x
     ((State.stack_peek >> extract) *>> State.branch) >> State.stack_pop
+  |Cast(dt, reg) -> State.write_register reg <<* (State.read_register reg >> Boxed.cast dt)
   |Alloc n -> (State.stack_push <<* State.current_alloc) >> State.alloc n
   |Arith(arith_t, sz, reg, rc) ->
     let check (v: Boxed) = if v.datatype.sizeof = sz then id else failwith "data size mismatch"
@@ -129,23 +134,31 @@ let rec eval': Asm -> State -> State = function
     let opnd2 = match rc with RC.R r -> State.read_register r | RC.C c -> lift c
     let op a b =
       match arith_t with
-      |Add -> State.write_register (R 0) (a + b)
-      |Sub -> State.write_register (R 0) (a - b)
-      |Mul -> State.write_register (R 0) (a * b)
-      |DivMod -> State.write_register (R 0) (a / b) >> State.write_register RX (a % b)
+      |Add -> State.write_register reg (a + b)
+      |Sub -> State.write_register reg (a - b)
+      |Mul -> State.write_register reg (a * b)
+      |DivMod -> State.write_register reg (a / b) >> State.write_register RX (a % b)
     check <<* opnd1
      >> (op <<*. opnd1 <<* opnd2)
+     
+let EXTERN_CALL_ADDR = CODE_START - 7
+
+let DEBUG = true
 
 let eval: Asm list -> State = fun instrs ->
-  let instrs = Array.ofList instrs
-  let extern_call_addr = CODE_START - 7
+  let instrs = Array.ofList (List.filter (function Label _ -> false | _ -> true) instrs)  // labels get removed because they are not considered when calculating label addresses
   let rec eval = function
-    |state when state.pc = extern_call_addr -> state
+    |state when state.pc = EXTERN_CALL_ADDR -> state
     |state when not (CODE_START <= state.pc && state.pc < CODE_START + instrs.Length) ->
       failwithf "executing non-code as code: pc = %A" state.pc
     |state ->
-      let state' = eval' (instrs.[state.pc - CODE_START]) state in eval (State.to_next_pc state')
+      if DEBUG then printfn ">>> %A" (instrs.[state.pc - CODE_START])
+      let state' = eval' (instrs.[state.pc - CODE_START]) state
+      state'
+       |> State.to_next_pc
+       |> if DEBUG then State.trace else id
+       |> eval
   State.initialize instrs
    // initially, push a magic number onto the stack; returning from main will return here, and the interpreter stops running
-   |> State.stack_push (Ptr(extern_call_addr - 1, DT.Void))
+   |> State.write_mem (Ptr(STACK_START, DT.Void)) (Ptr(EXTERN_CALL_ADDR - 1, DT.Void))
    |> eval

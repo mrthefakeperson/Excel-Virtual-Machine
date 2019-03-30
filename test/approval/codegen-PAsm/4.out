@@ -7,14 +7,14 @@
      Byte 105uy; Byte 115uy; Byte 32uy; Byte 37uy; Byte 100uy; Byte 10uy;
      Byte 0uy|]; Label "count"; Data [|Int 5|]; Label "main"; Br "enter_loop_1";
  Label "loop_2"; PushRealRs; MovRR (BP,SP); Call "func"; PopRealRs;
- Label "enter_loop_1"; MovRM (R 0,Lbl "count"); SubC (R 0,Int 1);
- MovMR (Lbl "count",R 0); AddC (R 0,Int 1); AddC (R 0,Byte 0uy);
+ Label "enter_loop_1"; MovRM (R 0,Lbl "count"); SubC (4,R 0,Int 1);
+ MovMR (Lbl "count",R 0); AddC (4,R 0,Int 1); Cast (Byte,R 0);
  CmpC (R 0,Byte 0uy); BrT "loop_2"; MovRC (R 0,Int 0); Ret; Ret; Label "func";
- AddC (SP,Int 1); MovRC (R 1,Int 5); MovRR (R 0,R 1); AddC (R 0,Int 1);
- MovRR (R 1,R 0); SubC (R 0,Int 1); PushRealRs;
+ AddC (4,SP,Int 1); MovRC (R 1,Int 5); MovRR (R 0,R 1); AddC (4,R 0,Int 1);
+ MovRR (R 1,R 0); SubC (4,R 0,Int 1); PushRealRs;
  MovRM
    (R 0,
     Lbl
       "$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a");
  Push (R 0); Push (R 1); MovRM (R 0,Lbl "count"); Push (R 0); MovRR (BP,SP);
- Call "printf"; PopRealRs; SubC (SP,Int 1); Ret]
+ Call "printf"; PopRealRs; SubC (4,SP,Int 1); Ret]

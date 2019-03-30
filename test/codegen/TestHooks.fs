@@ -2,6 +2,7 @@
 open Fuchu
 open Parser.Datatype
 open Parser.AST
+open Parser.AST.Hooks
 open Codegen.Hooks
 
 let test_hook message hook input_ast expected =
@@ -43,10 +44,10 @@ let run_all() =
   let expected =
     GlobalParse [
       Declare("$", Ptr Byte)
-      Assign(Value(Var("$", Ptr Byte)), Apply(Value(Var("\stack_alloc", DT.Function([Int], Ptr Byte))), [Value(Lit("1", Int))]))
+      Assign(Value(Var("$", Ptr Byte)), BuiltinASTs.stack_alloc Byte (Value(Lit("1", Int))))
       Assign(Index(Value(Var("$", TypeClasses.any)), Value(Lit("0", Int))), Value(Lit("'\\0'", Byte)))
       Declare("$78_79", Ptr Byte)
-      Assign(Value(Var("$78_79", Ptr Byte)), Apply(Value(Var("\stack_alloc", DT.Function([Int], Ptr Byte))), [Value(Lit("3", Int))]))
+      Assign(Value(Var("$78_79", Ptr Byte)), BuiltinASTs.stack_alloc Byte (Value(Lit("3", Int))))
       Assign(Index(Value(Var("$78_79", TypeClasses.any)), Value(Lit("0", Int))), Value(Lit("'x'", Byte)))
       Assign(Index(Value(Var("$78_79", TypeClasses.any)), Value(Lit("1", Int))), Value(Lit("'y'", Byte)))
       Assign(Index(Value(Var("$78_79", TypeClasses.any)), Value(Lit("2", Int))), Value(Lit("'\\0'", Byte)))
@@ -64,7 +65,7 @@ let run_all() =
   let expected =
     GlobalParse [
       Declare("$", Ptr Byte)
-      Assign(Value(Var("$", Ptr Byte)), Apply(Value(Var("\stack_alloc", DT.Function([Int], Ptr Byte))), [Value(Lit("1", Int))]))
+      Assign(Value(Var("$", Ptr Byte)), BuiltinASTs.stack_alloc Byte (Value(Lit("1", Int))))
       Assign(Index(Value(Var("$", TypeClasses.any)), Value(Lit("0", Int))), Value(Lit("'\\0'", Byte)))
       Value(Var("$", TypeClasses.any))
       Value(Var("$", TypeClasses.any))
