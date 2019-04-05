@@ -12,4 +12,4 @@
     Lbl
       "$53_74_6f_72_61_67_65_20_73_69_7a_65_20_66_6f_72_20_69_6e_74_20_3a_20_25_64_20_a");
  Push (R 0); PushC (Int 4); MovRR (BP,SP); Call "printf"; PopRealRs;
- MovRC (R 0,Int 0); Ret; Ret]
+ MovRC (R 0,Int 0); Ret]

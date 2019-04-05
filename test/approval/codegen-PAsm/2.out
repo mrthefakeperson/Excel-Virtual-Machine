@@ -9,13 +9,13 @@
      Byte 111uy; Byte 102uy; Byte 32uy; Byte 102uy; Byte 32uy; Byte 58uy;
      Byte 32uy; Byte 37uy; Byte 102uy; Byte 32uy; Byte 10uy; Byte 0uy|];
  Label "a"; Data [|Int 0|]; Label "b"; Data [|Int 0|]; Label "c"; Data [|Int 0|];
- Label "f"; Data [|Float 0.0f|]; Label "main"; AddC (4,SP,Int 4);
+ Label "f"; Data [|Float 0.0f|]; Label "main"; AddC (4,SP,Ptr (4,Byte));
  MovRC (R 1,Int 10); MovRC (R 2,Int 20); Push (R 1); MovRR (R 0,R 2); Pop RX;
- Add (4,RX,R 0); MovRR (R 3,R 0); PushRealRs;
+ Add (4,R 0,RX); MovRR (R 3,R 0); PushRealRs;
  MovRM (R 0,Lbl "$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a");
  Push (R 0); Push (R 3); MovRR (BP,SP); Call "printf"; PopRealRs;
  MovRC (R 0,Float 70.0f); DivModC (4,R 0,Float 3.0f); MovRR (R 4,R 0);
  PushRealRs;
  MovRM (R 0,Lbl "$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a");
  Push (R 0); Push (R 4); MovRR (BP,SP); Call "printf"; PopRealRs;
- MovRC (R 0,Int 0); SubC (4,SP,Int 4); Ret; SubC (4,SP,Int 4); Ret]
+ MovRC (R 0,Int 0); SubC (4,SP,Ptr (4,Byte)); Ret; SubC (4,SP,Ptr (4,Byte))]

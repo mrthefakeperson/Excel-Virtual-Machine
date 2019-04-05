@@ -17,11 +17,11 @@ let file_data =
   Path.Combine(__SOURCE_DIRECTORY__, "../samples")
     |> Directory.GetFiles
     |> Array.sortBy (fun f -> int(Path.GetFileName(f).Replace(".c", "")))
-    |> Seq.take 18  // partial test for now - 19
+    |> Seq.take 27  // partial test for now - 27
     |> Seq.map File.ReadAllText
     |> List.ofSeq
 
-open Lexer.Token
+open Lexer.Main
 let lexer_stage: string list -> Token list list = test_stage "lexer" Lexer.Main.tokenize_text
 
 open Parser.AST
@@ -57,10 +57,10 @@ let test() =
            |> lexer_stage
            |> parser_stage
         //let _ = ast |> ast_process_stage
-        let _ = ast |> interpret_ast_stage
-        let _ =
-          ast
-           |> codegen_stage
+        //let _ = ast |> interpret_ast_stage
+        //let _ =
+        //  ast
+        //   |> codegen_stage
         //   |> interpret_pasm_stage
         ()
    |> run

@@ -5,24 +5,24 @@
      Byte 110uy; Byte 103uy; Byte 32uy; Byte 109uy; Byte 101uy; Byte 115uy;
      Byte 115uy; Byte 97uy; Byte 103uy; Byte 101uy; Byte 58uy; Byte 32uy;
      Byte 37uy; Byte 115uy; Byte 10uy; Byte 0uy|]; Label "main";
- AddC (4,SP,Int 1); MovRC (R 0,Int 6); MovRR (RX,SP); Add (4,SP,R 0);
+ AddC (4,SP,Ptr (1,Byte)); MovRC (R 0,Int 6); MovRR (RX,SP); Add (4,SP,R 0);
  MovRR (R 1,RX); MovRC (R 0,Byte 72uy); Push (R 0); Push (R 1);
  MovRC (R 0,Int 0); Cast (Ptr Byte,R 0); MulC (4,R 0,Ptr (1,Byte)); Pop RX;
- Add (4,RX,R 0); Pop RX; MovMR (Indirect (R 0),RX); MovRC (R 0,Byte 101uy);
+ Add (4,R 0,RX); Pop RX; MovMR (Indirect (R 0),RX); MovRC (R 0,Byte 101uy);
  Push (R 0); Push (R 1); MovRC (R 0,Int 1); Cast (Ptr Byte,R 0);
- MulC (4,R 0,Ptr (1,Byte)); Pop RX; Add (4,RX,R 0); Pop RX;
+ MulC (4,R 0,Ptr (1,Byte)); Pop RX; Add (4,R 0,RX); Pop RX;
  MovMR (Indirect (R 0),RX); MovRC (R 0,Byte 108uy); Push (R 0); Push (R 1);
  MovRC (R 0,Int 2); Cast (Ptr Byte,R 0); MulC (4,R 0,Ptr (1,Byte)); Pop RX;
- Add (4,RX,R 0); Pop RX; MovMR (Indirect (R 0),RX); MovRC (R 0,Byte 108uy);
+ Add (4,R 0,RX); Pop RX; MovMR (Indirect (R 0),RX); MovRC (R 0,Byte 108uy);
  Push (R 0); Push (R 1); MovRC (R 0,Int 3); Cast (Ptr Byte,R 0);
- MulC (4,R 0,Ptr (1,Byte)); Pop RX; Add (4,RX,R 0); Pop RX;
+ MulC (4,R 0,Ptr (1,Byte)); Pop RX; Add (4,R 0,RX); Pop RX;
  MovMR (Indirect (R 0),RX); MovRC (R 0,Byte 111uy); Push (R 0); Push (R 1);
  MovRC (R 0,Int 4); Cast (Ptr Byte,R 0); MulC (4,R 0,Ptr (1,Byte)); Pop RX;
- Add (4,RX,R 0); Pop RX; MovMR (Indirect (R 0),RX); MovRC (R 0,Byte 0uy);
+ Add (4,R 0,RX); Pop RX; MovMR (Indirect (R 0),RX); MovRC (R 0,Byte 0uy);
  Push (R 0); Push (R 1); MovRC (R 0,Int 5); Cast (Ptr Byte,R 0);
- MulC (4,R 0,Ptr (1,Byte)); Pop RX; Add (4,RX,R 0); Pop RX;
+ MulC (4,R 0,Ptr (1,Byte)); Pop RX; Add (4,R 0,RX); Pop RX;
  MovMR (Indirect (R 0),RX); PushRealRs;
  MovRM
    (R 0,Lbl "$47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a");
  Push (R 0); Push (R 1); MovRR (BP,SP); Call "printf"; PopRealRs;
- MovRC (R 0,Int 0); SubC (4,SP,Int 1); Ret; SubC (4,SP,Int 1); Ret]
+ MovRC (R 0,Int 0); SubC (4,SP,Ptr (1,Byte)); Ret; SubC (4,SP,Ptr (1,Byte))]

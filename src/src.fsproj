@@ -55,8 +55,6 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="Utils.fs" />
-    <Compile Include="lexer\Token.fs" />
-    <Compile Include="lexer\Tokenize.fs" />
     <Compile Include="lexer\Preprocessor.fs" />
     <Compile Include="lexer\Main.fs" />
     <Compile Include="parser\Datatype.fs" />

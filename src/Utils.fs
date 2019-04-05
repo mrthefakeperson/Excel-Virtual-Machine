@@ -1,9 +1,16 @@
 ﻿[<AutoOpenAttribute>]
 module Utils
+open System.Text.RegularExpressions
 
 let trace x = printfn "%A" x; x
 
 let inline (|Strict|) x = failwithf "should never be reached (%A)" x
+
+let normalize_newlines (s: string) = Regex.Replace(s, @"\r\n|\n\r|\n|\r", "\r\n")
+
+let (|Regex|_|) rgx (s: string) =
+  let ``match`` = Regex.Match(s, rgx)
+  if ``match``.Value <> "" then Some ``match`` else None
 
 let unescape_string (s: string) =
   let rec escapes = function

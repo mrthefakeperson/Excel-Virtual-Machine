@@ -46,6 +46,12 @@ let test_parser_value() =
      )
   test_rule "value - suffix" value "a++++" <| Yes(expected, [])
 
+  let expected =
+    Apply'.fn2("+", TypeClasses.f_arith_infix)
+     (Apply'.fn2 "." (Apply'.fn2 "->" (Value(Var("a", TypeClasses.any))) (Value(Var("b", TypeClasses.any)))) (Value(Var("c", TypeClasses.any))))
+     (Apply'.fn2 "->" (Apply'.fn2 "." (Value(Var("d", TypeClasses.any))) (Value(Var("e", TypeClasses.any)))) (Value(Var("f", TypeClasses.any))))
+  test_rule "value - access" value "a->b.c + d . e->f" <| Yes(expected, [])
+
   let expected_left =
     Apply(
       Value(Var("+", TypeClasses.f_arith_infix)),
@@ -171,6 +177,42 @@ let test_parser_global() =
        )
      ]
   test_rule "function" declare_function "int f(int x, int* y) { return x; }" <| Yes(expected, [])
+  
+  let expected = DeclAlias("a", Int)
+  test_rule "typedef" typedef "typedef a int" <| Yes(expected, [])
+  
+  //let expected = DeclAlias("a", Ptr Int)  // TODO
+  //test_rule "typedef" typedef "typedef a int*" <| Yes(expected, [])
+
+  let expected = DeclStruct("A", [StructField("x", Int, 0, 4); StructField("y", Ptr Int, 32, 44)])
+  test_rule "struct" declare_struct "struct A {int x; int y[10];}" <| Yes(expected, [])
+
+  let expected = DeclUnion("A", [StructField("x", Int, 0, 4); StructField("y", Ptr Int, 0, 44)])
+  test_rule "struct" declare_union "union A {int x; int y[10];}" <| Yes(expected, [])
+
+  let expected =
+    GlobalParse [
+      Declare("?", TypeDef (DeclAlias("X", Int)))
+      DeclareHelper [Declare("x", TypeDef (Alias "X")); Assign(Value(Var("x", TypeClasses.any)), Value(Lit("1", Int)))]
+      Declare("anon", TypeDef (DeclStruct("_anon", [StructField("a", Int, 0, 4)])))
+      Declare("?", TypeDef (DeclStruct("Y", [StructField("b", Int, 3, 4)])))
+      DeclareHelper [Declare("y", TypeDef (Struct "Y"))]
+      Declare("?",
+        TypeDef (DeclUnion("Y", [StructField("a", Int, 0, 4); StructField("b", Byte, 0, 1); StructField("c", Ptr Int64, 0, 324)]))
+       )
+      DeclareHelper [Declare("z", TypeDef (Union "Y"))]
+      Declare("?", TypeDef (DeclUnion("ZZ", [])))
+      Declare("?", TypeDef (DeclAlias("A", TypeDef (Union "ZZ"))))
+      Declare("?", TypeDef (DeclAlias("B", TypeDef (Union "ZZ"))))
+      Declare("?", TypeDef (DeclAlias("C", TypeDef (Union "ZZ"))))
+     ]
+  test_rule "typedef, struct, union" parse_global_scope """
+    typedef X int; X x = 1;
+    struct {int a;} anon;
+    struct Y {int b:3;}; struct Y y;
+    union Y {int a; char b; long c[40];}; union Y z;
+    typedef union ZZ {} A, B, C;
+    """ <| Yes(expected, []) 
 
   let expected =
     GlobalParse [

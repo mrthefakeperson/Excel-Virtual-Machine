@@ -14,4 +14,4 @@
       "$54_68_69_73_20_6c_6f_6f_70_20_77_69_6c_6c_20_72_75_6e_20_66_6f_72_65_76_65_72_2e_a");
  Push (R 0); MovRR (BP,SP); Call "printf"; PopRealRs; Label "enter_loop_1";
  MovRC (R 0,Byte 49uy); CmpC (R 0,Byte 0uy); BrT "loop_2"; MovRC (R 0,Int 0);
- Ret; Ret]
+ Ret]

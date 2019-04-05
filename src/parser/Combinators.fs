@@ -1,7 +1,7 @@
 ﻿module Parser.Combinators
 open System.Text.RegularExpressions
 open System.Collections.Generic
-open Lexer.Token
+open Lexer.Main
 
 // syntax:
 // let rec nameOfRule() = () |> buildRule()       <<-- the `() |> ` is for lazy eval. manipulation
@@ -95,7 +95,7 @@ let ListOf(rule: 'a Rule) () : 'a list rule =
   list()
 let (~+) = ListOf
 
-let OptionalListOf rule = Optional (ListOf rule) ->/ function Some parsed_list -> parsed_list | None -> []
+let OptionalListOf rule = Optional (ListOf rule) ->/ Option.defaultValue []
 
 let JoinedListOf (rule: 'a Rule) (delimiter: 'b Rule) = rule +/ OptionalListOf (delimiter +/ rule)
 let (&/) = JoinedListOf

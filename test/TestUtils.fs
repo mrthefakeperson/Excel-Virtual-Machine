@@ -5,7 +5,7 @@ let approval_test fname obj =
   let serialized = sprintf "%A" obj
   let fpath = Path.Combine(__SOURCE_DIRECTORY__, "approval", fname)
   let record = try File.ReadAllText fpath with :? FileNotFoundException -> ""
-  if serialized <> record then
+  if serialized.Split('\n') <> record.Split('\n') then
     printf "Approval test failed on %s:\nExisting:\n%s\n-----\n\nNew:\n%s\n-----"
      fname record serialized
     let rec confirm() =

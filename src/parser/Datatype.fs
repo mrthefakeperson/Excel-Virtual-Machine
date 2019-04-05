@@ -1,11 +1,18 @@
 ﻿module Parser.Datatype
 
-type DT =
+type TypeDef =
+  |DeclAlias of string * DT | DeclStruct of StructDef | DeclUnion of StructDef  // define a new type and declare a variable using it
+  |Alias of string | Struct of string | Union of string  // declare a variable of a struct/union type already defined (replace in preprocessing)
+and StructDef = string * StructFieldDef list
+and StructFieldDef = StructField of name: string * DT * start_bit: int * size_bytes: int
+
+and DT =
   |Int | Byte | Int64 | Void | Float | Double
   |Ptr of DT
   |Function of args: DT list * ret: DT
   |Function2 of ret: DT  // non-explicit args; symbolizes any function when used in type parameter
   |T of identifier: int * valid_types: Lazy<DT list>  // type parameter
+  |TypeDef of TypeDef
   with
     member x.sizeof =
       match x with
@@ -19,6 +26,7 @@ type DT =
       |Function _ -> 4
       |Function2 _ -> 4
       |T _ -> failwith "cannot get size of T _"
+      |TypeDef _ -> failwith "unexpected typedef - should be removed at this point"
 
     static member can_promote from to_ =
       let hierarchy = [Byte; Int; Int64; Float; Double]
@@ -88,9 +96,6 @@ type DT =
       cast (replace model, concrete)
 
     static member infer_type model concrete : DT =
-     //match model, concrete with
-     //|_ when model = concrete -> model
-     //|_ ->
       let rec cast = function  // demote types in concrete if possible
         |T _, t -> t
         |Ptr t, Ptr t' -> Ptr (cast (t, t'))

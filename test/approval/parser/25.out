@@ -1,0 +1,55 @@
+GlobalParse
+  [Declare ("Age",TypeDef (DeclStruct ("_anon", [StructField ("age",Int,3,4)])));
+   DeclareHelper
+     [Declare ("main",Function2 Int);
+      Assign
+        (Value (Var ("main",Function2 Int)),
+         Function
+           ([],
+            Block
+              [Assign
+                 (Apply
+                    (Value (Var (".",T (0,[Byte; Int; Int64; ... ]))),
+                     [Value (Var ("Age",T (0,[Byte; Int; Int64; ... ])));
+                      Value (Var ("age",T (0,[Byte; Int; Int64; ... ])))]),
+                  Value (Lit ("4",Int)));
+               Apply
+                 (Value (Var ("printf",T (0,[Byte; Int; Int64; ... ]))),
+                  [Value (Lit (""Sizeof( Age ) : %d\n"",Ptr Byte));
+                   Apply
+                     (Value (Var ("sizeof",T (0,[Byte; Int; Int64; ... ]))),
+                      [Value (Var ("Age",T (0,[Byte; Int; Int64; ... ])))])]);
+               Apply
+                 (Value (Var ("printf",T (0,[Byte; Int; Int64; ... ]))),
+                  [Value (Lit (""Age.age : %d\n"",Ptr Byte));
+                   Apply
+                     (Value (Var (".",T (0,[Byte; Int; Int64; ... ]))),
+                      [Value (Var ("Age",T (0,[Byte; Int; Int64; ... ])));
+                       Value (Var ("age",T (0,[Byte; Int; Int64; ... ])))])]);
+               Assign
+                 (Apply
+                    (Value (Var (".",T (0,[Byte; Int; Int64; ... ]))),
+                     [Value (Var ("Age",T (0,[Byte; Int; Int64; ... ])));
+                      Value (Var ("age",T (0,[Byte; Int; Int64; ... ])))]),
+                  Value (Lit ("7",Int)));
+               Apply
+                 (Value (Var ("printf",T (0,[Byte; Int; Int64; ... ]))),
+                  [Value (Lit (""Age.age : %d\n"",Ptr Byte));
+                   Apply
+                     (Value (Var (".",T (0,[Byte; Int; Int64; ... ]))),
+                      [Value (Var ("Age",T (0,[Byte; Int; Int64; ... ])));
+                       Value (Var ("age",T (0,[Byte; Int; Int64; ... ])))])]);
+               Assign
+                 (Apply
+                    (Value (Var (".",T (0,[Byte; Int; Int64; ... ]))),
+                     [Value (Var ("Age",T (0,[Byte; Int; Int64; ... ])));
+                      Value (Var ("age",T (0,[Byte; Int; Int64; ... ])))]),
+                  Value (Lit ("8",Int)));
+               Apply
+                 (Value (Var ("printf",T (0,[Byte; Int; Int64; ... ]))),
+                  [Value (Lit (""Age.age : %d\n"",Ptr Byte));
+                   Apply
+                     (Value (Var (".",T (0,[Byte; Int; Int64; ... ]))),
+                      [Value (Var ("Age",T (0,[Byte; Int; Int64; ... ])));
+                       Value (Var ("age",T (0,[Byte; Int; Int64; ... ])))])]);
+               Return (Value (Lit ("0",Int)))]))]]
