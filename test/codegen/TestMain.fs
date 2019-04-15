@@ -97,7 +97,7 @@ let test_basics() =
   let expr = parse_string_to_ast_with parse_global_scope "int a = 1; int main(void) { a = 1L; }"
   let expected = [
     Br "main"; Label "a"; Data [|Int 1|];
-    Label "main"; MovRC(R 0, Int64 1L); Cast(DT.Int, R 0); MovMR(Lbl "a", R 0); Ret
+    Label "main"; MovRC(R 0, Int64 1L); Cast(DT.Int, R 0); MovMR(Lbl("a", DT.Int), R 0); Ret
    ]
   test_codegen_direct "assign global" expr expected
 

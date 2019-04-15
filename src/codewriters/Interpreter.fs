@@ -3,7 +3,7 @@ open Parser.Datatype
 open Codegen.PAsm.Simple
 open Codegen.PAsm
 
-let REAL_REGS = [R 0; RX; BP; SP; PSR_EQ; PSR_GT; PSR_LT]
+let REAL_REGS = [SP; BP; RX; PSR_EQ; PSR_GT; PSR_LT]  // don't do R0, since it's needed to store return values
 
 type State = {
   mem: Boxed[]
@@ -17,7 +17,7 @@ type State = {
       let initial = {
         mem = Array.create (max STACK_START CODE_START * 2) Void
         pc = CODE_START
-        regs = Map (List.map (fun r -> (r, Void)) REAL_REGS)
+        regs = Map (List.map (fun r -> (r, Void)) (R 0::REAL_REGS))
         next_alloc = 1
        }
       let code_as_boxed = Array.ofSeq code |> Array.collect (function Data data -> data | Label _ -> [||] | _ -> [|Void|])
@@ -84,8 +84,11 @@ let rec eval': Asm -> State -> State = function
   |Label _ -> id
   |Push rc -> State.stack_push <<* match rc with RC.R r -> State.read_register r | RC.C c -> lift c
   |PushRealRs -> List.fold (fun acc real_reg -> acc >> eval' (Push (RC.R real_reg))) id REAL_REGS
-  |Pop r -> (State.stack_peek *>> State.write_register r) >> State.stack_pop
-  |PopRealRs -> List.fold (fun acc real_reg -> acc >> eval' (Pop real_reg)) id REAL_REGS
+  |Pop r ->
+    match r with
+    |Register.SP -> State.stack_peek *>> State.write_register r
+    |_ -> (State.stack_peek *>> State.write_register r) >> State.stack_pop
+  |PopRealRs -> List.fold (fun acc real_reg -> acc >> eval' (Pop real_reg)) id (List.rev REAL_REGS)
   |ShiftStackDown(off, len) ->
     [1..len]
      |> List.fold (fun acc i ->
@@ -99,13 +102,13 @@ let rec eval': Asm -> State -> State = function
     let write =
       match rm with
       |RM.R r -> State.write_register r
-      |RM.M addr -> State.write_mem (Ptr(addr, DT.Void))
+      |RM.M(addr, _) -> State.write_mem (Ptr(addr, DT.Void))
       |RM.I r -> State.write_mem <<*. State.read_register r
     let read =
       match rmc with
       |RMC.C c -> fun _ -> c
       |RMC.R r -> State.read_register r
-      |RMC.M addr -> State.read_mem (Ptr(addr, DT.Void))
+      |RMC.M(addr, dt) -> State.read_mem (Ptr(addr, dt))
       |RMC.I r -> State.read_register r *>> State.read_mem
     read *>> write
   |Cmp(r, rc) ->
@@ -127,7 +130,7 @@ let rec eval': Asm -> State -> State = function
     let extract (Ptr(x, _) | Strict x) = x
     ((State.stack_peek >> extract) *>> State.branch) >> State.stack_pop
   |Cast(dt, reg) -> State.write_register reg <<* (State.read_register reg >> Boxed.cast dt)
-  |Alloc n -> (State.stack_push <<* State.current_alloc) >> State.alloc n
+  |Alloc n -> (State.write_register (R 0) <<* State.current_alloc) >> State.alloc n
   |Arith(arith_t, sz, reg, rc) ->
     let check (v: Boxed) = if v.datatype.sizeof = sz then id else failwith "data size mismatch"
     let opnd1 = State.read_register reg
@@ -143,10 +146,12 @@ let rec eval': Asm -> State -> State = function
      
 let EXTERN_CALL_ADDR = CODE_START - 7
 
-let DEBUG = true
+let DEBUG = false
+let PAUSE = false
 
 let eval: Asm list -> State = fun instrs ->
   let instrs = Array.ofList (List.filter (function Label _ -> false | _ -> true) instrs)  // labels get removed because they are not considered when calculating label addresses
+                                                                                          // TODO: bug: data arrays can overlap
   let rec eval = function
     |state when state.pc = EXTERN_CALL_ADDR -> state
     |state when not (CODE_START <= state.pc && state.pc < CODE_START + instrs.Length) ->
@@ -157,6 +162,7 @@ let eval: Asm list -> State = fun instrs ->
       state'
        |> State.to_next_pc
        |> if DEBUG then State.trace else id
+       |> fun e -> (if PAUSE && DEBUG then ignore (System.Console.ReadLine())); e
        |> eval
   State.initialize instrs
    // initially, push a magic number onto the stack; returning from main will return here, and the interpreter stops running

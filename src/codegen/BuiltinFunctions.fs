@@ -38,6 +38,4 @@ let generate f dt arg_instrs =
   |">", [a; b] -> push_r0 a @ b @ [Pop RX; Cmp(RX, R 0); MovRR(R 0, PSR_GT)]
   |"<", [a; b] -> push_r0 a @ b @ [Pop RX; Cmp(RX, R 0); MovRR(R 0, PSR_LT)]
   |"printf", args -> [PushRealRs] @ List.collect push_r0 args @ [MovRR(BP, SP); Call "printf"; PopRealRs]
-    // BROKEN: additional stack space is not budgeted for in local variables, call stack, etc.
-  |"\stack_alloc", [sz] -> sz @ [MovRR(RX, SP); Add(4, SP, R 0); MovRR(R 0, RX)]
   |_ -> failwithf "builtin function %s (%i args) not found" f (List.length arg_instrs)

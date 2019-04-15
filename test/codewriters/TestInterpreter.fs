@@ -38,13 +38,13 @@ let unit_tests() =
 
   let state = { State.initialize [] with mem = Array.create 3 Void }
   let expected = { state with mem = [|Void; Int 7; Void|] }
-  test_single "move into memory" (Mov(RM.M 1, RMC.C (Int 7))) state expected
+  test_single "move into memory" (Mov(RM.M(1, DT.Int), RMC.C (Int 7))) state expected
 
   let state =
     { State.initialize [] with mem = [|Void; Int 7; Void|] }
      |> State.write_register RX (Ptr(0, DT.Void))
   let expected = { state with mem = [|Int 7; Int 7; Void|] }
-  test_single "move memory contents into addr stored in register" (Mov(RM.I RX, RMC.M 1)) state expected
+  test_single "move memory contents into addr stored in register" (Mov(RM.I RX, RMC.M(1, DT.Int))) state expected
 
   let state = State.initialize [] |> State.write_register RX (Int 9)
   let expected =
@@ -127,19 +127,11 @@ let asm_samples() =
       result.regs.[RX] = Int 7 && result.regs.[Register.R 0] = Int 7
        && result.mem.[STACK_START + 1..STACK_START + 4] = [|Int 7; Int 7; Void; Void|])
 
-let test_ast message code verifier =
-  let pipeline = Codegen.Main.generate_from_ast >> convert_from_flat >> eval
-  testCase message <| fun () -> Assert.Equal(message, true, verifier (pipeline code))
-   |> run |> ignore
-
-let from_ast() =
-  ()
-
 let test_full_pipeline message code expected_ret =
   let pipeline =
     Lexer.Main.tokenize_text
      >> Parser.Main.parse_tokens_to_ast
-     >> Codegen.Main.generate_from_ast >> convert_from_flat
+     >> Codegen.Main.generate_from_ast >> trace >> convert_from_flat
      >> trace
      >> eval
   testCase message <| fun () ->
@@ -154,9 +146,8 @@ let e2e() =
   test_full_pipeline "local variables 1" "int main() { char x = 'a'; return x + 1; }" (Int 98)
 
   test_full_pipeline "local variables 2" "int main() { int x = 2, y = -3; return -x + y * x; }" (Int -8)
-
-  // "int main() { int x[3] = { 1, 2, 3 }; return 2 * *x + x[2]; }" is bugged because the stack space is not being properly allocated
-  //test_full_pipeline "local variables 3" "int main() { int x[3] = { 1, 2, 3 }, x2, x3, x4 = 7777777; return 2 * *x + x[2]; }" (Int 5)
+  
+  test_full_pipeline "local variables 3" "int main() { int x[3] = { 1, 2, 3 }, x2, x3, x4 = 7777777; return 2 * *x + x[2]; }" (Int 5)
 
   test_full_pipeline "local variables 4" "int main() { int x = 4, *y = &x; return *y; }" (Int 4)
 
@@ -167,18 +158,19 @@ let e2e() =
   test_full_pipeline "for 1" "int main() { int y = 1; for (int x = 0; x < 5; x++) y *= 2; return y; }" (Int 32)
 
   test_full_pipeline "global variables 1" "int x = 1, y = 7; int main() { int x = 7; return x + y; }" (Int 14)
-
-  // bugged: (uninitialized?) global arrays don't work, types don't match
-  //test_full_pipeline "global variables 2" "int x[50]; int main() { x[2] = 3; return x[2]; }" (Int 3)
+  
+  test_full_pipeline "global variables 2" "int x[10]; int main() { x[2] = 3; return x[2]; }" (Int 3)
 
   test_full_pipeline "function call 1" "int f(int a, int b) { return a + b; } int main(void) { return f(7, 70); }" (Int 77)
+  
+  test_full_pipeline "function call 2 (recursion)" 
+   "int f(int a) { if (a == 2) return a; else return f(a - 1) + 2; }
+    int main() { return f(4); }"
+   (Int 6)
 
-  // bugged?
-  //test_full_pipeline "function call 2 (recursion)" "int f(int a) { if (a == 2) return a; else return f(a - 1) + 2; } int main() { return f(4); }"
-  // (Int 6)
+  test_full_pipeline "loop & assignment" "int main() { int x; for (x = 0; x < 7; x += 2); return x; }" (Int 8)
 
 let run_all() =
   unit_tests()
   asm_samples()
-  from_ast()
   e2e()

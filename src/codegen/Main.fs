@@ -28,7 +28,7 @@ let rec addr_of (symtbl: SymbolTable) = function
   |Value(Var(name, t)) ->
     match symtbl.check_var name t with
     |Local(reg, sz) -> [MovRHandle(R 0, HandleReg reg)]
-    |Global sz -> [MovRHandle(R 0, HandleLbl name)]
+    |Global sz -> [MovRHandle(R 0, HandleLbl(name, t))]
   |Apply(Value(Var("*prefix", _)), [addr]) -> generate symtbl addr
   |Apply(Value(Var("\cast", t)), [xpr]) -> addr_of symtbl xpr @ [Cast(DT.Ptr t, R 0)]
   |Index _ -> failwith "should never be reached"
@@ -39,29 +39,34 @@ and generate (symtbl: SymbolTable) = function
   |Apply(f, xs) ->
     let get_args_r0 = List.map (generate symtbl) xs
     let push_args = List.collect push_r0 get_args_r0
+    let pop_args = SubC(4, SP, Ptr(List.length xs, DT.Byte))
     match f with
     |Value(Var("\cast", t)) -> List.exactlyOne get_args_r0 @ [Cast(t, R 0)]
     |Value(Var("&prefix", _)) -> addr_of symtbl (List.exactlyOne xs)
+    // TEMP: does not currently alloc onto stack; TODO: scan for these calls and budget stack appropriately
+    // TODO 2: allow alloc of a non-constant size
+    |Value(Var("\stack_alloc", DT.Function([DT.Int], dt))) ->
+      let Int sz | Strict sz = eval_ast (default_memory()) (List.exactlyOne xs)
+      [Alloc(sz, dt)]
     |Value(Var(name, _)) when symtbl.check_global_var name ->
-      [PushRealRs] @ push_args @ [MovRR(BP, SP); AddC(4, BP, Ptr(1, DT.Byte)); Call name; PopRealRs]  // stack is full, so shift BP by one more
+      [PushRealRs] @ push_args @ [MovRR(BP, SP); AddC(4, BP, Ptr(1, DT.Byte)); Call name; pop_args; PopRealRs]  // sp is full, so shift BP by one more
     |Value(Var(f, dt)) when List.exists ((=) f) (List.map fst Tables.builtins) ->
       BuiltinFunctions.generate f dt get_args_r0
     |unexpected -> failwithf "not a function: %A" unexpected
   |Assign(a, b) ->
     match addr_of symtbl a with
-    |[MovRHandle(R 0, HandleLbl lbl)] -> generate symtbl b @ [MovMR(Lbl lbl, R 0)]
+    |[MovRHandle(R 0, HandleLbl(lbl, dt))] -> generate symtbl b @ [MovMR(Lbl(lbl, dt), R 0)]
     |[MovRHandle(R 0, HandleReg reg)] -> to_rn_from_r0 (R reg) (generate symtbl b)
     |instrs -> generate symtbl b @ [Push (R 0)] @ instrs @ [Pop RX; MovMR(Indirect(R 0), RX); MovRR(R 0, RX)]
   |Index _ -> failwith "should never be reached"
   |Declare _ | DeclareHelper _ -> failwith "should never be reached; handled in block"
   |Return ast ->
     match ast with
-    |Apply(Value(Var(name, _)), args) when symtbl.check_global_var name ->  // tailcall
+    |Apply(Value(Var(name, _)), args) when symtbl.check_global_var name ->  // tailcall (partial optimization, experimental)
       let push_args = List.collect push_r0 (List.map (generate symtbl) args)
       let num_args = List.length args
-      push_args @ [SubC(4, SP, Ptr(RETURN_STACKRESET_DEFAULT, DT.Byte))]  // restore stack to original position + pushed args
-       @ [ShiftStackDown(RETURN_STACKRESET_DEFAULT - num_args, 0); MovRR(BP, SP); AddC(4, BP, Ptr(1, DT.Byte))]
-       @ [Br name]
+      push_args @ [MovRR(BP, SP); AddC(4, BP, Ptr(1, DT.Byte))] @ [Call name] @ [SubC(4, SP, Ptr(num_args, DT.Byte))]
+       @ [SubC(4, SP, Ptr(RETURN_STACKRESET_DEFAULT, DT.Byte)); Ret]
     |_ -> generate symtbl ast @ [SubC(4, SP, Ptr(RETURN_STACKRESET_DEFAULT, DT.Byte)); Ret]
   |Block xprs ->
     let rec gen_block (symtbl: SymbolTable) = function
@@ -90,9 +95,10 @@ and generate (symtbl: SymbolTable) = function
        @ [Label enter_loop_label] @ generate symtbl cond @ [CmpC(R 0, Byte 0uy); BrT loop_label]
   |Function _ -> failwith "should never be reached; handled in global"
   |Value(Var(name, typ)) ->
-    match symtbl.check_var name typ with
-    |Local(reg, sz) -> [MovRR(R 0, R reg)]
-    |Global sz -> [MovRM(R 0, Lbl name)]
+    match symtbl.check_var name typ, typ with
+    |Local(reg, sz), _ -> [MovRR(R 0, R reg)]
+    |Global sz, DT.Ptr _ -> [MovRHandle(R 0, HandleLbl(name, typ))]  // unsure if this branch on typ works
+    |Global sz, _ -> [MovRM(R 0, Lbl(name, typ))]
   |Value(Lit(_, DT.Void)) -> []
   |Value(Lit _) as v ->
     let x = eval_ast (default_memory()) v
@@ -104,19 +110,20 @@ and generate (symtbl: SymbolTable) = function
         let symtbl' = symtbl.register_global_var name t  // should only have global variables
         let symtbl'' =
           List.fold2 (fun symtbl i (name, t) ->
-            {symtbl with var_to_type = symtbl.var_to_type.Add(name, t); var_to_register = (name, i)::symtbl.var_to_register}
+            { symtbl with
+                var_to_type = symtbl.var_to_type.Add(name, t)
+                var_to_register = (name, i)::symtbl.var_to_register }
            ) symtbl' [-num_args .. -1] args
         let body_instrs = generate symtbl'' body
         let body_with_setup_teardown =
-          let highest_reg = get_highest_register body_instrs
-          let stack_reset = highest_reg + num_args
-          let setup = if highest_reg = 0 then [] else [AddC(4, SP, Ptr(highest_reg, DT.Byte))]
-          let teardown = if highest_reg + num_args = 0 then [] else [SubC(4, SP, Ptr(highest_reg + num_args, DT.Byte))]
+          let stack_reset = get_highest_register body_instrs
+          let setup = if stack_reset = 0 then [] else [AddC(4, SP, Ptr(stack_reset, DT.Byte))]
+          let teardown = if stack_reset = 0 then [Ret] else [SubC(4, SP, Ptr(stack_reset, DT.Byte)); Ret]
           let body_stack_reset =
             List.choose (function
               |SubC(4, SP, Ptr(RETURN_STACKRESET_DEFAULT, DT.Byte)) when stack_reset = 0 -> None
               |SubC(4, SP, Ptr(RETURN_STACKRESET_DEFAULT, DT.Byte)) -> Some <| SubC(4, SP, Ptr(stack_reset, DT.Byte))
-              |ShiftStackDown(offset, 0) -> Some <| ShiftStackDown(offset - RETURN_STACKRESET_DEFAULT + highest_reg, num_args)
+              |ShiftStackDown _ & Strict x -> x
               |c -> Some c
              ) body_instrs
           setup @ body_stack_reset @ teardown
@@ -133,11 +140,14 @@ and generate (symtbl: SymbolTable) = function
           |Assign _ as x -> failwithf "invalid global value initialization: %A" x
           |_ -> false
         let assigns, rest = List.takeWhile grouped_assign rest, List.skipWhile grouped_assign rest
-        match assigns with
-        |Assign(_, Apply(Value(Var("\stack_alloc", _)), _))::assigns | assigns ->
-          let data =  // TODO: don't use default memory, import definitions
+        let data =
+          match assigns with
+          |[Assign(_, Apply(Value(Var("\stack_alloc", DT.Function([DT.Int], dt'))), [sz_ast]))] ->
+            let Int sz | Strict sz = eval_ast (default_memory()) sz_ast
+            Array.create (sz * dt'.sizeof) (Boxed.default_value dt')
+          |assigns ->  // TODO: don't use default memory, import definitions
             Array.map (function Assign(_, xpr) | Strict xpr -> eval_ast (default_memory()) xpr) (Array.ofList assigns)
-          [Label name] @ [Data data] @ gen_global (symtbl.register_global_var name t) rest
+        [Label name] @ [Data data] @ gen_global (symtbl.register_global_var name t) rest
       |Declare(name, t)::rest ->
         [Label name] @ [Data [|Boxed.default_value t|]] @ gen_global (symtbl.register_global_var name t) rest
       |[] -> []

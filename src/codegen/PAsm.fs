@@ -104,10 +104,10 @@ type Register =
   |BP | SP
   |PSR_EQ | PSR_LT | PSR_GT
 
-type Memory = Lbl of string | Indirect of Register
+type Memory = Lbl of string * DT | Indirect of Register
 
 // contains reference to a var whose reference cannot be directly expressed
-type Handle = HandleLbl of string | HandleReg of int
+type Handle = HandleLbl of string * DT | HandleReg of int
 
 module Flat =
   type Asm =
@@ -135,7 +135,7 @@ module Flat =
     |Ret
     // operations
     |Cast of DT * Register
-    |Alloc of bytes: int  // alloc an address into R0
+    |Alloc of blocks: int * DT  // alloc an address into R0
     |Add of sz: int * Register * Register
     |AddC of sz: int * Register * Boxed
     |Sub of sz: int * Register * Register
@@ -147,8 +147,8 @@ module Flat =
     
 module Simple =
   type RC = R of Register | C of Boxed
-  type RM = R of Register | M of addr: int | I of deref: Register
-  type RMC = R of Register | C of Boxed | M of addr: int | I of deref: Register
+  type RM = R of Register | M of addr: int * dt: DT | I of deref: Register
+  type RMC = R of Register | C of Boxed | M of addr: int * dt: DT | I of deref: Register
 
   type Asm =
     |Data of Boxed[]
@@ -185,15 +185,15 @@ module Simple =
     let label_addr lbl =
       if labels_map.ContainsKey lbl then CODE_START + labels_map.[lbl] else failwithf "label not declared: %s" lbl
     let mov_rh reg: Handle -> Asm List = function
-      |HandleLbl lbl -> [Mov(RM.R reg, RMC.C (Ptr(label_addr lbl, TypeClasses.any)))]  // requires a hack when adding to other pointers
+      |HandleLbl(lbl, (DT.Ptr dt | Strict dt)) -> [Mov(RM.R reg, RMC.C (Ptr(label_addr lbl, dt)))]
       |HandleReg 0 -> failwith "code generation error: handle of R0?"
       |HandleReg n ->
         [Mov(RM.R reg, RMC.R BP); Arith(Add, 4, reg, RC.C (if n > 0 then Ptr(n - 1, DT.Byte) else Ptr(n, DT.Byte)))]
     let convert_memory_rm = function
-      |Memory.Lbl lbl -> RM.M (label_addr lbl)
+      |Memory.Lbl(lbl, dt) -> RM.M (label_addr lbl, dt)
       |Memory.Indirect r -> RM.I r
     let convert_memory_rmc = function
-      |Memory.Lbl lbl -> RMC.M (label_addr lbl)
+      |Memory.Lbl(lbl, dt) -> RMC.M (label_addr lbl, dt)
       |Memory.Indirect r -> RMC.I r
     
     List.collect (function
@@ -215,5 +215,5 @@ module Simple =
 
       |Flat.Data x -> [Data x] | Flat.PushRealRs -> [PushRealRs] | Flat.Pop r -> [Pop r] | Flat.PopRealRs -> [PopRealRs]
       | Flat.ShiftStackDown(off, len) -> [ShiftStackDown(off, len)] | Flat.Ret -> [Ret] | Flat.Cast(dt, r) -> [Cast(dt, r)]
-      | Flat.Alloc n -> [Alloc n]
+      | Flat.Alloc(n, dt) -> [Alloc (n * dt.sizeof); Cast(dt, Register.R 0)]
      ) instrs
