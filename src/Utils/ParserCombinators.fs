@@ -1,5 +1,4 @@
 ﻿module ParserCombinators
-open System.Text.RegularExpressions
 open Utils
 
 // syntax:
@@ -21,6 +20,7 @@ let ParseResultMap (binding: 'o1 -> 'o2) = Result.map (fun (i, o) -> (i, binding
   
 let Map (binding: 'o1 -> 'o2) (rule: Rule<'i, 'o1>) : Rule<'i, 'o2> =
   rule >> ParseResultMap binding
+let (<-/) = Map
 let (->/) r f = Map f r
 
 let Series (rule1: Rule<'i, 'o1>) (rule2: Rule<'i, 'o2>) : Rule<'i, 'o1 * 'o2> = fun input ->
@@ -35,12 +35,6 @@ type SequenceBuilder() =
   member __.Return(x: 'o) : Rule<'i, 'o> = fun input -> Ok(input, x)
   // member __.Zero() : Rule<'i, unit> = fun input -> Ok(input, ())
 let SequenceOf = SequenceBuilder()
-// SequenceOf {
-//   let! x = fun i -> Error ""
-//   let! k = fun i -> Ok([], x)
-//   let! _ = fun i -> Error ""
-//   return k
-// }
 
 let combine_errors _ = id
 let Parallel (rule1: Rule<'i, 'o>) (rule2: Rule<'i, 'o>) : Rule<'i, 'o> = fun input ->
@@ -55,14 +49,23 @@ let Optional (rule: Rule<'i, 'o>) : Rule<'i, 'o option> = fun input ->
   |Ok(input', res) -> Ok(input', Some res)
   |Error _ -> Ok(input, None)
 
-let OptionalListOf (rule: Rule<'i, 'o>) : Rule<'i, 'o list> =
+let FoldListOf (f: 'o -> Rule<'i, 'o>) (z: 'o) : Rule<'i, 'o> =
+  let rec parse_list acc input =
+    match f acc input with
+    |Ok(input', res) -> parse_list res input'
+    |Error _ -> Ok(input, acc)
+  parse_list z
+
+let FoldBackListOf (f: 'o1 -> 'o -> 'o) (rule: Rule<'i, 'o1>) (z: Rule<'i, 'o>) : Rule<'i, 'o> =
   let rec parse_list input =
     match rule input with
-    |Ok(input', res) -> ParseResultMap (fun resn -> res::resn) (parse_list input')
-    |Error _ -> Ok(input, [])
+    |Ok(input', res) -> ParseResultMap (f res) (parse_list input')
+    |Error _ -> z input
   parse_list
 
-let ListOf (rule: Rule<'i, 'o>) : Rule<'i, 'o list> = rule +/ OptionalListOf rule ->/ List.Cons
+let OptionalListOf rule : Rule<'i, 'o list> = FoldBackListOf (fun a b -> a::b) rule (fun i -> Ok(i, []))
+
+let ListOf rule : Rule<'i, 'o list> = rule +/ OptionalListOf rule ->/ List.Cons
 
 let JoinedListOf (rule: Rule<'i, 'o>) (sep: Rule<'i, unit>) : Rule<'i, 'o list> =
   rule +/ (OptionalListOf (sep +/ rule ->/ snd)) ->/ List.Cons
@@ -71,50 +74,28 @@ let LookAhead (rule: Rule<'i, 'o>) : Rule<'i, 'o> = fun input ->
   Result.map (fun (i, o) -> (input, o)) (rule input)
 let (&/) rule1 rule2 = LookAhead rule1 +/ rule2 ->/ snd
 
-module Atoms =
-  module List =
-    let Equal (token: 'i) : Rule<'i list, 'i> = function
-      |hd::tl when hd = token -> Ok(tl, hd)
-      |_ -> Error (lazy sprintf "expected token %A" token)
-    let (~%) = Equal
-    let (!) x = Equal x ->/ ignore
+let inline Equal (token: string) : Rule< ^I, 'o> = fun input ->
+  match (^I: (member atomic_equal: (string -> Option< ^I * 'o>)) input) token with
+  |Some(rest, result) -> Ok(rest, result)
+  |None -> Error (lazy sprintf "expected token %A" token)
+let inline (~%) x = Equal x
+let inline (!) x = Equal x ->/ ignore
 
-    let Match (rgx: string) : Rule<string list, string> = function
-      |hd::tl when Regex.Match(hd, rgx).Value = hd -> Ok(tl, hd)
-      |_ -> Error (lazy sprintf "expected regex %A" rgx)
-    let (~%%) = Match
-    let (!!) rgx = Match rgx ->/ ignore
+let inline Match (rgx: string) : Rule< ^I, 'o> = fun input ->
+  match (^I: (member atomic_match: (string -> Option< ^I * 'o>)) input) rgx with
+  |Some(rest, result) -> Ok(rest, result)
+  |None -> Error (lazy sprintf "expected regex %A" rgx)
+let inline (~%%) rgx = Match rgx
+let inline (!!) rgx = Match rgx ->/ ignore
 
-    let End: Rule<'i list, unit> = function [] -> Ok([], ()) | _ -> Error (lazy "expected EOF")
-    
-    let run_parser (parse_rule: Rule<'i list, 'o>) (input: 'i list) : 'o =
-      match parse_rule input with
-      |Ok([], result) -> result
-      |Error msg -> failwith (msg.Force())
-      |Ok(rest, result) ->
-        failwithf "parser did not reach EOF: result = %A, remaining = %A" result rest
+let inline End (input: ^I): ParseResult< ^I, unit> =
+  let empty = (^I: (static member empty: ^I) ())
+  if input = empty then Ok(empty, ()) else Error (lazy "expected end of stream")
 
-  module String =
-    let Equal (token: string) : Rule<string, string> = fun input ->
-      if input.StartsWith token
-       then Ok(input.[token.Length..], token)
-       else Error (lazy sprintf "expected token %A" token)
-    let (~%) = Equal
-    let (!) x = Equal x ->/ ignore
-     
-    let Match (rgx: string) : Rule<string, string> = fun input ->
-      let mtch = Regex.Match(input, rgx)
-      if mtch.Success && mtch.Index = 0
-       then Ok(input.[mtch.Value.Length..], mtch.Value)
-       else Error (lazy sprintf "expected regex %A" rgx)
-    let (~%%) = Match
-    let (!!) rgx = Match rgx ->/ ignore
-
-    let End: Rule<string, unit> = function "" -> Ok("", ()) | _ -> Error (lazy "expected end of string")
-    
-    let run_parser (parse_rule: Rule<string, 'o>) (input: string) : 'o =
-      match parse_rule input with
-      |Ok("", result) -> result
-      |Error msg -> failwith (msg.Force())
-      |Ok(rest, result) ->
-        failwithf "parser did not reach EOF: result = %A, remaining = %A" result rest
+let inline run_parser (parse_rule: Rule< ^I, 'o>) (input: ^I) : 'o =
+  match parse_rule input with
+  |Ok(rest, result) ->
+    if rest = (^I: (static member empty: ^I) ())
+     then result
+     else failwithf "parser did not reach end: result = %A, remaining = %A" result rest
+  |Error msg -> failwith (msg.Force())
