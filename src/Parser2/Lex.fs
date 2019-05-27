@@ -1,4 +1,4 @@
-﻿module Lexer.Main
+﻿module Parser.Lex
 open System
 open System.Text.RegularExpressions
 open Utils
@@ -6,7 +6,7 @@ open RegexUtils
 open ParserCombinators
 open CompilerDatatypes.DT
 open CompilerDatatypes.Token
-open Lexer.Preprocessor
+open Parser
 
 type SrcCode = {src : string}
   with
@@ -101,11 +101,10 @@ let rec tokenize filename (s: string) : Token list =
         {tkn with line = line; col = col}
        )
    |> List.collect (function
-        |{value = Lit(Directive("#include", incl), _)} ->  // handle this as a special case for recursion
-          let (file, src) = get_include incl
+        |{value = Lit(Preproc.Directive("#include", incl), _)} ->  // handle this as a special case for recursion
+          let (file, src) = Preproc.get_include incl
           tokenize file src
         |tkn -> [tkn]
        )
-   |> preprocessor_pass
 
 let tokenize_text = tokenize (Builtin "source")

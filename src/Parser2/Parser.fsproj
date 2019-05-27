@@ -10,6 +10,11 @@
     <Reference Include="CompilerDatatypes">
       <HintPath>../CompilerDatatypes/build/CompilerDatatypes.dll</HintPath>
     </Reference>
+    <Compile Include="Preproc.fs" />
+    <Compile Include="Lex.fs" />
+    <Compile Include="Parse/Expr.fs" />
+    <Compile Include="Parse/Control.fs" />
+    <Compile Include="Parse/Typedef.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
 </Project>

@@ -2,15 +2,15 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <RuntimeIdentifiers>ubuntu.16.04-x64</RuntimeIdentifiers>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="fuchu" Version="1.0.3.0" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="Utils">
-      <HintPath>../Utils/build/Utils.dll</HintPath>
+      <HintPath>./build/Parser.dll</HintPath>
     </Reference>
-    <Reference Include="CompilerDatatypes">
-      <HintPath>../CompilerDatatypes/build/CompilerDatatypes.dll</HintPath>
-    </Reference>
-    <Compile Include="Preprocessor.fs" />
-    <Compile Include="Main.fs" />
+    <Compile Include="Test/Main.fs" />
   </ItemGroup>
 </Project>

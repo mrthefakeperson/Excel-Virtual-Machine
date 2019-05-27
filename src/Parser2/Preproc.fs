@@ -1,4 +1,4 @@
-﻿module Lexer.Preprocessor
+﻿module Parser.Preproc
 open System.IO
 open Utils
 open RegexUtils

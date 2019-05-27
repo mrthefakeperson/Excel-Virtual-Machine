@@ -1,7 +1,8 @@
 #r "paket:
 nuget Fake.IO.FileSystem
 nuget Fake.DotNet.MSBuild
-nuget Fake.Core.Target //"
+nuget Fake.Core.Target //
+nuget Fuchu"
 #load "./.fake/build.fsx/intellisense.fsx"
 
 open Fake.Core
@@ -17,12 +18,18 @@ Target.create "CleanParser" (fun _ ->
  )
  
 Target.create "Parser" (fun _ ->
-  !! "Parser.fsproj"
+  !!"Parser.fsproj"
    |> MSBuild.runDebug id build_dir "Build"
    |> Trace.logItems "Target 'Source' output: "
  )
 
-open Fake.Core.TargetOperators
-"CleanParser" ==> "Parser"
+Target.create "TestParser" (fun _ ->
+  !!"TestParser.fsproj"
+   |> MSBuild.runDebug id build_dir "Build"
+   |> Trace.logItems "Target 'Test' output: "
+ )
 
-Target.runOrDefault "Parser"
+open Fake.Core.TargetOperators
+"CleanParser" ==> "Parser" ==> "TestParser"
+
+Target.runOrDefault "TestParser"
