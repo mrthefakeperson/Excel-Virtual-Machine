@@ -1,3 +1,0 @@
-open Fuchu
-
-printfn "test"
