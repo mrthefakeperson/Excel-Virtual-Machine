@@ -1,13 +1,18 @@
 ﻿module ParserCombinators
 open Utils
 
-// syntax:
-// let rec nameOfRule() = () |> buildRule()       <<-- the `() |> ` is for lazy eval. manipulation
-// and otherRule = () |> buildRule(nameOfRule)    <<-- don't pass `()` to nameOfRule
+type ParseError = {
+  message: string Lazy
+  priority: int  // lowest priority value error is propagated
+ }
+type ParseResult<'input, 'output> = Result<'input * 'output, ParseError>
 
-type ParseResult<'input, 'output> = Result<'input * 'output, string Lazy>
+// note: for accurate propagation of errors, (assuming the longest successful parse is ideal)
+//   prefer to factor parallel statements outside of all series statements
+// ex. (a +/ long +/ fail |/ nothing) +/ fail  -- fails to match a +/ long +/ fail, errors for nothing +/ fail
+//   whereas: a +/ long +/ fail +/ fail |/ nothing +/ fail  -- gives better error
 
-// use the below for cleaner recursive parsers
+// use the following for cleaner recursive parsers
 // type Rule<'input, 'output_inner, 'output> =
 //   |Match of recognizer: ('input -> 'output ParseResult)
 //   |Map of ('output_inner -> 'output)
@@ -27,16 +32,16 @@ let Series (rule1: Rule<'i, 'o1>) (rule2: Rule<'i, 'o2>) : Rule<'i, 'o1 * 'o2> =
   rule1 input
    |> Result.bind (fun (input', res1) -> ParseResultMap (mkpair res1) (rule2 input'))
 let (+/) = Series
-type SequenceBuilder() =
-  member __.Bind(rule: Rule<'i, 'o1>, cont: 'o1 -> Rule<'i, 'o2>) : Rule<'i, 'o2> = fun input ->
-    match rule input with
-    |Ok(input', x) -> cont x input'
-    |Error msg -> Error msg
-  member __.Return(x: 'o) : Rule<'i, 'o> = fun input -> Ok(input, x)
-  // member __.Zero() : Rule<'i, unit> = fun input -> Ok(input, ())
-let SequenceOf = SequenceBuilder()
+type SequenceBuilder = SequenceOf
+  with
+    member __.Bind(rule: Rule<'i, 'o1>, cont: 'o1 -> Rule<'i, 'o2>) : Rule<'i, 'o2> = fun input ->
+      match rule input with
+      |Ok(input', x) -> cont x input'
+      |Error msg -> Error msg
+    member __.Return(x: 'o) : Rule<'i, 'o> = fun input -> Ok(input, x)
 
-let combine_errors _ = id
+let combine_errors (a: ParseError) =
+  Result.mapError (fun b -> if a.priority < b.priority then a else b)
 let Parallel (rule1: Rule<'i, 'o>) (rule2: Rule<'i, 'o>) : Rule<'i, 'o> = fun input ->
   match rule1 input with
   |Ok res -> Ok res
@@ -77,20 +82,34 @@ let (&/) rule1 rule2 = LookAhead rule1 +/ rule2 ->/ snd
 let inline Equal (token: string) : Rule< ^I, 'o> = fun input ->
   match (^I: (member atomic_equal: (string -> Option< ^I * 'o>)) input) token with
   |Some(rest, result) -> Ok(rest, result)
-  |None -> Error (lazy sprintf "expected token %A" token)
+  |None ->
+    Error {
+      message = lazy sprintf "expected token %A" token
+      priority = (^I: (member length: int) input)
+     }
 let inline (~%) x = Equal x
 let inline (!) x = Equal x ->/ ignore
 
 let inline Match (rgx: string) : Rule< ^I, 'o> = fun input ->
   match (^I: (member atomic_match: (string -> Option< ^I * 'o>)) input) rgx with
   |Some(rest, result) -> Ok(rest, result)
-  |None -> Error (lazy sprintf "expected regex %A" rgx)
+  |None ->
+    Error {
+      message = lazy sprintf "expected regex %A" rgx
+      priority = (^I: (member length: int) input)
+     }
 let inline (~%%) rgx = Match rgx
 let inline (!!) rgx = Match rgx ->/ ignore
 
 let inline End (input: ^I): ParseResult< ^I, unit> =
   let empty = (^I: (static member empty: ^I) ())
-  if input = empty then Ok(empty, ()) else Error (lazy "expected end of stream")
+  if input = empty
+   then Ok(empty, ())
+   else
+    Error {
+      message = lazy "expected end of stream"
+      priority = (^I: (member length: int) input)
+     }
 
 let inline run_parser (parse_rule: Rule< ^I, 'o>) (input: ^I) : 'o =
   match parse_rule input with
@@ -98,4 +117,5 @@ let inline run_parser (parse_rule: Rule< ^I, 'o>) (input: ^I) : 'o =
     if rest = (^I: (static member empty: ^I) ())
      then result
      else failwithf "parser did not reach end: result = %A, remaining = %A" result rest
-  |Error msg -> failwith (msg.Force())
+  |Error msg ->
+    failwithf "parser failed with %i remaining elements:\n%s" msg.priority (msg.message.Force())

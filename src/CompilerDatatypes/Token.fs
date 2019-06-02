@@ -5,8 +5,8 @@ type Value = Var of name: string * DT | Lit of quote: string * DT
   with
     override x.ToString() =
       match x with
-      |Lit(s, _) -> s
-      |Var(s, t) -> sprintf "%s: %A" s t
+      |Lit(s, _) | Var(s, _) -> s
+      // |Var(s, t) -> sprintf "%s: %A" s t
 
 type SourceFile = Builtin of string | Local of string
 type Token = {

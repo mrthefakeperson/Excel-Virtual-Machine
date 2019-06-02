@@ -43,3 +43,37 @@ module RegexUtils =
   let NUM_FLOAT = "-?[0-9]+\.[0-9]*\w?"
   let STRING = "\"(\\\\\\\"|[^\"])*\""  // "(\\\"|[^"])*"
   let CHAR = "'\\\\?.'"
+
+module CLI =
+  open System
+
+  let interact app_name (repl: string -> 'a) =
+    printfn app_name
+    let rec input_block() =
+      match Console.ReadLine() with
+      |"quit" -> None
+      |line when line.EndsWith "\\" ->
+        Option.map ((+) line.[..line.Length - 2]) (input_block())
+      |line -> Some line
+    let rec loop() =
+      printf "in > "
+      match input_block() with
+      |None -> ()
+      |Some input ->
+        try printfn "out > %A" (repl input)
+        with ex -> printfn "error > %A" ex
+        loop()
+    loop()
+
+  let get_cli_flags argv =
+    let argv = Array.collect (fun (e: string) -> e.Split '=') argv
+    let is_flag_name (s: string) = s.StartsWith "-"
+    let rec parse_argv = function
+      |[] -> []
+      |hd::tl when is_flag_name hd ->
+        let values = List.takeWhile (not << is_flag_name) tl
+        (hd, values)::parse_argv (List.skip (List.length values) tl)
+      |args -> parse_argv ("-unnamed"::args)
+    List.ofArray argv
+     |> parse_argv
+     |> dict
