@@ -20,28 +20,38 @@ let datatype: DT Rule =
     _var ->/ fun (Var(t, _) | Strict t) -> TypeDef (Alias t)
    ]
 
-let declarable_expr dt : AST Rule =
+let declarable_expr dt : AST list Rule =
   let _var' = _var ->/ fun (Var(s, _) | Strict s) -> Declare(s, dt)
   let wrap_ptr _ (Declare(s, dt) | Strict(s, dt)) = Declare(s, DT.Ptr dt)
   let ptr = FoldBackListOf wrap_ptr !"*" _var'
   // TODO: package bounds into wrap_ptr
-  let array = _var' +/ ListOf square_bracketed ->/ fun (v, bounds) -> List.fold wrap_ptr v bounds
-  array |/ ptr |/ _var'
+  let array = SequenceOf {
+    let! Declare(s, dt) | Strict(s, dt) = _var'
+    match! ListOf square_bracketed with
+    |[] -> return [Declare(s, dt)]
+    |array_dims ->
+      let alloc_array = BuiltinASTs.stack_alloc dt array_dims
+      let dt = TypeDef (Array(List.length array_dims, dt))
+      return [Declare(s, dt); Assign(V (Var(s, dt)), alloc_array)]
+   }
+  array |/ (ptr |/ _var') ->/ List.singleton
 
 // TODO: update static and extern
 let declare_expr: AST list Rule =
   let init_list = !"{" +/ JoinedListOf (expr()) !"," +/ !"}" ->/ middle
   let decl_with_assign dt = SequenceOf {
-    let! Declare(name, dt) | Strict(name, dt) as decl = declarable_expr dt
+    let! Declare(name, dt)::_ | Strict(name, dt) as decl = declarable_expr dt
     match! Optional !"=" with
-    |None -> return [decl]
+    |None -> return decl
     |Some () ->
       match! Optional (expr()) with
-      |Some x -> return [decl; Assign(V (Var(name, dt)), x)]
+      |Some x -> return decl @ [Assign(V (Var(name, dt)), x)]
       |None ->
         let! init_values = init_list
-        let assign_index i expr = Assign(Index(V(Var(name, dt)), V(Lit(string i, DT.Int))), expr)
-        return decl::List.mapi assign_index init_values
+        let assign_index i expr =
+          let i_ast = V (Lit(string i, DT.Int))
+          Assign(BuiltinASTs.index (V (Var(name, dt))) i_ast, expr)
+        return decl @ List.mapi assign_index init_values
    }
   let decl_list = SequenceOf {
     let! dt = datatype
@@ -76,7 +86,7 @@ let rec statement() : AST list Rule =
     let decl = Option.defaultValue [] decl
     do! !";"
     let! cond = Optional (expr())
-    let cond = Option.defaultValue (V(Lit("'\001'", Byte))) cond
+    let cond = Option.defaultValue (V(Lit("1", Byte))) cond
     do! !";"
     let! incr = Optional (expr())
     let incr = Option.defaultValue Value.unit incr
@@ -87,9 +97,9 @@ let rec statement() : AST list Rule =
    }
   OneOf [
     OneOf [_if; _for; _while] ->/ List.singleton
+    OneOf [return_expr; expr()] +/ !";" ->/ (fst >> List.singleton)  // keywords (eg. if, while, return) before declare_expr
     declare_expr +/ !";" ->/ fst
     !";" ->/ fun _ -> []
-    OneOf [return_expr; expr()] +/ !";" ->/ (fst >> List.singleton)
    ]
 and code_block: AST list Rule =
   !"{" +/ OptionalListOf (statement()) +/ !"}" ->/ (middle >> List.concat)
@@ -100,8 +110,9 @@ let declare_function: AST list Rule =
   let arg_list: (string * DT) list Option Rule =  // TODO: update void args / no args - no args should accept any number of args, void should not accept any args
     let single_arg = SequenceOf {
       let! dt = datatype
-      let! (Declare(name, dt) | Strict(name, dt)) = declarable_expr dt
-      return (name, dt)
+      match! declarable_expr dt with
+      |[Declare(name, dt)] | [Declare(name, (TypeDef (Array _) as dt)); _] -> return (name, dt)
+      |Strict x -> return x
      }
     let csvalues = JoinedListOf single_arg !","
     // f(void) - must be called f(); f() - can be called f(..);

@@ -60,38 +60,33 @@ let comparison: Value Rule =
 
 let assignment: Value Rule = (%"=" |/ Match "[+\-*/&|]=") ->/ retype Types.f_arith_infix
 
-let Index(v, i) =
-  Apply'.fn("*prefix", Types.f_unary Types.ptr Types.any)
-   (Apply'.fn2("+", Types.f_arith_infix) v i)
-
 let rec expr() : AST Rule =
   let apply_and_index_expr = SequenceOf {
     let! v = V <-/ basic_value |/ bracketed
     let! result =
       FoldListOf (fun acc ->
         !"(" +/ arg_list +/ !")" ->/ fun parsed -> Apply(acc, middle parsed)
-         |/ square_bracketed ->/ fun i -> Index(acc, i)
+         |/ square_bracketed ->/ fun i -> BuiltinASTs.index acc i
        ) v
     return result
    }
   let op1 v op = Apply'.fn2(op, Types.f_arith_infix) v (V(Lit("1", Int)))
   let prefixed_expr =
-    FoldBackListOf (fun (Var(s, _) | Strict s as pref) ast ->
+    FoldBackListOf (fun (Var(s, _) | Strict s as pref) (var, ast) ->
       match s with
-      |"++" -> Assign(V pref, op1 ast "+")
-      |"--" -> Assign(V pref, op1 ast "-")
-      |"-prefix" -> Apply'.fn2 "*" ast (V(Lit("-1", Int)))
-      |Strict x -> x
-     ) prefix apply_and_index_expr
+      |"++" -> (var, Assign(var, op1 ast "+"))
+      |"--" -> (var, Assign(var, op1 ast "-"))
+      |"-prefix" -> (var, Apply'.fn2 "*" ast (V(Lit("-1", Int))))
+      |_ -> (var, Apply(V pref, [ast]))
+     ) prefix (apply_and_index_expr ->/ fun e -> (e, e))
   let suffixed_expr = SequenceOf {
     let! pref = prefixed_expr
-    let! result =
-      FoldListOf (fun acc ->
-        // TODO: fix bug - acc is generated twice, and assignments / calls occur twice
+    let! (_, result) =
+      FoldListOf (fun (var, acc) ->
         suffix ->/ function
-          |Var("++suffix", _) -> op1 (Assign(acc, op1 acc "+")) "-"
-          |Var("--suffix", _) -> op1 (Assign(acc, op1 acc "-")) "+"
-          |Strict x -> x
+          |Var("++suffix", _) -> (var, op1 (Assign(var, op1 acc "+")) "-")
+          |Var("--suffix", _) -> (var, op1 (Assign(var, op1 acc "-")) "+")
+          |suf -> (var, Apply(V suf, [acc]))
        ) pref
     return result
    }
@@ -106,6 +101,16 @@ let rec expr() : AST Rule =
      |> wrap_infix_rule math_infix_2
      |> wrap_infix_rule comparison
      |> wrap_infix_rule logic_infix
+  let ternary_expr = SequenceOf {
+    let! cond = infix_expr
+    match! Optional !"?" with
+    |None -> return cond
+    |Some _ ->
+      let! thn = infix_expr
+      do! !":"
+      let! els = infix_expr
+      return If(cond, thn, els)
+   }
   let assignment_expr =
     FoldBackListOf (fun (left, assign) right ->
       match assign with
@@ -113,7 +118,7 @@ let rec expr() : AST Rule =
       |Var(Regex "^(\+=|-=|\*=|/=|&=|\|=)$" _ as s, _) ->
         Assign(left, Apply'.fn2(s.[..0], Types.f_arith_infix) left right)
       |Strict x -> x
-     ) (infix_expr +/ assignment) infix_expr
+     ) (ternary_expr +/ assignment) ternary_expr
   assignment_expr
 and bracketed: AST Rule = !"(" +/ expr() +/ !")" ->/ middle
 and square_bracketed: AST Rule = !"[" +/ expr() +/ !"]" ->/ middle

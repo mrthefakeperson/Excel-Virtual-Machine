@@ -5,10 +5,11 @@ open RegexUtils
 open CompilerDatatypes.Token
 
 let (|Directive|_|) (content: string) =
-  match content.TrimStart() with
+  match content.Trim() with
   |Regex PREPROCESSOR_LINE _ ->
-    let [|dir; content'|] | Strict(dir, content') = content.Split([|' '|], 2) 
-    Some(dir, content'.Trim().Split ' ')
+    let split = Seq.findIndex ((<>) ' ') content
+    let (dir, content) = (content.[..split - 1], content.[split + 1..])
+    Some(dir, content.Trim().Split())
   |_ -> None
 
 let builtin_files: Map<string, string> =

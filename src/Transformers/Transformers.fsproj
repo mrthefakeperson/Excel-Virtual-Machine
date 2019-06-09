@@ -5,18 +5,15 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="fuchu" Version="1.0.3.0" />
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="Utils">
       <HintPath>../Utils/build/Utils.dll</HintPath>
     </Reference>
     <Reference Include="CompilerDatatypes">
       <HintPath>../CompilerDatatypes/build/CompilerDatatypes.dll</HintPath>
     </Reference>
-    <Reference Include="Parser">
-      <HintPath>./build/Parser.dll</HintPath>
-    </Reference>
-    <Compile Include="Test/Main.fs" />
+    <Compile Include="SimplifyAST.fs" />
+    <Compile Include="Tables.fs" />
+    <Compile Include="TypeCheck.fs" />
+    <Compile Include="Main.fs" />
   </ItemGroup>
 </Project>

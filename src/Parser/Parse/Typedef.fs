@@ -12,23 +12,36 @@ let typedef: TypeDef Rule = SequenceOf {
   do! !"typedef"
   let! Var(alias_name, _) | Strict alias_name = _var
   let! dt = datatype
-  return DeclAlias(alias_name, dt)
+  let! ptrs = OptionalListOf !"*"
+  return DeclAlias(alias_name, List.fold (fun acc _ -> Ptr acc) dt ptrs)
  }
 
-let declare_struct: TypeDef Rule = SequenceOf {  // `struct X? { int a; int b[50]; int c:2; }`  (initial values are parsed later)
+let declarable_expr_with_sz dt = declarable_expr dt ->/ function
+  |[Declare(name, dt)] -> (name, dt, dt.sizeof)
+  |[Declare(name, (TypeDef (Array(_, arrt)) as dt)); Assign(_, Apply(V (Var("\stack_alloc", _)), dims))] ->
+    let sz =
+      List.fold (fun acc -> function
+        |V (Lit (x, Int)) -> int x * acc
+        |_ -> 0  // TODO: currently defaults size of array to 0 if it cannot be statically determined; should error
+       ) arrt.sizeof dims
+    (name, dt, sz)
+  |Strict x -> x
+
+// `struct X? { int a; int b[50]; int c:2; }`  (initial values are parsed later)
+let declare_struct: TypeDef Rule = SequenceOf {
   do! !"struct"
   let! name_option = Optional _var
   let Var(name, _) | Strict name = Option.defaultValue (Var("_anon", DT.Void)) name_option
   do! !"{"
   let field = SequenceOf {
     let! dt = datatype
-    let! Declare(name, dt) | Strict(name, dt) = declarable_expr dt
+    let! (name, dt, sz) = declarable_expr_with_sz dt
     match! Optional !":" with
     |Some () ->
       let! Lit(start_bit, _) | Strict start_bit = %%NUM_INT32
       do! !";"
-      return StructField(name, dt, int start_bit, dt.sizeof)
-    |None -> let! () = !";" in return StructField(name, dt, -1, dt.sizeof)
+      return StructField(name, dt, int start_bit, sz)
+    |None -> let! () = !";" in return StructField(name, dt, -1, sz)
    }
   let! fields = OptionalListOf field
   do! !"}"
@@ -47,9 +60,9 @@ let declare_union: TypeDef Rule = SequenceOf {
   do! !"{"
   let field = SequenceOf {
     let! dt = datatype
-    let! Declare(name, dt) | Strict(name, dt) = declarable_expr dt
+    let! (name, dt, sz) = declarable_expr_with_sz dt
     do! !";"
-    return StructField(name, dt, 0, dt.sizeof)
+    return StructField(name, dt, 0, sz)
    }
   let! fields = OptionalListOf field
   do! !"}"
@@ -60,7 +73,7 @@ let parse_typedecl: AST list Rule =
   let placeholder_decl dt = Declare("?", dt)  // generated to contain new type when no immediate variable is assigned to it
   let declare_struct_or_union = SequenceOf {
     let! dt = DT.TypeDef <-/ (declare_struct |/ declare_union)
-    let! decls = Optional (JoinedListOf (declarable_expr dt) !",")
+    let! decls = Optional (JoinedListOf (declarable_expr dt) !"," ->/ List.concat)
     let decls = Option.defaultValue [placeholder_decl dt] decls
     return decls
    }

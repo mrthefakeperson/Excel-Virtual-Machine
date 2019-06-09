@@ -25,10 +25,9 @@ type SrcCode = {src : string}
 let comment: Rule<SrcCode, string> = %%COMMENT_LINE |/ %%COMMENT_BLOCK |/ %""
 let garbage =
   %%WHITESPACE +/ comment +/ %%WHITESPACE ->/ fun ((a, b), c) -> a.Length + b.Length + c.Length
-let lexeme tkn (rule: Rule<SrcCode, Value>) : Rule<SrcCode, Token> = fun input ->
-  match (garbage +/ rule) input with
-  |Ok(rest, (spaces, res)) -> Ok(rest, {tkn with value = res; col = -input.src.Length + spaces})
-  |Error msg -> Error msg
+let lexeme tkn (rule: Rule<SrcCode, Value>) : Rule<SrcCode, Token> = fun err input ->
+  (garbage +/ rule) ->/ fun (spaces, res) -> {tkn with value = res; col = -input.src.Length + spaces}
+   <| err <| input
 
 let token_null = OneOf [!"null"; !"Null"; !"NULL"] ->/ fun () -> Lit("0", Ptr Void)
 
@@ -79,7 +78,7 @@ let token_char = SequenceOf {
  }
 
 let token_symbol =
-  (%%"(--|\+\+|>=|<=|==|!=|&&|\|\||&|\+=|-=|\*=|/=|&=|\|=|->)" |/ %%"[{}();,=+\-*/%<>\[\].:]")
+  (%%"(--|\+\+|>=|<=|==|!=|&&|\|\||&|\+=|-=|\*=|/=|&=|\|=|->)" |/ %%"[{}();,=+\-*/%<>\[\].:!?]")
    ->/ fun name -> Var(name, DT.Void)
 
 let preprocess = %%PREPROCESSOR_LINE ->/ fun name -> Lit(name, DT.Void)

@@ -5,9 +5,7 @@ open CompilerDatatypes.Token
 type AST =
   |Apply of AST * AST list  // f(a, b, ...)
   |Assign of AST * AST  // a = b
-//   |Index of AST * AST  // a[b]
   |Declare of string * DT  // [int|...] a;
-//   |DeclareHelper of AST list  // like block, but no inner scope (declares are moved to the outside)
   |Return of AST  // return a
   |Block of AST list  // {x; y; ...}
   |If of AST * AST * AST  // if (a) b; else c
@@ -27,9 +25,15 @@ type Apply' =
     Apply(V(Var(name, Option.defaultValue TypeClasses.any dt)), [x; y])
 
 module BuiltinASTs =
-  let stack_alloc dt x = Apply'.fn("\stack_alloc", DT.Function([Int], Ptr dt)) x
+  let stack_alloc dt xs =
+    let dim = List.length xs
+    let fnsig = DT.Function(List.replicate dim Int, TypeDef (Array(dim, dt)))
+    Apply(V (Var("\stack_alloc", fnsig)), xs)
   let alloc dt x = Apply'.fn("\alloc", DT.Function([Int], Ptr dt)) x
   let cast dt x = Apply'.fn("\cast", dt) x
+  let index a i =
+    Apply'.fn("*prefix", TypeClasses.f_unary TypeClasses.ptr TypeClasses.any)
+     (Apply'.fn2("+", TypeClasses.f_arith_infix) a i)
 
 module Hooks =
   // module for transforming hooks

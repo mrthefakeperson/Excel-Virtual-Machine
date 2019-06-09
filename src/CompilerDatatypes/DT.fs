@@ -3,6 +3,7 @@ module CompilerDatatypes.DT
 type TypeDef =
   |DeclAlias of string * DT | DeclStruct of StructDef | DeclUnion of StructDef  // define a new type and declare a variable using it
   |Alias of string | Struct of string | Union of string  // declare a variable of a struct/union type already defined (replace in preprocessing)
+  |Array of dim: int * DT
 and StructDef = string * StructFieldDef list
 and StructFieldDef = StructField of name: string * DT * start_bit: int * size_bytes: int
 
