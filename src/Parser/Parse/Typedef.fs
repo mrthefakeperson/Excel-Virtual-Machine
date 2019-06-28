@@ -5,14 +5,15 @@ open ParserCombinators
 open CompilerDatatypes.DT
 open CompilerDatatypes.Token
 open CompilerDatatypes.AST
+open CompilerDatatypes.AST.SyntaxAST
 open Parser.Parse.Expr
 open Parser.Parse.Control
 
 let typedef: TypeDef Rule = SequenceOf {
   do! !"typedef"
-  let! Var(alias_name, _) | Strict alias_name = _var
   let! dt = datatype
   let! ptrs = OptionalListOf !"*"
+  let! Var(alias_name, _) | Strict alias_name = _var
   return DeclAlias(alias_name, List.fold (fun acc _ -> Ptr acc) dt ptrs)
  }
 

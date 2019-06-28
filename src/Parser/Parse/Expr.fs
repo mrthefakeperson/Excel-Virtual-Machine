@@ -5,6 +5,7 @@ open ParserCombinators
 open CompilerDatatypes.DT
 open CompilerDatatypes.Token
 open CompilerDatatypes.AST
+open CompilerDatatypes.AST.SyntaxAST
 
 type Tokens = {stream : Token list}
   with
@@ -60,6 +61,20 @@ let comparison: Value Rule =
 
 let assignment: Value Rule = (%"=" |/ Match "[+\-*/&|]=") ->/ retype Types.f_arith_infix
 
+let datatype: DT Rule =
+  OneOf [
+    Optional !"unsigned" +/ %"int" ->/ fun _ -> Int  // TEMP - unsigned
+    %"char" ->/ fun _ -> Byte
+    %"bool" ->/ fun _ -> Byte
+    %"long" ->/ fun _ -> Int64
+    %"double" ->/ fun _ -> Double
+    %"float" ->/ fun _ -> Float
+    %"void" ->/ fun _ -> Void
+    !"struct" +/ _var ->/ fun (_, (Var(s, _)) | Strict s) -> TypeDef (Struct s)
+    !"union" +/ _var ->/ fun (_, (Var(u, _)) | Strict u) -> TypeDef (Union u)
+    _var ->/ fun (Var(t, _) | Strict t) -> TypeDef (Alias t)
+   ]
+
 let rec expr() : AST Rule =
   let apply_and_index_expr = SequenceOf {
     let! v = V <-/ basic_value |/ bracketed
@@ -70,6 +85,17 @@ let rec expr() : AST Rule =
        ) v
     return result
    }
+  let cast_expr =
+    SequenceOf {
+      do! !"("
+      let! dt = datatype
+      let! ptrs = OptionalListOf !"*"
+      do! !")"
+      let dt = List.fold (fun acc _ -> Ptr acc) dt ptrs
+      let! x = apply_and_index_expr
+      return BuiltinASTs.cast dt x
+     }
+     |/ apply_and_index_expr
   let op1 v op = Apply'.fn2(op, Types.f_arith_infix) v (V(Lit("1", Int)))
   let prefixed_expr =
     FoldBackListOf (fun (Var(s, _) | Strict s as pref) (var, ast) ->
@@ -78,7 +104,7 @@ let rec expr() : AST Rule =
       |"--" -> (var, Assign(var, op1 ast "-"))
       |"-prefix" -> (var, Apply'.fn2 "*" ast (V(Lit("-1", Int))))
       |_ -> (var, Apply(V pref, [ast]))
-     ) prefix (apply_and_index_expr ->/ fun e -> (e, e))
+     ) prefix (cast_expr ->/ fun e -> (e, e))
   let suffixed_expr = SequenceOf {
     let! pref = prefixed_expr
     let! (_, result) =

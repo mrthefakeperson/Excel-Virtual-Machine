@@ -7,9 +7,10 @@ open CompilerDatatypes.Token
 let (|Directive|_|) (content: string) =
   match content.Trim() with
   |Regex PREPROCESSOR_LINE _ ->
-    let split = Seq.findIndex ((<>) ' ') content
+    let split = Seq.findIndex ((=) ' ') content
     let (dir, content) = (content.[..split - 1], content.[split + 1..])
-    Some(dir, content.Trim().Split())
+    let content = Array.filter ((<>) "") (content.Trim().Split())
+    Some(dir, content)
   |_ -> None
 
 let builtin_files: Map<string, string> =
@@ -31,16 +32,22 @@ let get_include: string[] -> SourceFile * string = function
     with :? FileNotFoundException -> failwithf "bad include: could not find %A" filename
   |_ -> failwith "bad include"
 
-type PreprocessState = {
-  macros: Map<string, string Option>
- }
-
 let preprocessor_pass: Token list -> Token list =
-  let rec preprocess state = function
+  let rec preprocess (state: {| macros: Map<string, string> |}) = function
     |[] -> []
-    |{value = Lit(Directive("#define", content), _)}::_ ->
-      match content with
-      |_ -> failwith "macros not supported"
+    |{value = Lit(Directive("#define", content), _)}::tl ->
+      let state =
+        match content with
+        |[|token1; token2|] -> {|state with macros = Map.add token1 token2 state.macros|}
+        |_ -> failwith "macro not supported"
+      preprocess state tl
     |{value = Lit(Directive(dir, _), _)}::_ -> failwithf "directive not supported: %s" dir
+    |{value = Var(token, dt) | Lit(token, dt)} as hd::tl when Map.containsKey token state.macros ->
+      let substitution = state.macros.[token]
+      let constructor =
+        match substitution with
+        |Regex RegexUtils.VAR _ -> Var
+        |_ -> Lit
+      {hd with value = constructor(substitution, dt)}::preprocess state tl
     |hd::tl -> hd::preprocess state tl
-  preprocess {macros = Map.empty}
+  preprocess {|macros = Map []|}

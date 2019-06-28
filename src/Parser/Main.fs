@@ -2,6 +2,7 @@
 open ParserCombinators
 open CompilerDatatypes.Token
 open CompilerDatatypes.AST
+open CompilerDatatypes.AST.SyntaxAST
 open Parser.Parse
 
 let parse_global_scope: AST Expr.Rule =

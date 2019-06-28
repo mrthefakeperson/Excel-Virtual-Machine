@@ -22,9 +22,8 @@ type SrcCode = {src : string}
     member x.get_length() = x.src.Length
     static member empty = {src = ""}
 
-let comment: Rule<SrcCode, string> = %%COMMENT_LINE |/ %%COMMENT_BLOCK |/ %""
-let garbage =
-  %%WHITESPACE +/ comment +/ %%WHITESPACE ->/ fun ((a, b), c) -> a.Length + b.Length + c.Length
+let comment: Rule<SrcCode, string> = %%COMMENT_LINE |/ %%COMMENT_BLOCK
+let garbage = OptionalListOf (comment |/ %%WHITESPACE) ->/ List.sumBy String.length
 let lexeme tkn (rule: Rule<SrcCode, Value>) : Rule<SrcCode, Token> = fun err input ->
   (garbage +/ rule) ->/ fun (spaces, res) -> {tkn with value = res; col = -input.src.Length + spaces}
    <| err <| input
@@ -59,7 +58,8 @@ let escape = SequenceOf {
   let! c = %%"."
   return
     match c with
-    |"n" -> '\n' | "t" -> '\t' | "r" -> '\r' | "f" -> '\f' | "\\" -> '\\' | "0" -> '\000'
+    |"n" -> '\n' | "t" -> '\t' | "r" -> '\r' | "f" -> '\f' | "\\" -> '\\'
+    | "0" -> '\000' | "1" -> '\001'
     |_ -> failwithf "unknown escape character: \\%s" c
  }
 

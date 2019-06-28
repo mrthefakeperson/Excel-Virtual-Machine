@@ -1,13 +1,16 @@
-#load "./.fake/build.fsx/intellisense.fsx"
-#r "./build/Utils.dll"  // compatibility issues?
-#r "./build/CompilerDatatypes.dll"
-#r "./build/Parser.dll"
+#if !TEST
+#load "../.fake/build.fsx/intellisense.fsx"
+#endif
+#r "../build/Utils.dll"
+#r "../build/CompilerDatatypes.dll"
+#r "../build/Parser.dll"
 
 open Fuchu
 open ParserCombinators
 open CompilerDatatypes.DT
 open CompilerDatatypes.Token
 open CompilerDatatypes.AST
+open CompilerDatatypes.AST.SyntaxAST
 open Parser.Lex
 open Parser.Parse
 open Parser.Main
@@ -35,7 +38,7 @@ let test_parser_elements() =
   test_rule "suffix" Expr.suffix "++" expected
 
   let expected = Byte
-  test_rule "datatype" Control.datatype "char" expected
+  test_rule "datatype" Expr.datatype "char" expected
 
 test_parser_elements()
 
@@ -84,6 +87,9 @@ let test_parser_expr() =
     Assign(b, Apply'.fn2("/", TypeClasses.f_arith_infix) b expected_right)
   let expected = Assign(V (Var("a", TypeClasses.any)), expected_inner_assign)
   test_rule "value - assign, brackets, infix, apply" (Expr.expr()) "a = b /= (c + d)(e)" expected
+
+  let expected = BuiltinASTs.cast (Ptr Int) (V (Var("a", TypeClasses.any)))
+  test_rule "cast" (Expr.expr()) "(int *)a" expected
 
 test_parser_expr()
 
@@ -183,9 +189,9 @@ let test_parser_global() =
    ]
   test_rule "function" Control.declare_function "int f(int x, int* y) { return x; }" expected
   
-  test_rule "typedef" Typedef.typedef "typedef a int" (DeclAlias("a", Int))
+  test_rule "typedef" Typedef.typedef "typedef int a" (DeclAlias("a", Int))
   
-  test_rule "typedef 2" Typedef.typedef "typedef a int**" (DeclAlias("a", Ptr (Ptr Int)))
+  test_rule "typedef 2" Typedef.typedef "typedef int** a" (DeclAlias("a", Ptr (Ptr Int)))
 
   let expected = DeclStruct("A", [
     StructField("x", Int, 0, 4)
@@ -219,7 +225,7 @@ let test_parser_global() =
       Declare("?", TypeDef (DeclAlias("C", TypeDef (Union "ZZ"))))
      ]
   test_rule "typedef, struct, union" parse_global_scope """
-    typedef X int; X x = 1;
+    typedef int X; X x = 1;
     struct {int a;} anon;
     struct Y {int b:3;}; struct Y y;
     union Y {int a; char b; long c[40];}; union Y z;
@@ -230,10 +236,34 @@ let test_parser_global() =
     GlobalParse [
       Declare("x", Int64); Assign(V (Var("x", Int64)), V (Lit("1", Int)))
       Declare("f", DT.Function([], Void))
-      Assign(V (Var("f", DT.Function([], Void))), Function(Void, [], Block []))
       Declare("main", Function2 Int)
       Assign(V (Var("main", Function2 Int)), Function(Int, [], Block []))
      ]
   test_rule "global parse" parse_global_scope "long x = 1; ; void f(void); main() {}" expected
+
+  let expected =
+    GlobalParse [
+      Declare("main", DT.Function2 Int)
+      Assign(V (Var("main", DT.Function2 Int)), Function(Int, [], Block [Declare("y", Ptr Int)]))
+     ]
+  test_rule "declare ptr, not multiply" parse_global_scope """
+    main() {
+      int *y;
+    }
+    """ expected
+
+  let expected_inner =
+    Apply'.fn2("*", TypeClasses.f_arith_infix)
+     (V (Var("x", TypeClasses.any))) (V (Var("y", TypeClasses.any)))
+  let expected =
+    GlobalParse [
+      Declare("main", DT.Function2 Int)
+      Assign(V (Var("main", DT.Function2 Int)), Function(Int, [], Block [expected_inner]))
+     ]
+  test_rule "multiply ptr, not declare ptr" parse_global_scope """
+    main() {
+      x *y;
+    }
+    """ expected
 
 test_parser_global()

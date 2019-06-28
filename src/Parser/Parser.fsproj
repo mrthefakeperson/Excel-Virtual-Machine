@@ -6,10 +6,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Utils">
-      <HintPath>../Utils/build/Utils.dll</HintPath>
+      <HintPath>../build/Utils.dll</HintPath>
     </Reference>
     <Reference Include="CompilerDatatypes">
-      <HintPath>../CompilerDatatypes/build/CompilerDatatypes.dll</HintPath>
+      <HintPath>../build/CompilerDatatypes.dll</HintPath>
     </Reference>
     <Compile Include="Preproc.fs" />
     <Compile Include="Lex.fs" />
