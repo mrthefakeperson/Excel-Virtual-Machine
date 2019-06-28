@@ -3,7 +3,9 @@ open Utils
 open CompilerDatatypes.Token
 open CompilerDatatypes.DT
 open CompilerDatatypes.AST
-open CompilerDatatypes.AST.Hooks
+open CompilerDatatypes.AST.SyntaxAST
+
+open Hooks
 
 // transform sizeof(DT) to literal
 let eval_sizeof_hook: MappingASTHook = fun (|P|) (|Q|) -> function
@@ -20,15 +22,15 @@ let label_of = Seq.map (sprintf "%x" << int) >> String.concat "_" >> (+) "$"
 
 // get string literals
 let find_strings ast : (string * string) list =
-  let acc_strings = ref Map.empty
+  let mutable acc_strings = Map.empty
   let find_strings_hook: MappingASTHook = fun (|P|) (|Q|) -> function
     |V (Lit(Regex RegexUtils.STRING _ as s, Ptr Byte)) ->
       let raw_string = s.[1..s.Length - 2]
-      acc_strings := Map.add (label_of raw_string) raw_string !acc_strings
+      acc_strings <- Map.add (label_of raw_string) raw_string acc_strings
       None
     |_ -> None
   ignore (apply_mapping_hook find_strings_hook ast)
-  List.sortBy snd (Map.toList !acc_strings)
+  List.sortBy snd (Map.toList acc_strings)
 
 // add string literals to global scope
 let extract_strings_to_global_hook: MappingASTHook =
@@ -54,7 +56,7 @@ let extract_strings_to_global_hook: MappingASTHook =
       Some(V (Var(label_of s.[1..s.Length - 2], TypeClasses.any)))
     |_ -> None
 
-// implement prototyping by removing all but the first declaration of anything - keep the assigns which follow
+// implement prototyping by removing all but the first declaration of anything
 let prototype_hook: MappingASTHook = fun (|P|) (|Q|) -> function
   |GlobalParse xprs ->
     List.fold (fun (acc, acc_decls) -> function
@@ -67,7 +69,7 @@ let prototype_hook: MappingASTHook = fun (|P|) (|Q|) -> function
 
 // convert logic functions to a subset to simplify code generation
 let convert_logic_hook: MappingASTHook =
-  let apply infix a b = Apply(V (Var(infix, TypeClasses.any)), [a; b])
+  let apply infix a b = Apply(V (Var(infix, TypeClasses.f_logic_infix)), [a; b])
   let apply_not a = apply "==" a (V (Lit("0", Byte)))
   let (|Builtin|_|) x = function Apply(V (Var(x', _)), args) when x = x' -> Some args | _ -> None
   fun (|P|) (|Q|) -> function
@@ -81,18 +83,60 @@ let convert_logic_hook: MappingASTHook =
 
 // a->b <=> (*a).b
 let convert_arrow_hook: MappingASTHook = fun (|P|) (|Q|) -> function
-  |Apply(V (Var("->", _)), [x; field]) -> Some (Apply'.fn2 "." (Apply'.fn "*" x) field)
+  |Apply(V (Var("->", _)), [x; field]) ->
+    let deref = Apply'.fn("*prefix", DT.Function([Ptr TypeClasses.any], TypeClasses.any))
+    Some (Apply'.fn2 "." (deref x) field)
   |_ -> None
 
 // arrays -> pointers (including multidimensional)
-let convert_arrays_hook: MappingASTHook = fun (|P|) (|Q|) -> function
-  |Declare(v, TypeDef (Array(1, dt))) -> Some (Declare(v, Ptr dt))
-  |V (Var(v, TypeDef (Array(1, dt)))) -> Some (V (Var(v, Ptr dt)))
-  |Declare(_, TypeDef (Array(_, _)))
-  |V (Var(_, TypeDef (Array(_, _)))) -> failwith "multidimensional arrays not currently supported"
-  |_ -> None
+let convert_arrays_hook: MappingASTHook =
+  let rec replace = function
+    |TypeDef (Array(1, dt)) -> Ptr dt
+    |TypeDef (Array _) -> failwith "multidimensional arrays not supported"
+    |Ptr dt -> Ptr (replace dt)
+    |DT.Function(args, ret) -> DT.Function(List.map replace args, replace ret)
+    |Function2 ret -> Function2 (replace ret)
+    |dt -> dt  // TODO: arrays inside structs
+  fun (|P|) (|Q|) -> function
+    |Declare(v, dt) -> Some (Declare(v, replace dt))
+    |V (Var(v, dt)) -> Some (V (Var(v, replace dt)))
+    |_ -> None
+
+// static globals are treated as normal globals
+// static locals copy a global and write it back at the end of scope
+let create_static_vars ast : AST =
+  let mutable gvar = 0
+  let mutable all_gvars = []
+  let next_gvar dt =
+    let gvar_name = "$$static_var_" + string gvar
+    let flag_name = "$$static_flag_" + string gvar
+    gvar <- gvar + 1
+    all_gvars <-
+      Declare(gvar_name, dt)
+       :: Declare(flag_name, Byte)  // initialize a flag
+       :: Assign(V (Var(flag_name, Byte)), V (Lit("1", Byte)))
+       :: all_gvars
+    (V (Var(gvar_name, dt)), V (Var(flag_name, Byte)))
+  apply_mapping_hook (fun (|P|) (|Q|) -> function
+    |GlobalParse (Q xprs) ->
+      let xprs = List.collect (function BuiltinASTs.GetStatic(_, init) -> init | x -> [x]) xprs
+      Some (GlobalParse (all_gvars @ xprs))
+    |Block (Q xprs) ->
+      let (xprs, writeback) =
+        List.mapFold (fun acc -> function
+          |BuiltinASTs.GetStatic(V (Var(_, dt)) as var, init) ->
+            let (gvar, init_flag) = next_gvar dt
+            let initialize = init @ [Assign(gvar, var); Assign(init_flag, V (Lit("0", Byte)))]
+            let write_init = If(init_flag, Block initialize, Block [Assign(var, gvar)])
+            (write_init, Assign(gvar, var)::acc)
+          |BuiltinASTs.GetStatic _ & Strict x -> x
+          |ast -> (ast, acc)
+         ) [] xprs
+      Some (Block (xprs @ writeback))
+    |_ -> None
+   ) ast
   
-let pre_inference =
+let pre_inference: AST -> AST =
   List.map apply_mapping_hook [
     eval_sizeof_hook
     extract_strings_to_global_hook
@@ -101,19 +145,27 @@ let pre_inference =
     convert_arrow_hook
     convert_arrays_hook
    ]
+   @ [create_static_vars]
    |> List.reduce (>>)
+
+open CompilerDatatypes.Semantics.RegisterAlloc
+open CompilerDatatypes.Semantics.InterpreterValue
+open CompilerDatatypes.AST.SemanticAST
 
 // (a: Ptr int)[i: int] -> *(a + (Ptr int)i) -> *(a + 4 * i)
 // gets run after type inference hook - all types should be concrete
 let scale_ptr_offsets_hook: MappingASTHook = fun (|P|) (|Q|) -> function
-  |Apply(V (Var("\cast", Ptr t)), [P x]) ->
+  |Apply(V (Var("\cast", Global (DT.Ptr dt as ptr))), [P x]) ->
+    let deref_dt = DT.Function([ptr; ptr], ptr)
+    let sizeof = Boxed.Ptr(dt.sizeof, dt)
     Some <|
-      Apply'.fn2("*", DT.Function([Ptr t; Ptr t], Ptr t))
-       (V (Lit(string t.sizeof, Ptr t)))
-       (BuiltinASTs.cast (Ptr t) x)
+      Apply(V (Var("*", Global deref_dt)), [
+        V (Lit sizeof)
+        BuiltinASTs.cast ptr x
+       ])
   |_ -> None
 
-let post_inference =
+let post_inference: AST -> AST =
   List.map apply_mapping_hook [
     scale_ptr_offsets_hook
    ]
