@@ -52,6 +52,7 @@ let targets = [
   "Transformers"
   "Sim"
   "Codegen"
+  "Codewriters"
  ]
 
 let tests = List.choose (create_target >> create_test None) targets

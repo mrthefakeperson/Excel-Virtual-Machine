@@ -55,7 +55,7 @@ let write_code: Asm seq -> string seq =
       |ShiftStackDown _ -> failwith "shift stack down not supported yet"
       |MovRR(ra, rb) -> yield sprintf "mov %s %s" (reg_to_string ra) (reg_to_string rb)
       |MovRM(ra, mem) -> yield sprintf ""
-      |
+      // |
       yield! write_code rest
      }
   List.ofSeq >> write_code

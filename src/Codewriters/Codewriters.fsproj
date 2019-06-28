@@ -15,4 +15,7 @@
     <Compile Include="Xlsx.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Office" Version="14.0.4760.1000" />
+  </ItemGroup>
 </Project>
