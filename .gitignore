@@ -5,7 +5,9 @@
 old
 samples
 .vs
+.ionide
 **/build
 **/obj
 **/bin
 **/packages
+**/.env.fsx

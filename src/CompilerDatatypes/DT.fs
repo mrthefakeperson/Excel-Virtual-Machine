@@ -27,7 +27,15 @@ and DT =
       |Function _ -> 4
       |Function2 _ -> 4
       |T _ -> failwith "cannot get size of T _"
+      |TypeDef (DeclStruct(_, fields) | DeclUnion(_, fields)) ->
+        0::List.map (fun (StructField(_, _, start, sz)) -> start + sz) fields
+         |> List.max
+         |> fun sz_bits -> (sz_bits + 7) / 8
       |TypeDef _ -> failwith "unexpected typedef - should be removed at this point"
+
+    static member ptr_equivalent = function
+      |Ptr Byte | TypeDef (DeclStruct _ | DeclUnion _ | Array _) -> true
+      |_ -> false
 
     static member can_promote from to_ =
       let hierarchy = [Byte; Int; Int64; Float; Double]
@@ -35,8 +43,9 @@ and DT =
       else
         match List.tryFindIndex ((=) from) hierarchy, List.tryFindIndex ((=) to_) hierarchy with
         |Some ai, Some bi when ai < bi -> true
+        |Some _, None when DT.ptr_equivalent to_ -> true
         |Some _, None -> match to_ with Ptr _ -> true | _ -> false
-        |_ -> false
+        |_ -> match to_ with Ptr Byte -> DT.ptr_equivalent from | _ -> false
     static member supertype a b =  // automatic casting: when some type wants to be both a and b, choose one of them
       if DT.can_promote a b then b
       elif DT.can_promote b a then a
@@ -74,6 +83,7 @@ and DT =
          |> Map.map (fun identifier types ->
               if types = [] then failwithf "type %A has no concrete candidates" identifier
               let inferred = List.reduce DT.supertype types
+              let inferred = if DT.ptr_equivalent inferred then Ptr Byte else inferred
               if List.exists (fun t -> try ignore (DT.infer_type' t inferred); true with _ -> false) (valid_types.[identifier].Force())
                then inferred
                else failwithf "type %A cannot be constrained to %A" identifier inferred
@@ -92,6 +102,7 @@ and DT =
         |Function(args, ret), Function(args', ret') -> Function(List.map cast (List.zip args args'), cast (ret, ret'))
         |Function2 ret, Function2 ret' -> Function2 (cast (ret, ret'))
         |Function2 ret, Function(args', ret') -> Function(args', cast (ret, ret'))
+        |Ptr Byte, target when DT.ptr_equivalent target -> Ptr Byte
         |model, target when DT.can_promote target model -> model
         |x -> failwithf "cannot resolve cast: %A" x
       cast (replace model, concrete)

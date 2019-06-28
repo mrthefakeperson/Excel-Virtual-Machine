@@ -1,11 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <RuntimeIdentifiers>ubuntu.16.04-x64</RuntimeIdentifiers>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DT.fs" />
     <Compile Include="Token.fs" />
+    <Compile Include="Semantics.fs" />
     <Compile Include="AST.fs" />
+    <Compile Include="SymbolTable.fs" />
+    <Compile Include="PseudoASM.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Utils">
+      <HintPath>../build/Utils.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
