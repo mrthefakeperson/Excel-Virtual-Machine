@@ -2,8 +2,7 @@
 **/*.fsx.lock
 *.dll
 *.exe
-old
-samples
+**/samples
 .vs
 .ionide
 **/build
