@@ -4,6 +4,12 @@ open System.Text.RegularExpressions
 
 let inline trace x = printfn "%A" x; x
 
+let inline time f x =
+  printfn "start"
+  let t = System.Environment.TickCount
+  try f x
+  finally printfn "end: %i" (System.Environment.TickCount - t)
+
 let inline mkpair a b = (a, b)
 
 let inline (|Strict|) x = failwithf "should never be reached (%A)" x
@@ -33,10 +39,10 @@ let unescape_string (s: string) =
    |> String.concat ""
 
 module RegexUtils =
-  let WHITESPACE = "\\s*"
+  let WHITESPACE = "\\s+"
   let PREPROCESSOR_LINE = "#[^\n]*"
   let COMMENT_LINE = "//[^\n]*"
-  let COMMENT_BLOCK = "/\*((?!\*/).)*\*/"
+  let COMMENT_BLOCK = "/\\*([^*]|(\\*[^/]))*\\*/"
   let VAR = "[a-z A-Z _][a-z 0-9 A-Z _]*"
   let NUM_INT32 = "-?[0-9]+"
   let NUM_INT64 = "-?[0-9]+(L|l){1,2}"
@@ -52,8 +58,9 @@ module CLI =
     let rec input_block() =
       match Console.ReadLine() with
       |"quit" -> None
+      |"\\" -> Option.map ((+) "\n") (input_block())
       |line when line.EndsWith "\\" ->
-        Option.map ((+) line.[..line.Length - 2]) (input_block())
+        Option.map ((+) (line.[..line.Length - 2] + "\n")) (input_block())
       |line -> Some line
     let rec loop() =
       printf "in > "
