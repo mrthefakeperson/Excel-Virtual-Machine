@@ -1,7 +1,9 @@
-﻿module Codewriters.Interpreter
-open Parser.Datatype
-open Codegen.PAsm.Simple
-open Codegen.PAsm
+﻿module Sim.PAsmMachine
+open Utils
+open CompilerDatatypes.DT
+open CompilerDatatypes.Semantics.InterpreterValue
+open CompilerDatatypes.PseudoASM.Simple
+open CompilerDatatypes.PseudoASM
 
 let REAL_REGS = [SP; BP; RX; PSR_EQ; PSR_GT; PSR_LT]  // don't do R0, since it's needed to store return values
 
@@ -10,6 +12,7 @@ type State = {
   pc: int
   regs: Map<Register, Boxed>
   next_alloc: int
+  stdout: string
  }
   with
     static member copy (state: State) = {state with mem = Array.copy state.mem}
@@ -19,10 +22,11 @@ type State = {
         pc = CODE_START
         regs = Map (List.map (fun r -> (r, Void)) (R 0::REAL_REGS))
         next_alloc = 1
+        stdout = ""
        }
       let code_as_boxed = Array.ofSeq code |> Array.collect (function Data data -> data | Label _ -> [||] | _ -> [|Void|])
       Array.blit code_as_boxed 0 initial.mem CODE_START code_as_boxed.Length
-      let init_registers = [(BP, Ptr(STACK_START + 1, DT.Byte)); (SP, Ptr(STACK_START, DT.Byte))]
+      let init_registers = [(BP, Ptr(STACK_START, DT.Byte)); (SP, Ptr(STACK_START, DT.Byte))]
       { initial with
           regs = List.fold (fun acc (k, v) -> Map.add k v acc) initial.regs init_registers }
     static member branch pc' state = {state with pc = pc'}
@@ -34,13 +38,13 @@ type State = {
       |_ when state.regs.ContainsKey reg -> state.regs.[reg]
       |Register.R n | Strict n ->
         let Ptr(bp, DT.Byte) | Strict bp = state.regs.[BP]
-        state.mem.[bp + (if n > 0 then n - 1 else n)]
+        state.mem.[bp + n]
     static member write_register reg value (state: State) =
       match reg with
       |_ when state.regs.ContainsKey reg -> { state with regs = Map.add reg value state.regs }
       |Register.R n | Strict n ->
         let Ptr(bp, DT.Byte) | Strict bp = state.regs.[BP]
-        state.mem.[bp + (if n > 0 then n - 1 else n)] <- value; state
+        state.mem.[bp + n] <- value; state
     static member read_mem (Ptr(addr, _) | Strict addr) (state: State) = state.mem.[addr]
     static member write_mem (Ptr(addr, _) | Strict addr) value (state: State) =
       state.mem.[addr] <- value; state
@@ -63,6 +67,37 @@ type State = {
     static member current_alloc (state: State) = Ptr(state.next_alloc, DT.Byte)
     static member alloc n state = {state with next_alloc = state.next_alloc + n}
 
+    static member print s state = {state with stdout = state.stdout + s}
+    static member printf arg addr state =
+      let Byte b | Strict b = State.read_mem addr state
+      let incr addr = addr + Ptr(1, DT.Byte)
+      match char b with
+      |'\000' -> state
+      |'%' ->
+        let addr = incr addr
+        let Byte b | Strict b = State.read_mem addr state
+        match char b with
+        |'%' -> State.printf arg (incr addr) (State.print "%" state)
+        |'i' | 'd' | 'x' | 'f' | 'l' as fmt ->
+          let dt = match fmt with 'f' -> DT.Float | 'l' -> DT.Int64 | _ -> DT.Int
+          let x = Boxed.cast dt (State.read_register (R arg) state)
+          let strrep =
+            match fmt with
+            |'x' -> sprintf "%x" (Option.get x.to_int64)
+            |'f' -> sprintf "%f" (Option.get x.to_double)
+            |_ -> string (Option.get x.to_int64)
+          State.printf (arg - 1) (incr addr) (State.print strrep state)
+        |'s' ->
+          let str_addr = State.read_register (R arg) state
+          let rec get_string addr =
+            let Byte b | Strict b = State.read_mem addr state
+            match char b with
+            |'\000' -> ""
+            |c -> string c + get_string (incr addr)
+          State.printf (arg - 1) (incr addr) (State.print (get_string str_addr) state)
+        |fmt -> failwithf "unrecognized printf format: %%%c" fmt
+      |c -> State.printf arg (incr addr) (State.print (string c) state)
+
     static member trace ({pc = pc; mem = mem; regs = regs; next_alloc = next_alloc} as state) =
       String.concat "\n" [
         sprintf "pc: %i" pc
@@ -70,7 +105,7 @@ type State = {
         sprintf "sp: %A, bp: %A, stack: %A" regs.[SP] regs.[BP] mem.[STACK_START..STACK_START + 30]
         sprintf "next alloc: %A, mem: %A" next_alloc mem.[..50]
         sprintf "code: %A" mem.[CODE_START..CODE_START + 50]
-        sprintf "R0: %A, RX: %A" regs.[Register.R 0] regs.[RX]
+        sprintf "R0: %A, RX: %A" regs.[R 0] regs.[RX]
        ]
        |> printfn "%s"
       state
@@ -123,9 +158,13 @@ let rec eval': Asm -> State -> State = function
     |T -> read_psr PSR_EQ *>> (not >> apply_branch)
     |LT -> read_psr PSR_LT *>> apply_branch
     |GT -> read_psr PSR_GT *>> apply_branch
-  |Call addr ->  // TODO: consider adding custom instruction for print
+  |Call addr ->
     State.stack_push <<* State.current_pc
      >> State.branch (addr - 1)
+  |ExternCall fn ->
+    match fn with
+    |"printf" -> State.printf -2 <<* State.read_register (R -1)
+    |_ -> State.print (sprintf "extern call %s not recognized\n" fn)
   |Ret ->
     let extract (Ptr(x, _) | Strict x) = x
     ((State.stack_peek >> extract) *>> State.branch) >> State.stack_pop
@@ -150,15 +189,20 @@ let DEBUG = false
 let PAUSE = false
 
 let eval: Asm list -> State = fun instrs ->
-  let instrs = Array.ofList (List.filter (function Label _ -> false | _ -> true) instrs)  // labels get removed because they are not considered when calculating label addresses
-                                                                                          // TODO: bug: data arrays can overlap
+  let instrs = Array.filter (function Label _ -> false | _ -> true) (Array.ofList instrs)
   let rec eval = function
-    |state when state.pc = EXTERN_CALL_ADDR -> state
+    |state when state.pc = EXTERN_CALL_ADDR || state.stdout.Length > 500 -> state
     |state when not (CODE_START <= state.pc && state.pc < CODE_START + instrs.Length) ->
+      ignore (State.trace state)
       failwithf "executing non-code as code: pc = %A" state.pc
     |state ->
       if DEBUG then printfn ">>> %A" (instrs.[state.pc - CODE_START])
-      let state' = eval' (instrs.[state.pc - CODE_START]) state
+      let state' =
+        try eval' (instrs.[state.pc - CODE_START]) state
+        with ex ->
+          printfn "failed at %A: %A" instrs.[state.pc - CODE_START] instrs
+          ignore (State.trace state)
+          raise ex
       state'
        |> State.to_next_pc
        |> if DEBUG then State.trace else id
