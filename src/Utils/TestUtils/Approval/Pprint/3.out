@@ -1,0 +1,20 @@
+"Int a
+Int b
+Int c
+Float f
+Function2 Int main
+main = Int fn() {
+  Int a;
+  Int b;
+  Int c;
+  Float f;
+  a = 10;
+  b = 20;
+  c = +(a, b);
+  printf("value of c : %d 
+  ", c);
+  f = /(70, 3);
+  printf("value of f : %f 
+  ", f);
+  return 0;
+}"

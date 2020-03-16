@@ -1,0 +1,23 @@
+"Ptr Byte $48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a
+$48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a = \stack_alloc(Int 16)
+*prefix(+($48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a, *(Ptr (1,Byte), \cast(Int 0)))) = Byte 72uy
+*prefix(+($48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a, *(Ptr (1,Byte), \cast(Int 1)))) = Byte 101uy
+*prefix(+($48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a, *(Ptr (1,Byte), \cast(Int 2)))) = Byte 108uy
+*prefix(+($48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a, *(Ptr (1,Byte), \cast(Int 3)))) = Byte 108uy
+*prefix(+($48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a, *(Ptr (1,Byte), \cast(Int 4)))) = Byte 111uy
+*prefix(+($48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a, *(Ptr (1,Byte), \cast(Int 5)))) = Byte 44uy
+*prefix(+($48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a, *(Ptr (1,Byte), \cast(Int 6)))) = Byte 32uy
+*prefix(+($48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a, *(Ptr (1,Byte), \cast(Int 7)))) = Byte 87uy
+*prefix(+($48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a, *(Ptr (1,Byte), \cast(Int 8)))) = Byte 111uy
+*prefix(+($48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a, *(Ptr (1,Byte), \cast(Int 9)))) = Byte 114uy
+*prefix(+($48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a, *(Ptr (1,Byte), \cast(Int 10)))) = Byte 108uy
+*prefix(+($48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a, *(Ptr (1,Byte), \cast(Int 11)))) = Byte 100uy
+*prefix(+($48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a, *(Ptr (1,Byte), \cast(Int 12)))) = Byte 33uy
+*prefix(+($48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a, *(Ptr (1,Byte), \cast(Int 13)))) = Byte 32uy
+*prefix(+($48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a, *(Ptr (1,Byte), \cast(Int 14)))) = Byte 10uy
+*prefix(+($48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a, *(Ptr (1,Byte), \cast(Int 15)))) = Byte 0uy
+Function2 Int main
+main = Int fn() {
+  printf($48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a);
+  return Int 0;
+}"

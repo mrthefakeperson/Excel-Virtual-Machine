@@ -1,0 +1,18 @@
+"TypeDef
+  (DeclStruct
+     ("_anon",
+      [StructField ("widthValidated",Int,0,4);
+       StructField ("heightValidated",Int,32,4)])) status1
+TypeDef
+  (DeclStruct
+     ("_anon",
+      [StructField ("widthValidated",Int,1,4);
+       StructField ("heightValidated",Int,1,4)])) status2
+Function2 Int main
+main = Int fn() {
+  printf("Memory size occupied by status1 : %d
+  ", sizeof(status1));
+  printf("Memory size occupied by status2 : %d
+  ", sizeof(status2));
+  return 0;
+}"

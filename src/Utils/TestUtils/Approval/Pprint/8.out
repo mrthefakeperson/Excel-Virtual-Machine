@@ -1,0 +1,11 @@
+"Function2 Int main
+main = Int fn() {
+  {
+    while (1) {
+      printf("This loop will run forever.
+      ");
+      ;
+    };
+  };
+  return 0;
+}"

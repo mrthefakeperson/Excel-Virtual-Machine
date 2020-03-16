@@ -1,0 +1,23 @@
+"Function2 Int main
+main = Int fn() {
+  TypeDef (Array (1,Int)) n;
+  n = \stack_alloc(10);
+  Int i;
+  Int j;
+  {
+    i = 0;
+    while (<(i, 10)) {
+      *prefix(+(n, i)) = +(i, 100);
+      -(i = +(i, 1), 1);
+    };
+  };
+  {
+    j = 0;
+    while (<(j, 10)) {
+      printf("Element[%d] = %d
+      ", j, *prefix(+(n, j)));
+      -(j = +(j, 1), 1);
+    };
+  };
+  return 0;
+}"

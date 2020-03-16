@@ -1,0 +1,18 @@
+[Br "main";
+ Label
+   "$54_68_69_73_20_6c_6f_6f_70_20_77_69_6c_6c_20_72_75_6e_20_66_6f_72_65_76_65_72_2e_a";
+ Data
+   [|Byte 84uy; Byte 104uy; Byte 105uy; Byte 115uy; Byte 32uy; Byte 108uy;
+     Byte 111uy; Byte 111uy; Byte 112uy; Byte 32uy; Byte 119uy; Byte 105uy;
+     Byte 108uy; Byte 108uy; Byte 32uy; Byte 114uy; Byte 117uy; Byte 110uy;
+     Byte 32uy; Byte 102uy; Byte 111uy; Byte 114uy; Byte 101uy; Byte 118uy;
+     Byte 101uy; Byte 114uy; Byte 46uy; Byte 10uy; Byte 0uy|]; Label "main";
+ Br "enter_loop_16"; Label "loop_17"; PushRealRs;
+ MovRHandle
+   (R 0,
+    HandleLbl
+      ("$54_68_69_73_20_6c_6f_6f_70_20_77_69_6c_6c_20_72_75_6e_20_66_6f_72_65_76_65_72_2e_a",
+       Ptr Byte)); Push (R 0); MovRR (BP,SP); AddC (4,BP,Ptr (1,Byte));
+ Call "printf"; SubC (4,SP,Ptr (1,Byte)); PopRealRs; Label "enter_loop_16";
+ MovRC (R 0,Byte 1uy); CmpC (R 0,Byte 0uy); BrT "loop_17"; MovRC (R 0,Int 0);
+ MovRR (SP,BP); Ret; Ret]

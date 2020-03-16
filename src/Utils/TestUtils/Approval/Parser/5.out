@@ -1,0 +1,67 @@
+GlobalParse
+  [Declare ("func",Function ([],Void)); Declare ("count",Int);
+   Apply
+     (V (Var ("\get_static",T (0,Value is not created.))),
+      [V (Var ("count",Int));
+       Block [Assign (V (Var ("count",Int)),V (Lit ("5",Int)))]]);
+   Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [While
+              (Apply
+                 (V (Var
+                       ("+",
+                        Function
+                          ([T (0,Value is not created.);
+                            T (0,Value is not created.)],
+                           T (0,Value is not created.)))),
+                  [Assign
+                     (V (Var ("count",T (0,Value is not created.))),
+                      Apply
+                        (V (Var
+                              ("-",
+                               Function
+                                 ([T (0,Value is not created.);
+                                   T (0,Value is not created.)],
+                                  T (0,Value is not created.)))),
+                         [V (Var ("count",T (0,Value is not created.)));
+                          V (Lit ("1",Int))])); V (Lit ("1",Int))]),
+               Block [Apply (V (Var ("func",T (0,Value is not created.))),[])]);
+            Return (V (Lit ("0",Int)))])); Declare ("func",Function ([],Void));
+   Assign
+     (V (Var ("func",Function ([],Void))),
+      Function
+        (Void,[],
+         Block
+           [Declare ("i",Int);
+            Apply
+              (V (Var ("\get_static",T (0,Value is not created.))),
+               [V (Var ("i",Int));
+                Block [Assign (V (Var ("i",Int)),V (Lit ("5",Int)))]]);
+            Apply
+              (V (Var
+                    ("-",
+                     Function
+                       ([T (0,Value is not created.);
+                         T (0,Value is not created.)],
+                        T (0,Value is not created.)))),
+               [Assign
+                  (V (Var ("i",T (0,Value is not created.))),
+                   Apply
+                     (V (Var
+                           ("+",
+                            Function
+                              ([T (0,Value is not created.);
+                                T (0,Value is not created.)],
+                               T (0,Value is not created.)))),
+                      [V (Var ("i",T (0,Value is not created.)));
+                       V (Lit ("1",Int))])); V (Lit ("1",Int))]);
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""i is %d and count is %d
+"",Ptr Byte));
+                V (Var ("i",T (0,Value is not created.)));
+                V (Var ("count",T (0,Value is not created.)))])]))]

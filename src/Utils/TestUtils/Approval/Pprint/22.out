@@ -1,0 +1,35 @@
+"TypeDef
+  (DeclStruct
+     ("Books",
+      [StructField ("title",TypeDef (Array (1,Byte)),0,50);
+       StructField ("author",TypeDef (Array (1,Byte)),400,50);
+       StructField ("subject",TypeDef (Array (1,Byte)),800,100);
+       StructField ("book_id",Int,1600,4)])) ?
+Function ([Ptr (TypeDef (Struct "Books"))],Void) printBook
+Function2 Int main
+main = Int fn() {
+  TypeDef (Struct "Books") Book1;
+  TypeDef (Struct "Books") Book2;
+  strcpy(.(Book1, title), "C Programming");
+  strcpy(.(Book1, author), "Nuha Ali");
+  strcpy(.(Book1, subject), "C Programming Tutorial");
+  .(Book1, book_id) = 6495407;
+  strcpy(.(Book2, title), "Telecom Billing");
+  strcpy(.(Book2, author), "Zara Ali");
+  strcpy(.(Book2, subject), "Telecom Billing Tutorial");
+  .(Book2, book_id) = 6495700;
+  printBook(&prefix(Book1));
+  printBook(&prefix(Book2));
+  return 0;
+}
+Function ([Ptr (TypeDef (Struct "Books"))],Void) printBook
+printBook = Void fn(Ptr (TypeDef (Struct "Books")) book) {
+  printf("Book title : %s
+  ", ->(book, title));
+  printf("Book author : %s
+  ", ->(book, author));
+  printf("Book subject : %s
+  ", ->(book, subject));
+  printf("Book book_id : %d
+  ", ->(book, book_id));
+}"

@@ -1,0 +1,22 @@
+"Function2 Int main
+main = Int fn() {
+  TypeDef (Array (1,Byte)) str1;
+  str1 = \stack_alloc(12);
+  str1 = "Hello";
+  TypeDef (Array (1,Byte)) str2;
+  str2 = \stack_alloc(12);
+  str2 = "World";
+  TypeDef (Array (1,Byte)) str3;
+  str3 = \stack_alloc(12);
+  Int len;
+  strcpy(str3, str1);
+  printf("strcpy( str3, str1) :  %s
+  ", str3);
+  strcat(str1, str2);
+  printf("strcat( str1, str2):   %s
+  ", str1);
+  len = strlen(str1);
+  printf("strlen(str1) :  %d
+  ", len);
+  return 0;
+}"

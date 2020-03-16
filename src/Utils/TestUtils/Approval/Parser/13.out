@@ -1,0 +1,54 @@
+GlobalParse
+  [Declare ("sum",Function ([Int; Int],Int)); Declare ("a",Int);
+   Assign (V (Var ("a",Int)),V (Lit ("20",Int))); Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [Declare ("a",Int); Assign (V (Var ("a",Int)),V (Lit ("10",Int)));
+            Declare ("b",Int); Assign (V (Var ("b",Int)),V (Lit ("20",Int)));
+            Declare ("c",Int); Assign (V (Var ("c",Int)),V (Lit ("0",Int)));
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""value of a in main() = %d
+"",Ptr Byte));
+                V (Var ("a",T (0,Value is not created.)))]);
+            Assign
+              (V (Var ("c",T (0,Value is not created.))),
+               Apply
+                 (V (Var ("sum",T (0,Value is not created.))),
+                  [V (Var ("a",T (0,Value is not created.)));
+                   V (Var ("b",T (0,Value is not created.)))]));
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""value of c in main() = %d
+"",Ptr Byte));
+                V (Var ("c",T (0,Value is not created.)))]);
+            Return (V (Lit ("0",Int)))]));
+   Declare ("sum",Function ([Int; Int],Int));
+   Assign
+     (V (Var ("sum",Function ([Int; Int],Int))),
+      Function
+        (Int,[("a", Int); ("b", Int)],
+         Block
+           [Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""value of a in sum() = %d
+"",Ptr Byte));
+                V (Var ("a",T (0,Value is not created.)))]);
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""value of b in sum() = %d
+"",Ptr Byte));
+                V (Var ("b",T (0,Value is not created.)))]);
+            Return
+              (Apply
+                 (V (Var
+                       ("+",
+                        Function
+                          ([T (0,Value is not created.);
+                            T (0,Value is not created.)],
+                           T (0,Value is not created.)))),
+                  [V (Var ("a",T (0,Value is not created.)));
+                   V (Var ("b",T (0,Value is not created.)))]))]))]

@@ -1,0 +1,24 @@
+"Function ([Int; Int],Int) max
+Function2 Int main
+main = Int fn() {
+  Int a;
+  a = 100;
+  Int b;
+  b = 200;
+  Int ret;
+  ret = max(a, b);
+  printf("Max value is : %d
+  ", ret);
+  return 0;
+}
+Function ([Int; Int],Int) max
+max = Int fn(Int num1, Int num2) {
+  Int result;
+  if (>(num1, num2)) {
+    result = num1;
+  }
+  else {
+    result = num2;
+  };
+  return result;
+}"

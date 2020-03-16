@@ -1,0 +1,28 @@
+"Ptr Byte $76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a
+$76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a = \stack_alloc(Int 17)
+*prefix(+($76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a, *(Ptr (1,Byte), \cast(Int 0)))) = Byte 118uy
+*prefix(+($76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a, *(Ptr (1,Byte), \cast(Int 1)))) = Byte 97uy
+*prefix(+($76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a, *(Ptr (1,Byte), \cast(Int 2)))) = Byte 108uy
+*prefix(+($76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a, *(Ptr (1,Byte), \cast(Int 3)))) = Byte 117uy
+*prefix(+($76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a, *(Ptr (1,Byte), \cast(Int 4)))) = Byte 101uy
+*prefix(+($76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a, *(Ptr (1,Byte), \cast(Int 5)))) = Byte 32uy
+*prefix(+($76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a, *(Ptr (1,Byte), \cast(Int 6)))) = Byte 111uy
+*prefix(+($76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a, *(Ptr (1,Byte), \cast(Int 7)))) = Byte 102uy
+*prefix(+($76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a, *(Ptr (1,Byte), \cast(Int 8)))) = Byte 32uy
+*prefix(+($76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a, *(Ptr (1,Byte), \cast(Int 9)))) = Byte 103uy
+*prefix(+($76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a, *(Ptr (1,Byte), \cast(Int 10)))) = Byte 32uy
+*prefix(+($76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a, *(Ptr (1,Byte), \cast(Int 11)))) = Byte 61uy
+*prefix(+($76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a, *(Ptr (1,Byte), \cast(Int 12)))) = Byte 32uy
+*prefix(+($76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a, *(Ptr (1,Byte), \cast(Int 13)))) = Byte 37uy
+*prefix(+($76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a, *(Ptr (1,Byte), \cast(Int 14)))) = Byte 100uy
+*prefix(+($76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a, *(Ptr (1,Byte), \cast(Int 15)))) = Byte 10uy
+*prefix(+($76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a, *(Ptr (1,Byte), \cast(Int 16)))) = Byte 0uy
+Int g
+g = Int 20
+Function2 Int main
+main = Int fn() {
+  Int g;
+  g = Int 10;
+  printf($76_61_6c_75_65_20_6f_66_20_67_20_3d_20_25_64_a, g);
+  return Int 0;
+}"

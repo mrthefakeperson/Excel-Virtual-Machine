@@ -1,0 +1,12 @@
+GlobalParse
+  [Declare ("count",Int); Declare ("write_extern",Function ([],Void));
+   Assign
+     (V (Var ("write_extern",Function ([],Void))),
+      Function
+        (Void,[],
+         Block
+           [Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""count is %d
+"",Ptr Byte));
+                V (Var ("count",T (0,Value is not created.)))])]))]

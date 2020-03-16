@@ -1,0 +1,12 @@
+"Int g
+Function2 Int main
+main = Int fn() {
+  Int a;
+  Int b;
+  a = 10;
+  b = 20;
+  g = +(a, b);
+  printf("value of a = %d, b = %d and g = %d
+  ", a, b, g);
+  return 0;
+}"

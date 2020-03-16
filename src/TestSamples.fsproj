@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <RuntimeIdentifiers>ubuntu.16.04-x64</RuntimeIdentifiers>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="fuchu" Version="1.0.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Utils">
+      <HintPath>./build/Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="CompilerDatatypes">
+      <HintPath>./build/CompilerDatatypes.dll</HintPath>
+    </Reference>
+    <Reference Include="Parser">
+      <HintPath>./build/Parser.dll</HintPath>
+    </Reference>
+    <Reference Include="Transformers">
+      <HintPath>./build/Transformers.dll</HintPath>
+    </Reference>
+    <Reference Include="Sim">
+      <HintPath>./build/Sim.dll</HintPath>
+    </Reference>
+    <Reference Include="Codegen">
+      <HintPath>./build/Codegen.dll</HintPath>
+    </Reference>
+    <Compile Include="TestSamples.fs" />
+  </ItemGroup>
+</Project>

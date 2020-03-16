@@ -1,0 +1,9 @@
+[Br "main"; Label "$63_6f_75_6e_74_20_69_73_20_25_64_a";
+ Data
+   [|Byte 99uy; Byte 111uy; Byte 117uy; Byte 110uy; Byte 116uy; Byte 32uy;
+     Byte 105uy; Byte 115uy; Byte 32uy; Byte 37uy; Byte 100uy; Byte 10uy;
+     Byte 0uy|]; Label "count"; Data [|Int 0|]; Label "write_extern"; PushRealRs;
+ MovRM (R 0,Lbl ("count",Int)); Push (R 0);
+ MovRHandle (R 0,HandleLbl ("$63_6f_75_6e_74_20_69_73_20_25_64_a",Ptr Byte));
+ Push (R 0); MovRR (BP,SP); AddC (4,BP,Ptr (1,Byte)); Call "printf";
+ SubC (4,SP,Ptr (2,Byte)); PopRealRs; Ret]

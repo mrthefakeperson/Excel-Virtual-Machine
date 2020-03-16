@@ -1,0 +1,116 @@
+GlobalParse
+  [Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [Declare ("greeting",TypeDef (Array (1,Byte)));
+            Assign
+              (V (Var ("greeting",TypeDef (Array (1,Byte)))),
+               Apply
+                 (V (Var
+                       ("\stack_alloc",Function ([Int],TypeDef (Array (1,Byte))))),
+                  [V (Lit ("6",Int))]));
+            Assign
+              (Apply
+                 (V (Var
+                       ("*prefix",
+                        Function
+                          ([Ptr (T (0,Value is not created.))],
+                           T (0,Value is not created.)))),
+                  [Apply
+                     (V (Var
+                           ("+",
+                            Function
+                              ([T (0,Value is not created.);
+                                T (0,Value is not created.)],
+                               T (0,Value is not created.)))),
+                      [V (Var ("greeting",TypeDef (Array (1,Byte))));
+                       V (Lit ("0",Int))])]),V (Lit ("72",Byte)));
+            Assign
+              (Apply
+                 (V (Var
+                       ("*prefix",
+                        Function
+                          ([Ptr (T (0,Value is not created.))],
+                           T (0,Value is not created.)))),
+                  [Apply
+                     (V (Var
+                           ("+",
+                            Function
+                              ([T (0,Value is not created.);
+                                T (0,Value is not created.)],
+                               T (0,Value is not created.)))),
+                      [V (Var ("greeting",TypeDef (Array (1,Byte))));
+                       V (Lit ("1",Int))])]),V (Lit ("101",Byte)));
+            Assign
+              (Apply
+                 (V (Var
+                       ("*prefix",
+                        Function
+                          ([Ptr (T (0,Value is not created.))],
+                           T (0,Value is not created.)))),
+                  [Apply
+                     (V (Var
+                           ("+",
+                            Function
+                              ([T (0,Value is not created.);
+                                T (0,Value is not created.)],
+                               T (0,Value is not created.)))),
+                      [V (Var ("greeting",TypeDef (Array (1,Byte))));
+                       V (Lit ("2",Int))])]),V (Lit ("108",Byte)));
+            Assign
+              (Apply
+                 (V (Var
+                       ("*prefix",
+                        Function
+                          ([Ptr (T (0,Value is not created.))],
+                           T (0,Value is not created.)))),
+                  [Apply
+                     (V (Var
+                           ("+",
+                            Function
+                              ([T (0,Value is not created.);
+                                T (0,Value is not created.)],
+                               T (0,Value is not created.)))),
+                      [V (Var ("greeting",TypeDef (Array (1,Byte))));
+                       V (Lit ("3",Int))])]),V (Lit ("108",Byte)));
+            Assign
+              (Apply
+                 (V (Var
+                       ("*prefix",
+                        Function
+                          ([Ptr (T (0,Value is not created.))],
+                           T (0,Value is not created.)))),
+                  [Apply
+                     (V (Var
+                           ("+",
+                            Function
+                              ([T (0,Value is not created.);
+                                T (0,Value is not created.)],
+                               T (0,Value is not created.)))),
+                      [V (Var ("greeting",TypeDef (Array (1,Byte))));
+                       V (Lit ("4",Int))])]),V (Lit ("111",Byte)));
+            Assign
+              (Apply
+                 (V (Var
+                       ("*prefix",
+                        Function
+                          ([Ptr (T (0,Value is not created.))],
+                           T (0,Value is not created.)))),
+                  [Apply
+                     (V (Var
+                           ("+",
+                            Function
+                              ([T (0,Value is not created.);
+                                T (0,Value is not created.)],
+                               T (0,Value is not created.)))),
+                      [V (Var ("greeting",TypeDef (Array (1,Byte))));
+                       V (Lit ("5",Int))])]),V (Lit ("0",Byte)));
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Greeting message: %s
+"",Ptr Byte));
+                V (Var ("greeting",T (0,Value is not created.)))]);
+            Return (V (Lit ("0",Int)))]))]

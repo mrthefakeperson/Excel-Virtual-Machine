@@ -1,0 +1,3 @@
+(Int 0, "Max value is : %d
+ (fmt [Int 200])
+")

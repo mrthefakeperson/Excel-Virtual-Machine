@@ -1,0 +1,46 @@
+GlobalParse
+  [Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [Declare ("var",Int); Assign (V (Var ("var",Int)),V (Lit ("20",Int)));
+            Declare ("ip",Ptr Int);
+            Assign
+              (V (Var ("ip",T (0,Value is not created.))),
+               Apply
+                 (V (Var
+                       ("&prefix",
+                        Function
+                          ([T (0,Value is not created.)],
+                           Ptr (T (0,Value is not created.))))),
+                  [V (Var ("var",T (0,Value is not created.)))]));
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Address of var variable: %x
+"",Ptr Byte));
+                Apply
+                  (V (Var
+                        ("&prefix",
+                         Function
+                           ([T (0,Value is not created.)],
+                            Ptr (T (0,Value is not created.))))),
+                   [V (Var ("var",T (0,Value is not created.)))])]);
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Address stored in ip variable: %x
+"",Ptr Byte));
+                V (Var ("ip",T (0,Value is not created.)))]);
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Value of *ip variable: %d
+"",Ptr Byte));
+                Apply
+                  (V (Var
+                        ("*prefix",
+                         Function
+                           ([Ptr (T (0,Value is not created.))],
+                            T (0,Value is not created.)))),
+                   [V (Var ("ip",T (0,Value is not created.)))])]);
+            Return (V (Lit ("0",Int)))]))]

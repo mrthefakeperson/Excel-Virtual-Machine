@@ -1,0 +1,27 @@
+GlobalParse
+  [Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [Declare ("fp",Ptr (TypeDef (Alias "FILE")));
+            Assign
+              (V (Var ("fp",T (0,Value is not created.))),
+               Apply
+                 (V (Var ("fopen",T (0,Value is not created.))),
+                  [V (Lit (""/tmp/test.txt"",Ptr Byte));
+                   V (Lit (""w+"",Ptr Byte))]));
+            Apply
+              (V (Var ("fprintf",T (0,Value is not created.))),
+               [V (Var ("fp",T (0,Value is not created.)));
+                V (Lit (""This is testing for fprintf...
+"",Ptr Byte))]);
+            Apply
+              (V (Var ("fputs",T (0,Value is not created.))),
+               [V (Lit (""This is testing for fputs...
+"",Ptr Byte));
+                V (Var ("fp",T (0,Value is not created.)))]);
+            Apply
+              (V (Var ("fclose",T (0,Value is not created.))),
+               [V (Var ("fp",T (0,Value is not created.)))])]))]

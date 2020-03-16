@@ -1,0 +1,6 @@
+"Int count
+Function ([],Void) write_extern
+write_extern = Void fn() {
+  printf("count is %d
+  ", count);
+}"

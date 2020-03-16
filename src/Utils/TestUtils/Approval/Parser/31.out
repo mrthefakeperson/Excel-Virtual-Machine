@@ -1,0 +1,35 @@
+GlobalParse
+  [Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [Declare ("str",TypeDef (Array (1,Byte)));
+            Assign
+              (V (Var ("str",TypeDef (Array (1,Byte)))),
+               Apply
+                 (V (Var
+                       ("\stack_alloc",Function ([Int],TypeDef (Array (1,Byte))))),
+                  [V (Lit ("100",Int))])); Declare ("i",Int);
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Enter a value :"",Ptr Byte))]);
+            Apply
+              (V (Var ("scanf",T (0,Value is not created.))),
+               [V (Lit (""%s %d"",Ptr Byte));
+                V (Var ("str",T (0,Value is not created.)));
+                Apply
+                  (V (Var
+                        ("&prefix",
+                         Function
+                           ([T (0,Value is not created.)],
+                            Ptr (T (0,Value is not created.))))),
+                   [V (Var ("i",T (0,Value is not created.)))])]);
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""
+You entered: %s %d "",Ptr Byte));
+                V (Var ("str",T (0,Value is not created.)));
+                V (Var ("i",T (0,Value is not created.)))]);
+            Return (V (Lit ("0",Int)))]))]

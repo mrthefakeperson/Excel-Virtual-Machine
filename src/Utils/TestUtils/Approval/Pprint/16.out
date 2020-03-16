@@ -1,0 +1,14 @@
+"Function2 Int main
+main = Int fn() {
+  Int var;
+  var = 20;
+  Ptr Int ip;
+  ip = &prefix(var);
+  printf("Address of var variable: %x
+  ", &prefix(var));
+  printf("Address stored in ip variable: %x
+  ", ip);
+  printf("Value of *ip variable: %d
+  ", *prefix(ip));
+  return 0;
+}"

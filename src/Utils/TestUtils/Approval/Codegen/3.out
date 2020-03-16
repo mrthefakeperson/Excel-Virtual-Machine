@@ -1,0 +1,27 @@
+[Br "main"; Label "$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a";
+ Data
+   [|Byte 118uy; Byte 97uy; Byte 108uy; Byte 117uy; Byte 101uy; Byte 32uy;
+     Byte 111uy; Byte 102uy; Byte 32uy; Byte 99uy; Byte 32uy; Byte 58uy;
+     Byte 32uy; Byte 37uy; Byte 100uy; Byte 32uy; Byte 10uy; Byte 0uy|];
+ Label "$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a";
+ Data
+   [|Byte 118uy; Byte 97uy; Byte 108uy; Byte 117uy; Byte 101uy; Byte 32uy;
+     Byte 111uy; Byte 102uy; Byte 32uy; Byte 102uy; Byte 32uy; Byte 58uy;
+     Byte 32uy; Byte 37uy; Byte 102uy; Byte 32uy; Byte 10uy; Byte 0uy|];
+ Label "a"; Data [|Int 0|]; Label "b"; Data [|Int 0|]; Label "c"; Data [|Int 0|];
+ Label "f"; Data [|Float 0.0f|]; Label "main"; AddC (4,SP,Ptr (4,Byte));
+ MovRC (R 1,Int 10); MovRC (R 2,Int 20); Push (R 1); MovRR (R 0,R 2); Pop RX;
+ Add (4,R 0,RX); MovRR (R 3,R 0); PushRealRs; Push (R 3);
+ MovRHandle
+   (R 0,
+    HandleLbl ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",Ptr Byte));
+ Push (R 0); MovRR (BP,SP); AddC (4,BP,Ptr (1,Byte)); Call "printf";
+ SubC (4,SP,Ptr (2,Byte)); PopRealRs; MovRC (R 0,Double 70.0);
+ DivModC (8,R 0,Double 3.0); Cast (Float,R 0); MovRR (R 4,R 0); PushRealRs;
+ Push (R 4);
+ MovRHandle
+   (R 0,
+    HandleLbl ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",Ptr Byte));
+ Push (R 0); MovRR (BP,SP); AddC (4,BP,Ptr (1,Byte)); Call "printf";
+ SubC (4,SP,Ptr (2,Byte)); PopRealRs; MovRC (R 0,Int 0); MovRR (SP,BP); Ret;
+ MovRR (SP,BP); Ret]

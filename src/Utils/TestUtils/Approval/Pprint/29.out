@@ -1,0 +1,10 @@
+"Function2 Int main
+main = Int fn() {
+  Int c;
+  printf("Enter a value :");
+  c = getchar();
+  printf("
+  You entered: ");
+  putchar(c);
+  return 0;
+}"

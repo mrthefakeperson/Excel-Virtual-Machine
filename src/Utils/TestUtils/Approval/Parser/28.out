@@ -1,0 +1,18 @@
+GlobalParse
+  [Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Value of TRUE : %d
+"",Ptr Byte));
+                V (Lit ("1",T (0,Value is not created.)))]);
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Value of FALSE : %d
+"",Ptr Byte));
+                V (Lit ("0",T (0,Value is not created.)))]);
+            Return (V (Lit ("0",Int)))]))]

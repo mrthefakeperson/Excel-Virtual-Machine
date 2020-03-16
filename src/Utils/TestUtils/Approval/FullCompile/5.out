@@ -1,0 +1,29 @@
+[Br "main"; Label "$$static_var_0"; Data [|Int 0|]; Label "$$static_flag_0";
+ Data [|Byte 1uy|];
+ Label "$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a";
+ Data
+   [|Byte 105uy; Byte 32uy; Byte 105uy; Byte 115uy; Byte 32uy; Byte 37uy;
+     Byte 100uy; Byte 32uy; Byte 97uy; Byte 110uy; Byte 100uy; Byte 32uy;
+     Byte 99uy; Byte 111uy; Byte 117uy; Byte 110uy; Byte 116uy; Byte 32uy;
+     Byte 105uy; Byte 115uy; Byte 32uy; Byte 37uy; Byte 100uy; Byte 10uy;
+     Byte 0uy|]; Label "count"; Data [|Int 5|]; Label "main"; Br "enter_loop_12";
+ Label "loop_13"; PushRealRs; MovRR (BP,SP); AddC (4,BP,Ptr (1,Byte));
+ Call "func"; SubC (4,SP,Ptr (0,Byte)); PopRealRs; Label "enter_loop_12";
+ MovRM (R 0,Lbl ("count",Int)); SubC (4,R 0,Int 1);
+ MovMR (Lbl ("count",Int),R 0); AddC (4,R 0,Int 1); Cast (Byte,R 0);
+ CmpC (R 0,Byte 0uy); BrT "loop_13"; MovRC (R 0,Int 0); MovRR (SP,BP); Ret; Ret;
+ Label "func"; AddC (4,SP,Ptr (1,Byte));
+ MovRM (R 0,Lbl ("$$static_flag_0",Byte)); CmpC (R 0,Byte 0uy); Br0 "else_14";
+ MovRC (R 1,Int 5); MovRR (R 0,R 1); MovMR (Lbl ("$$static_var_0",Int),R 0);
+ MovRC (R 0,Byte 0uy); MovMR (Lbl ("$$static_flag_0",Byte),R 0); Br "cont_15";
+ Label "else_14"; MovRM (R 0,Lbl ("$$static_var_0",Int)); MovRR (R 1,R 0);
+ Label "cont_15"; MovRR (R 0,R 1); AddC (4,R 0,Int 1); MovRR (R 1,R 0);
+ SubC (4,R 0,Int 1); PushRealRs; MovRM (R 0,Lbl ("count",Int)); Push (R 0);
+ Push (R 1);
+ MovRHandle
+   (R 0,
+    HandleLbl
+      ("$69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a",
+       Ptr Byte)); Push (R 0); MovRR (BP,SP); AddC (4,BP,Ptr (1,Byte));
+ Call "printf"; SubC (4,SP,Ptr (3,Byte)); PopRealRs; MovRR (R 0,R 1);
+ MovMR (Lbl ("$$static_var_0",Int),R 0); MovRR (SP,BP); Ret]

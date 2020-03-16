@@ -1,0 +1,11 @@
+GlobalParse
+  [Declare ("count",Int); Declare ("write_extern",Function2 Void);
+   Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [Assign
+              (V (Var ("count",T (0,Value is not created.))),V (Lit ("5",Int)));
+            Apply (V (Var ("write_extern",T (0,Value is not created.))),[])]))]

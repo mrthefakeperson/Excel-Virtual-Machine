@@ -1,0 +1,10 @@
+"Function2 Int main
+main = Int fn() {
+  Ptr (TypeDef (Alias "FILE")) fp;
+  fp = fopen("/tmp/test.txt", "w+");
+  fprintf(fp, "This is testing for fprintf...
+  ");
+  fputs("This is testing for fputs...
+  ", fp);
+  fclose(fp);
+}"

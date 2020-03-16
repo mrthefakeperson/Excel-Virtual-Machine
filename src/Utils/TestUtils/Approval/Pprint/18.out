@@ -1,0 +1,14 @@
+"Function2 Int main
+main = Int fn() {
+  TypeDef (Array (1,Byte)) greeting;
+  greeting = \stack_alloc(6);
+  *prefix(+(greeting, 0)) = 72;
+  *prefix(+(greeting, 1)) = 101;
+  *prefix(+(greeting, 2)) = 108;
+  *prefix(+(greeting, 3)) = 108;
+  *prefix(+(greeting, 4)) = 111;
+  *prefix(+(greeting, 5)) = 0;
+  printf("Greeting message: %s
+  ", greeting);
+  return 0;
+}"

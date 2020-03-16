@@ -1,0 +1,37 @@
+GlobalParse
+  [Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [Declare ("var1",Int); Declare ("var2",TypeDef (Array (1,Byte)));
+            Assign
+              (V (Var ("var2",TypeDef (Array (1,Byte)))),
+               Apply
+                 (V (Var
+                       ("\stack_alloc",Function ([Int],TypeDef (Array (1,Byte))))),
+                  [V (Lit ("10",Int))]));
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Address of var1 variable: %x
+"",Ptr Byte));
+                Apply
+                  (V (Var
+                        ("&prefix",
+                         Function
+                           ([T (0,Value is not created.)],
+                            Ptr (T (0,Value is not created.))))),
+                   [V (Var ("var1",T (0,Value is not created.)))])]);
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Address of var2 variable: %x
+"",Ptr Byte));
+                Apply
+                  (V (Var
+                        ("&prefix",
+                         Function
+                           ([T (0,Value is not created.)],
+                            Ptr (T (0,Value is not created.))))),
+                   [V (Var ("var2",T (0,Value is not created.)))])]);
+            Return (V (Lit ("0",Int)))]))]

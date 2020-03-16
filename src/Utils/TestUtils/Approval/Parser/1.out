@@ -1,0 +1,12 @@
+GlobalParse
+  [Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Hello, World! 
+"",Ptr Byte))]);
+            Return (V (Lit ("0",Int)))]))]

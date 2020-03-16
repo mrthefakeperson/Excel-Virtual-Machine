@@ -1,0 +1,26 @@
+"Function ([Int; Int],Int) sum
+Int a
+a = 20
+Function2 Int main
+main = Int fn() {
+  Int a;
+  a = 10;
+  Int b;
+  b = 20;
+  Int c;
+  c = 0;
+  printf("value of a in main() = %d
+  ", a);
+  c = sum(a, b);
+  printf("value of c in main() = %d
+  ", c);
+  return 0;
+}
+Function ([Int; Int],Int) sum
+sum = Int fn(Int a, Int b) {
+  printf("value of a in sum() = %d
+  ", a);
+  printf("value of b in sum() = %d
+  ", b);
+  return +(a, b);
+}"

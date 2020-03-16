@@ -1,0 +1,19 @@
+"TypeDef
+  (DeclUnion
+     ("Data",
+      [StructField ("i",Int,0,4); StructField ("f",Float,0,4);
+       StructField ("str",TypeDef (Array (1,Byte)),0,20)])) ?
+Function2 Int main
+main = Int fn() {
+  TypeDef (Union "Data") data;
+  .(data, i) = 10;
+  printf("data.i : %d
+  ", .(data, i));
+  .(data, f) = 220.5;
+  printf("data.f : %f
+  ", .(data, f));
+  strcpy(.(data, str), "C Programming");
+  printf("data.str : %s
+  ", .(data, str));
+  return 0;
+}"

@@ -1,0 +1,122 @@
+GlobalParse
+  [Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [Declare ("n",TypeDef (Array (1,Int)));
+            Assign
+              (V (Var ("n",TypeDef (Array (1,Int)))),
+               Apply
+                 (V (Var
+                       ("\stack_alloc",Function ([Int],TypeDef (Array (1,Int))))),
+                  [V (Lit ("10",Int))])); Declare ("i",Int); Declare ("j",Int);
+            Block
+              [Assign
+                 (V (Var ("i",T (0,Value is not created.))),V (Lit ("0",Int)));
+               While
+                 (Apply
+                    (V (Var
+                          ("<",
+                           Function
+                             ([T (0,Value is not created.);
+                               T (0,Value is not created.)],Byte))),
+                     [V (Var ("i",T (0,Value is not created.)));
+                      V (Lit ("10",Int))]),
+                  Block
+                    [Assign
+                       (Apply
+                          (V (Var
+                                ("*prefix",
+                                 Function
+                                   ([Ptr (T (0,Value is not created.))],
+                                    T (0,Value is not created.)))),
+                           [Apply
+                              (V (Var
+                                    ("+",
+                                     Function
+                                       ([T (0,Value is not created.);
+                                         T (0,Value is not created.)],
+                                        T (0,Value is not created.)))),
+                               [V (Var ("n",T (0,Value is not created.)));
+                                V (Var ("i",T (0,Value is not created.)))])]),
+                        Apply
+                          (V (Var
+                                ("+",
+                                 Function
+                                   ([T (0,Value is not created.);
+                                     T (0,Value is not created.)],
+                                    T (0,Value is not created.)))),
+                           [V (Var ("i",T (0,Value is not created.)));
+                            V (Lit ("100",Int))]));
+                     Apply
+                       (V (Var
+                             ("-",
+                              Function
+                                ([T (0,Value is not created.);
+                                  T (0,Value is not created.)],
+                                 T (0,Value is not created.)))),
+                        [Assign
+                           (V (Var ("i",T (0,Value is not created.))),
+                            Apply
+                              (V (Var
+                                    ("+",
+                                     Function
+                                       ([T (0,Value is not created.);
+                                         T (0,Value is not created.)],
+                                        T (0,Value is not created.)))),
+                               [V (Var ("i",T (0,Value is not created.)));
+                                V (Lit ("1",Int))])); V (Lit ("1",Int))])])];
+            Block
+              [Assign
+                 (V (Var ("j",T (0,Value is not created.))),V (Lit ("0",Int)));
+               While
+                 (Apply
+                    (V (Var
+                          ("<",
+                           Function
+                             ([T (0,Value is not created.);
+                               T (0,Value is not created.)],Byte))),
+                     [V (Var ("j",T (0,Value is not created.)));
+                      V (Lit ("10",Int))]),
+                  Block
+                    [Apply
+                       (V (Var ("printf",T (0,Value is not created.))),
+                        [V (Lit (""Element[%d] = %d
+"",Ptr Byte));
+                         V (Var ("j",T (0,Value is not created.)));
+                         Apply
+                           (V (Var
+                                 ("*prefix",
+                                  Function
+                                    ([Ptr (T (0,Value is not created.))],
+                                     T (0,Value is not created.)))),
+                            [Apply
+                               (V (Var
+                                     ("+",
+                                      Function
+                                        ([T (0,Value is not created.);
+                                          T (0,Value is not created.)],
+                                         T (0,Value is not created.)))),
+                                [V (Var ("n",T (0,Value is not created.)));
+                                 V (Var ("j",T (0,Value is not created.)))])])]);
+                     Apply
+                       (V (Var
+                             ("-",
+                              Function
+                                ([T (0,Value is not created.);
+                                  T (0,Value is not created.)],
+                                 T (0,Value is not created.)))),
+                        [Assign
+                           (V (Var ("j",T (0,Value is not created.))),
+                            Apply
+                              (V (Var
+                                    ("+",
+                                     Function
+                                       ([T (0,Value is not created.);
+                                         T (0,Value is not created.)],
+                                        T (0,Value is not created.)))),
+                               [V (Var ("j",T (0,Value is not created.)));
+                                V (Lit ("1",Int))])); V (Lit ("1",Int))])])];
+            Return (V (Lit ("0",Int)))]))]

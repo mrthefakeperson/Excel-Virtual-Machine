@@ -1,0 +1,12 @@
+"TypeDef
+  (DeclUnion
+     ("Data",
+      [StructField ("i",Int,0,4); StructField ("f",Float,0,4);
+       StructField ("str",TypeDef (Array (1,Byte)),0,20)])) ?
+Function2 Int main
+main = Int fn() {
+  TypeDef (Union "Data") data;
+  printf("Memory size occupied by data : %d
+  ", sizeof(data));
+  return 0;
+}"

@@ -1,0 +1,15 @@
+GlobalParse
+  [Declare ("g",Int); Assign (V (Var ("g",Int)),V (Lit ("20",Int)));
+   Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [Declare ("g",Int); Assign (V (Var ("g",Int)),V (Lit ("10",Int)));
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""value of g = %d
+"",Ptr Byte));
+                V (Var ("g",T (0,Value is not created.)))]);
+            Return (V (Lit ("0",Int)))]))]

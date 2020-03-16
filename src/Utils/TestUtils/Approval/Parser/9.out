@@ -1,0 +1,47 @@
+GlobalParse
+  [Declare ("max",Function ([Int; Int],Int)); Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [Declare ("a",Int); Assign (V (Var ("a",Int)),V (Lit ("100",Int)));
+            Declare ("b",Int); Assign (V (Var ("b",Int)),V (Lit ("200",Int)));
+            Declare ("ret",Int);
+            Assign
+              (V (Var ("ret",T (0,Value is not created.))),
+               Apply
+                 (V (Var ("max",T (0,Value is not created.))),
+                  [V (Var ("a",T (0,Value is not created.)));
+                   V (Var ("b",T (0,Value is not created.)))]));
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Max value is : %d
+"",Ptr Byte));
+                V (Var ("ret",T (0,Value is not created.)))]);
+            Return (V (Lit ("0",Int)))]));
+   Declare ("max",Function ([Int; Int],Int));
+   Assign
+     (V (Var ("max",Function ([Int; Int],Int))),
+      Function
+        (Int,[("num1", Int); ("num2", Int)],
+         Block
+           [Declare ("result",Int);
+            If
+              (Apply
+                 (V (Var
+                       (">",
+                        Function
+                          ([T (0,Value is not created.);
+                            T (0,Value is not created.)],Byte))),
+                  [V (Var ("num1",T (0,Value is not created.)));
+                   V (Var ("num2",T (0,Value is not created.)))]),
+               Block
+                 [Assign
+                    (V (Var ("result",T (0,Value is not created.))),
+                     V (Var ("num1",T (0,Value is not created.))))],
+               Block
+                 [Assign
+                    (V (Var ("result",T (0,Value is not created.))),
+                     V (Var ("num2",T (0,Value is not created.))))]);
+            Return (V (Var ("result",T (0,Value is not created.))))]))]

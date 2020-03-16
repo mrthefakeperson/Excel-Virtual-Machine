@@ -1,0 +1,22 @@
+"Function ([],Void) func
+Int count
+\get_static(count, {
+  count = 5;
+})
+Function2 Int main
+main = Int fn() {
+  while (+(count = -(count, 1), 1)) {
+    func();
+  };
+  return 0;
+}
+Function ([],Void) func
+func = Void fn() {
+  Int i;
+  \get_static(i, {
+    i = 5;
+  });
+  -(i = +(i, 1), 1);
+  printf("i is %d and count is %d
+  ", i, count);
+}"

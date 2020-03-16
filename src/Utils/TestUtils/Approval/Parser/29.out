@@ -1,0 +1,22 @@
+GlobalParse
+  [Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [Declare ("c",Int);
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Enter a value :"",Ptr Byte))]);
+            Assign
+              (V (Var ("c",T (0,Value is not created.))),
+               Apply (V (Var ("getchar",T (0,Value is not created.))),[]));
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""
+You entered: "",Ptr Byte))]);
+            Apply
+              (V (Var ("putchar",T (0,Value is not created.))),
+               [V (Var ("c",T (0,Value is not created.)))]);
+            Return (V (Lit ("0",Int)))]))]

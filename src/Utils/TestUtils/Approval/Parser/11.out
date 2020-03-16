@@ -1,0 +1,31 @@
+GlobalParse
+  [Declare ("g",Int); Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [Declare ("a",Int); Declare ("b",Int);
+            Assign
+              (V (Var ("a",T (0,Value is not created.))),V (Lit ("10",Int)));
+            Assign
+              (V (Var ("b",T (0,Value is not created.))),V (Lit ("20",Int)));
+            Assign
+              (V (Var ("g",T (0,Value is not created.))),
+               Apply
+                 (V (Var
+                       ("+",
+                        Function
+                          ([T (0,Value is not created.);
+                            T (0,Value is not created.)],
+                           T (0,Value is not created.)))),
+                  [V (Var ("a",T (0,Value is not created.)));
+                   V (Var ("b",T (0,Value is not created.)))]));
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""value of a = %d, b = %d and g = %d
+"",Ptr Byte));
+                V (Var ("a",T (0,Value is not created.)));
+                V (Var ("b",T (0,Value is not created.)));
+                V (Var ("g",T (0,Value is not created.)))]);
+            Return (V (Lit ("0",Int)))]))]

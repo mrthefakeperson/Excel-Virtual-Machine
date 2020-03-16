@@ -1,0 +1,7 @@
+"Int count
+Function2 Void write_extern
+Function2 Int main
+main = Int fn() {
+  count = Int 5;
+  write_extern();
+}"

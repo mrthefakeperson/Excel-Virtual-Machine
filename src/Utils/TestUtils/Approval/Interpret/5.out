@@ -1,0 +1,12 @@
+(Int 0,
+ "i is %d and count is %d
+ (fmt [Int 6; Int 4])
+i is %d and count is %d
+ (fmt [Int 7; Int 3])
+i is %d and count is %d
+ (fmt [Int 8; Int 2])
+i is %d and count is %d
+ (fmt [Int 9; Int 1])
+i is %d and count is %d
+ (fmt [Int 10; Int 0])
+")

@@ -1,0 +1,6 @@
+"Function2 Int main
+main = Int fn() {
+  printf("Storage size for int : %d 
+  ", sizeof(int));
+  return 0;
+}"

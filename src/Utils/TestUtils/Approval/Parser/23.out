@@ -1,0 +1,23 @@
+GlobalParse
+  [Declare
+     ("?",
+      TypeDef
+        (DeclUnion
+           ("Data",
+            [StructField ("i",Int,0,4); StructField ("f",Float,0,4);
+             StructField ("str",TypeDef (Array (1,Byte)),0,20)])));
+   Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [Declare ("data",TypeDef (Union "Data"));
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Memory size occupied by data : %d
+"",Ptr Byte));
+                Apply
+                  (V (Var ("sizeof",T (0,Value is not created.))),
+                   [V (Var ("data",T (0,Value is not created.)))])]);
+            Return (V (Lit ("0",Int)))]))]

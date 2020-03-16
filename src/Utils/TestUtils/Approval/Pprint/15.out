@@ -1,0 +1,11 @@
+"Function2 Int main
+main = Int fn() {
+  Int var1;
+  TypeDef (Array (1,Byte)) var2;
+  var2 = \stack_alloc(10);
+  printf("Address of var1 variable: %x
+  ", &prefix(var1));
+  printf("Address of var2 variable: %x
+  ", &prefix(var2));
+  return 0;
+}"

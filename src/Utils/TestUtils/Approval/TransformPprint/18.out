@@ -1,0 +1,37 @@
+"Ptr Byte $47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a
+$47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a = \stack_alloc(Int 22)
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 0)))) = Byte 71uy
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 1)))) = Byte 114uy
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 2)))) = Byte 101uy
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 3)))) = Byte 101uy
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 4)))) = Byte 116uy
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 5)))) = Byte 105uy
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 6)))) = Byte 110uy
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 7)))) = Byte 103uy
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 8)))) = Byte 32uy
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 9)))) = Byte 109uy
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 10)))) = Byte 101uy
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 11)))) = Byte 115uy
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 12)))) = Byte 115uy
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 13)))) = Byte 97uy
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 14)))) = Byte 103uy
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 15)))) = Byte 101uy
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 16)))) = Byte 58uy
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 17)))) = Byte 32uy
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 18)))) = Byte 37uy
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 19)))) = Byte 115uy
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 20)))) = Byte 10uy
+*prefix(+($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, *(Ptr (1,Byte), \cast(Int 21)))) = Byte 0uy
+Function2 Int main
+main = Int fn() {
+  Ptr Byte greeting;
+  greeting = \stack_alloc(Int 6);
+  *prefix(+(greeting, *(Ptr (1,Byte), \cast(Int 0)))) = Byte 72uy;
+  *prefix(+(greeting, *(Ptr (1,Byte), \cast(Int 1)))) = Byte 101uy;
+  *prefix(+(greeting, *(Ptr (1,Byte), \cast(Int 2)))) = Byte 108uy;
+  *prefix(+(greeting, *(Ptr (1,Byte), \cast(Int 3)))) = Byte 108uy;
+  *prefix(+(greeting, *(Ptr (1,Byte), \cast(Int 4)))) = Byte 111uy;
+  *prefix(+(greeting, *(Ptr (1,Byte), \cast(Int 5)))) = Byte 0uy;
+  printf($47_72_65_65_74_69_6e_67_20_6d_65_73_73_61_67_65_3a_20_25_73_a, greeting);
+  return Int 0;
+}"

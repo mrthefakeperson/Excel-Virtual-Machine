@@ -1,0 +1,58 @@
+GlobalParse
+  [Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [Declare ("fp",Ptr (TypeDef (Alias "FILE")));
+            Declare ("buff",TypeDef (Array (1,Byte)));
+            Assign
+              (V (Var ("buff",TypeDef (Array (1,Byte)))),
+               Apply
+                 (V (Var
+                       ("\stack_alloc",Function ([Int],TypeDef (Array (1,Byte))))),
+                  [V (Lit ("255",Int))]));
+            Assign
+              (V (Var ("fp",T (0,Value is not created.))),
+               Apply
+                 (V (Var ("fopen",T (0,Value is not created.))),
+                  [V (Lit (""/tmp/test.txt"",Ptr Byte));
+                   V (Lit (""r"",Ptr Byte))]));
+            Apply
+              (V (Var ("fscanf",T (0,Value is not created.))),
+               [V (Var ("fp",T (0,Value is not created.)));
+                V (Lit (""%s"",Ptr Byte));
+                V (Var ("buff",T (0,Value is not created.)))]);
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""1 : %s
+"",Ptr Byte));
+                V (Var ("buff",T (0,Value is not created.)))]);
+            Apply
+              (V (Var ("fgets",T (0,Value is not created.))),
+               [V (Var ("buff",T (0,Value is not created.)));
+                V (Lit ("255",Int));
+                Apply
+                  (V (Var ("\cast",Ptr (TypeDef (Alias "FILE")))),
+                   [V (Var ("fp",T (0,Value is not created.)))])]);
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""2: %s
+"",Ptr Byte));
+                V (Var ("buff",T (0,Value is not created.)))]);
+            Apply
+              (V (Var ("fgets",T (0,Value is not created.))),
+               [V (Var ("buff",T (0,Value is not created.)));
+                V (Lit ("255",Int));
+                Apply
+                  (V (Var ("\cast",Ptr (TypeDef (Alias "FILE")))),
+                   [V (Var ("fp",T (0,Value is not created.)))])]);
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""3: %s
+"",Ptr Byte));
+                V (Var ("buff",T (0,Value is not created.)))]);
+            Apply
+              (V (Var ("fclose",T (0,Value is not created.))),
+               [V (Var ("fp",T (0,Value is not created.)))])]))]

@@ -1,0 +1,78 @@
+GlobalParse
+  [Declare
+     ("?",
+      TypeDef
+        (DeclStruct
+           ("Books",
+            [StructField ("title",TypeDef (Array (1,Byte)),0,50);
+             StructField ("author",TypeDef (Array (1,Byte)),400,50);
+             StructField ("subject",TypeDef (Array (1,Byte)),800,100);
+             StructField ("book_id",Int,1600,4)])));
+   Declare ("?",TypeDef (DeclAlias ("Book",TypeDef (Struct "Books"))));
+   Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [Declare ("book",TypeDef (Alias "Book"));
+            Apply
+              (V (Var ("strcpy",T (0,Value is not created.))),
+               [Apply
+                  (V (Var (".",T (0,Value is not created.))),
+                   [V (Var ("book",T (0,Value is not created.)));
+                    V (Var ("title",T (0,Value is not created.)))]);
+                V (Lit (""C Programming"",Ptr Byte))]);
+            Apply
+              (V (Var ("strcpy",T (0,Value is not created.))),
+               [Apply
+                  (V (Var (".",T (0,Value is not created.))),
+                   [V (Var ("book",T (0,Value is not created.)));
+                    V (Var ("author",T (0,Value is not created.)))]);
+                V (Lit (""Nuha Ali"",Ptr Byte))]);
+            Apply
+              (V (Var ("strcpy",T (0,Value is not created.))),
+               [Apply
+                  (V (Var (".",T (0,Value is not created.))),
+                   [V (Var ("book",T (0,Value is not created.)));
+                    V (Var ("subject",T (0,Value is not created.)))]);
+                V (Lit (""C Programming Tutorial"",Ptr Byte))]);
+            Assign
+              (Apply
+                 (V (Var (".",T (0,Value is not created.))),
+                  [V (Var ("book",T (0,Value is not created.)));
+                   V (Var ("book_id",T (0,Value is not created.)))]),
+               V (Lit ("6495407",Int)));
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Book title : %s
+"",Ptr Byte));
+                Apply
+                  (V (Var (".",T (0,Value is not created.))),
+                   [V (Var ("book",T (0,Value is not created.)));
+                    V (Var ("title",T (0,Value is not created.)))])]);
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Book author : %s
+"",Ptr Byte));
+                Apply
+                  (V (Var (".",T (0,Value is not created.))),
+                   [V (Var ("book",T (0,Value is not created.)));
+                    V (Var ("author",T (0,Value is not created.)))])]);
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Book subject : %s
+"",Ptr Byte));
+                Apply
+                  (V (Var (".",T (0,Value is not created.))),
+                   [V (Var ("book",T (0,Value is not created.)));
+                    V (Var ("subject",T (0,Value is not created.)))])]);
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Book book_id : %d
+"",Ptr Byte));
+                Apply
+                  (V (Var (".",T (0,Value is not created.))),
+                   [V (Var ("book",T (0,Value is not created.)));
+                    V (Var ("book_id",T (0,Value is not created.)))])]);
+            Return (V (Lit ("0",Int)))]))]

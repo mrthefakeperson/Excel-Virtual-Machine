@@ -1,0 +1,16 @@
+GlobalParse
+  [Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [Block
+              [While
+                 (V (Lit ("1",Byte)),
+                  Block
+                    [Apply
+                       (V (Var ("printf",T (0,Value is not created.))),
+                        [V (Lit (""This loop will run forever.
+"",Ptr Byte))]);
+                     V (Lit ("",Void))])]; Return (V (Lit ("0",Int)))]))]

@@ -1,0 +1,16 @@
+"TypeDef (DeclStruct ("_anon", [StructField ("age",Int,3,4)])) Age
+Function2 Int main
+main = Int fn() {
+  .(Age, age) = 4;
+  printf("Sizeof( Age ) : %d
+  ", sizeof(Age));
+  printf("Age.age : %d
+  ", .(Age, age));
+  .(Age, age) = 7;
+  printf("Age.age : %d
+  ", .(Age, age));
+  .(Age, age) = 8;
+  printf("Age.age : %d
+  ", .(Age, age));
+  return 0;
+}"

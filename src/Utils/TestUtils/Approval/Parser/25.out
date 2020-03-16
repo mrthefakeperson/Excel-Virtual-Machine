@@ -1,0 +1,36 @@
+GlobalParse
+  [Declare
+     ("status1",
+      TypeDef
+        (DeclStruct
+           ("_anon",
+            [StructField ("widthValidated",Int,0,4);
+             StructField ("heightValidated",Int,32,4)])));
+   Declare
+     ("status2",
+      TypeDef
+        (DeclStruct
+           ("_anon",
+            [StructField ("widthValidated",Int,1,4);
+             StructField ("heightValidated",Int,1,4)])));
+   Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Memory size occupied by status1 : %d
+"",Ptr Byte));
+                Apply
+                  (V (Var ("sizeof",T (0,Value is not created.))),
+                   [V (Var ("status1",T (0,Value is not created.)))])]);
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Memory size occupied by status2 : %d
+"",Ptr Byte));
+                Apply
+                  (V (Var ("sizeof",T (0,Value is not created.))),
+                   [V (Var ("status2",T (0,Value is not created.)))])]);
+            Return (V (Lit ("0",Int)))]))]

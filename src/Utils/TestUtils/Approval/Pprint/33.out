@@ -1,0 +1,17 @@
+"Function2 Int main
+main = Int fn() {
+  Ptr (TypeDef (Alias "FILE")) fp;
+  TypeDef (Array (1,Byte)) buff;
+  buff = \stack_alloc(255);
+  fp = fopen("/tmp/test.txt", "r");
+  fscanf(fp, "%s", buff);
+  printf("1 : %s
+  ", buff);
+  fgets(buff, 255, \cast(fp));
+  printf("2: %s
+  ", buff);
+  fgets(buff, 255, \cast(fp));
+  printf("3: %s
+  ", buff);
+  fclose(fp);
+}"

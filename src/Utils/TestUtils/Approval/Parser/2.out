@@ -1,0 +1,15 @@
+GlobalParse
+  [Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Storage size for int : %d 
+"",Ptr Byte));
+                Apply
+                  (V (Var ("sizeof",T (0,Value is not created.))),
+                   [V (Var ("int",T (0,Value is not created.)))])]);
+            Return (V (Lit ("0",Int)))]))]

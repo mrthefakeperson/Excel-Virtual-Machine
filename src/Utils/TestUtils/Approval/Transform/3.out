@@ -1,0 +1,518 @@
+GlobalParse
+  [Declare ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",Ptr Byte);
+   Assign
+     (V (Var
+           ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",
+            Global (Ptr Byte))),
+      Apply
+        (V (Var ("\stack_alloc",Global (Function ([Int],Ptr Byte)))),
+         [V (Lit (Int 18))]));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 0))])])])]),
+      V (Lit (Byte 118uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 1))])])])]),
+      V (Lit (Byte 97uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 2))])])])]),
+      V (Lit (Byte 108uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 3))])])])]),
+      V (Lit (Byte 117uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 4))])])])]),
+      V (Lit (Byte 101uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 5))])])])]),
+      V (Lit (Byte 32uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 6))])])])]),
+      V (Lit (Byte 111uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 7))])])])]),
+      V (Lit (Byte 102uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 8))])])])]),
+      V (Lit (Byte 32uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 9))])])])]),
+      V (Lit (Byte 99uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 10))])])])]),
+      V (Lit (Byte 32uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 11))])])])]),
+      V (Lit (Byte 58uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 12))])])])]),
+      V (Lit (Byte 32uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 13))])])])]),
+      V (Lit (Byte 37uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 14))])])])]),
+      V (Lit (Byte 100uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 15))])])])]),
+      V (Lit (Byte 32uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 16))])])])]),
+      V (Lit (Byte 10uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 17))])])])]),
+      V (Lit (Byte 0uy)));
+   Declare ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",Ptr Byte);
+   Assign
+     (V (Var
+           ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",
+            Global (Ptr Byte))),
+      Apply
+        (V (Var ("\stack_alloc",Global (Function ([Int],Ptr Byte)))),
+         [V (Lit (Int 18))]));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 0))])])])]),
+      V (Lit (Byte 118uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 1))])])])]),
+      V (Lit (Byte 97uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 2))])])])]),
+      V (Lit (Byte 108uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 3))])])])]),
+      V (Lit (Byte 117uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 4))])])])]),
+      V (Lit (Byte 101uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 5))])])])]),
+      V (Lit (Byte 32uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 6))])])])]),
+      V (Lit (Byte 111uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 7))])])])]),
+      V (Lit (Byte 102uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 8))])])])]),
+      V (Lit (Byte 32uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 9))])])])]),
+      V (Lit (Byte 102uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 10))])])])]),
+      V (Lit (Byte 32uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 11))])])])]),
+      V (Lit (Byte 58uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 12))])])])]),
+      V (Lit (Byte 32uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 13))])])])]),
+      V (Lit (Byte 37uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 14))])])])]),
+      V (Lit (Byte 102uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 15))])])])]),
+      V (Lit (Byte 32uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 16))])])])]),
+      V (Lit (Byte 10uy)));
+   Assign
+     (Apply
+        (V (Var ("*prefix",Global (Function ([Ptr Byte],Byte)))),
+         [Apply
+            (V (Var ("+",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+             [V (Var
+                   ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",
+                    Global (Ptr Byte)));
+              Apply
+                (V (Var ("*",Global (Function ([Ptr Byte; Ptr Byte],Ptr Byte)))),
+                 [V (Lit (Ptr (1,Byte)));
+                  Apply (V (Var ("\cast",Global (Ptr Byte))),[V (Lit (Int 17))])])])]),
+      V (Lit (Byte 0uy))); Declare ("a",Int); Declare ("b",Int);
+   Declare ("c",Int); Declare ("f",Float); Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Global (Function2 Int))),
+      Function
+        (Int,[],
+         Block
+           [Declare ("a",Int); Declare ("b",Int); Declare ("c",Int);
+            Declare ("f",Float);
+            Assign (V (Var ("a",Local (1,Int))),V (Lit (Int 10)));
+            Assign (V (Var ("b",Local (2,Int))),V (Lit (Int 20)));
+            Assign
+              (V (Var ("c",Local (3,Int))),
+               Apply
+                 (V (Var ("+",Global (Function ([Int; Int],Int)))),
+                  [V (Var ("a",Local (1,Int))); V (Var ("b",Local (2,Int)))]));
+            Apply
+              (V (Var ("printf",Global (Function2 Void))),
+               [V (Var
+                     ("$76_61_6c_75_65_20_6f_66_20_63_20_3a_20_25_64_20_a",
+                      Global (Ptr Byte))); V (Var ("c",Local (3,Int)))]);
+            Assign
+              (V (Var ("f",Local (4,Float))),
+               Apply
+                 (V (Var ("\cast",Global Float)),
+                  [Apply
+                     (V (Var ("/",Global (Function ([Double; Double],Double)))),
+                      [V (Lit (Double 70.0)); V (Lit (Double 3.0))])]));
+            Apply
+              (V (Var ("printf",Global (Function2 Void))),
+               [V (Var
+                     ("$76_61_6c_75_65_20_6f_66_20_66_20_3a_20_25_66_20_a",
+                      Global (Ptr Byte))); V (Var ("f",Local (4,Float)))]);
+            Return (V (Lit (Int 0)))]))]

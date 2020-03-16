@@ -1,0 +1,58 @@
+GlobalParse
+  [Declare ("Age",TypeDef (DeclStruct ("_anon", [StructField ("age",Int,3,4)])));
+   Declare ("main",Function2 Int);
+   Assign
+     (V (Var ("main",Function2 Int)),
+      Function
+        (Int,[],
+         Block
+           [Assign
+              (Apply
+                 (V (Var (".",T (0,Value is not created.))),
+                  [V (Var ("Age",T (0,Value is not created.)));
+                   V (Var ("age",T (0,Value is not created.)))]),
+               V (Lit ("4",Int)));
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Sizeof( Age ) : %d
+"",Ptr Byte));
+                Apply
+                  (V (Var ("sizeof",T (0,Value is not created.))),
+                   [V (Var ("Age",T (0,Value is not created.)))])]);
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Age.age : %d
+"",Ptr Byte));
+                Apply
+                  (V (Var (".",T (0,Value is not created.))),
+                   [V (Var ("Age",T (0,Value is not created.)));
+                    V (Var ("age",T (0,Value is not created.)))])]);
+            Assign
+              (Apply
+                 (V (Var (".",T (0,Value is not created.))),
+                  [V (Var ("Age",T (0,Value is not created.)));
+                   V (Var ("age",T (0,Value is not created.)))]),
+               V (Lit ("7",Int)));
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Age.age : %d
+"",Ptr Byte));
+                Apply
+                  (V (Var (".",T (0,Value is not created.))),
+                   [V (Var ("Age",T (0,Value is not created.)));
+                    V (Var ("age",T (0,Value is not created.)))])]);
+            Assign
+              (Apply
+                 (V (Var (".",T (0,Value is not created.))),
+                  [V (Var ("Age",T (0,Value is not created.)));
+                   V (Var ("age",T (0,Value is not created.)))]),
+               V (Lit ("8",Int)));
+            Apply
+              (V (Var ("printf",T (0,Value is not created.))),
+               [V (Lit (""Age.age : %d
+"",Ptr Byte));
+                Apply
+                  (V (Var (".",T (0,Value is not created.))),
+                   [V (Var ("Age",T (0,Value is not created.)));
+                    V (Var ("age",T (0,Value is not created.)))])]);
+            Return (V (Lit ("0",Int)))]))]
