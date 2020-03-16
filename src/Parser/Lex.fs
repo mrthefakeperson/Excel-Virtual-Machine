@@ -24,9 +24,12 @@ type SrcCode = {src : string}
 
 let comment: Rule<SrcCode, string> = %%COMMENT_LINE |/ %%COMMENT_BLOCK
 let garbage = OptionalListOf (comment |/ %%WHITESPACE) ->/ List.sumBy String.length
-let lexeme tkn (rule: Rule<SrcCode, Value>) : Rule<SrcCode, Token> = fun err input ->
-  (garbage +/ rule) ->/ fun (spaces, res) -> {tkn with value = res; col = -input.src.Length + spaces}
-   <| err <| input
+let lexeme tkn (rule: Rule<SrcCode, Value>) : Rule<SrcCode, Token> =
+  lazy
+    fun err input ->
+      let lex_rule =
+        (garbage +/ rule) ->/ fun (spaces, res) -> {tkn with value = res; col = -input.src.Length + spaces}
+      lex_rule.Force() err input
 
 let token_null = OneOf [!"null"; !"Null"; !"NULL"] ->/ fun () -> Lit("0", Ptr Void)
 
@@ -86,7 +89,7 @@ let preprocess = %%PREPROCESSOR_LINE ->/ fun name -> Lit(name, DT.Void)
 let parse_tokens tkn : Rule<SrcCode, Token list> =
   let parse_token =
     OneOf [token_null; token_num; token_var; token_string; token_char; token_symbol; preprocess]
-  OptionalListOf (lexeme tkn parse_token) +/ (garbage +/ End) ->/ fst
+  OptionalListOf (lexeme tkn parse_token) +/ (garbage +/ lazy End) ->/ fst
 
 let rec tokenize filename (s: string) : Token list =
   let array_rc = Array.create s.Length (0, 0)

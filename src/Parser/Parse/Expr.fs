@@ -75,77 +75,82 @@ let datatype: DT Rule =
     _var ->/ fun (Var(t, _) | Strict t) -> TypeDef (Alias t)
    ]
 
-let rec expr() : AST Rule =
-  let apply_and_index_expr = SequenceOf {
-    let! v = V <-/ basic_value |/ bracketed
-    let! result =
-      FoldListOf (fun acc ->
-        !"(" +/ arg_list +/ !")" ->/ fun parsed -> Apply(acc, middle parsed)
-         |/ square_bracketed ->/ fun i -> BuiltinASTs.index acc i
-       ) v
-    return result
-   }
-  let cast_expr =
-    SequenceOf {
-      do! !"("
-      let! dt = datatype
-      let! ptrs = OptionalListOf !"*"
-      do! !")"
-      let dt = List.fold (fun acc _ -> Ptr acc) dt ptrs
-      let! x = apply_and_index_expr
-      return BuiltinASTs.cast dt x
-     }
-     |/ apply_and_index_expr
-  let op1 v op = Apply'.fn2(op, Types.f_arith_infix) v (V(Lit("1", Int)))
-  let prefixed_expr =
-    FoldBackListOf (fun (Var(s, _) | Strict s as pref) (var, ast) ->
-      match s with
-      |"++" -> (var, Assign(var, op1 ast "+"))
-      |"--" -> (var, Assign(var, op1 ast "-"))
-      |"-prefix" -> (var, Apply'.fn2 "*" ast (V(Lit("-1", Int))))
-      |_ -> (var, Apply(V pref, [ast]))
-     ) prefix (cast_expr ->/ fun e -> (e, e))
-  let suffixed_expr = SequenceOf {
-    let! pref = prefixed_expr
-    let! (_, result) =
-      FoldListOf (fun (var, acc) ->
-        suffix ->/ function
-          |Var("++suffix", _) -> (var, op1 (Assign(var, op1 acc "+")) "-")
-          |Var("--suffix", _) -> (var, op1 (Assign(var, op1 acc "-")) "+")
-          |suf -> (var, Apply(V suf, [acc]))
-       ) pref
-    return result
-   }
-  let infix_expr =
-    let wrap_infix_rule oprule opndrule = SequenceOf {
-      let! opnd = opndrule
-      let! applys = OptionalListOf (oprule +/ opndrule)
-      return List.fold (fun acc (op, opnd) -> Apply(V op, [acc; opnd])) opnd applys
-     }
-    wrap_infix_rule access_operator suffixed_expr
-     |> wrap_infix_rule math_infix_1
-     |> wrap_infix_rule math_infix_2
-     |> wrap_infix_rule comparison
-     |> wrap_infix_rule logic_infix
-  let ternary_expr = SequenceOf {
-    let! cond = infix_expr
-    match! Optional !"?" with
-    |None -> return cond
-    |Some _ ->
-      let! thn = infix_expr
-      do! !":"
-      let! els = infix_expr
-      return If(cond, thn, els)
-   }
-  let assignment_expr =
-    FoldBackListOf (fun (left, assign) right ->
-      match assign with
-      |Var("=", _) -> Assign(left, right)
-      |Var(Regex "^(\+=|-=|\*=|/=|&=|\|=)$" _ as s, _) ->
-        Assign(left, Apply'.fn2(s.[..0], Types.f_arith_infix) left right)
-      |Strict x -> x
-     ) (ternary_expr +/ assignment) ternary_expr
-  assignment_expr
-and bracketed: AST Rule = !"(" +/ expr() +/ !")" ->/ middle
-and square_bracketed: AST Rule = !"[" +/ expr() +/ !"]" ->/ middle
-and arg_list: AST list Rule = Option.defaultValue [] <-/ Optional (JoinedListOf (expr()) !",")
+let rec expr' : AST Rule =
+  lazy
+    fun err input ->
+      let apply_and_index_expr = SequenceOf {
+        let! v = V <-/ basic_value |/ bracketed
+        let! result =
+          FoldListOf (fun acc ->
+            !"(" +/ arg_list +/ !")" ->/ fun parsed -> Apply(acc, middle parsed)
+             |/ square_bracketed ->/ fun i -> BuiltinASTs.index acc i
+           ) v
+        return result
+       }
+      let cast_expr =
+        SequenceOf {
+          do! !"("
+          let! dt = datatype
+          let! ptrs = OptionalListOf !"*"
+          do! !")"
+          let dt = List.fold (fun acc _ -> Ptr acc) dt ptrs
+          let! x = apply_and_index_expr
+          return BuiltinASTs.cast dt x
+         }
+         |/ apply_and_index_expr
+      let op1 v op = Apply'.fn2(op, Types.f_arith_infix) v (V(Lit("1", Int)))
+      let prefixed_expr =
+        FoldBackListOf (fun (Var(s, _) | Strict s as pref) (var, ast) ->
+          match s with
+          |"++" -> (var, Assign(var, op1 ast "+"))
+          |"--" -> (var, Assign(var, op1 ast "-"))
+          |"-prefix" -> (var, Apply'.fn2 "*" ast (V(Lit("-1", Int))))
+          |_ -> (var, Apply(V pref, [ast]))
+         ) prefix (cast_expr ->/ fun e -> (e, e))
+      let suffixed_expr = SequenceOf {
+        let! pref = prefixed_expr
+        let! (_, result) =
+          FoldListOf (fun (var, acc) ->
+            suffix ->/ function
+              |Var("++suffix", _) -> (var, op1 (Assign(var, op1 acc "+")) "-")
+              |Var("--suffix", _) -> (var, op1 (Assign(var, op1 acc "-")) "+")
+              |suf -> (var, Apply(V suf, [acc]))
+           ) pref
+        return result
+       }
+      let infix_expr =
+        let wrap_infix_rule oprule opndrule = SequenceOf {
+          let! opnd = opndrule
+          let! applys = OptionalListOf (oprule +/ opndrule)
+          return List.fold (fun acc (op, opnd) -> Apply(V op, [acc; opnd])) opnd applys
+         }
+        wrap_infix_rule access_operator suffixed_expr
+         |> wrap_infix_rule math_infix_1
+         |> wrap_infix_rule math_infix_2
+         |> wrap_infix_rule comparison
+         |> wrap_infix_rule logic_infix
+      let ternary_expr = SequenceOf {
+        let! cond = infix_expr
+        match! Optional !"?" with
+        |None -> return cond
+        |Some _ ->
+          let! thn = infix_expr
+          do! !":"
+          let! els = infix_expr
+          return If(cond, thn, els)
+       }
+      let assignment_expr =
+        FoldBackListOf (fun (left, assign) right ->
+          match assign with
+          |Var("=", _) -> Assign(left, right)
+          |Var(Regex "^(\+=|-=|\*=|/=|&=|\|=)$" _ as s, _) ->
+            Assign(left, Apply'.fn2(s.[..0], Types.f_arith_infix) left right)
+          |Strict x -> x
+         ) (ternary_expr +/ assignment) ternary_expr
+      assignment_expr.Force() err input
+and bracketed : AST Rule =
+  !"(" +/ expr' +/ !")" ->/ middle
+and square_bracketed: AST Rule = !"[" +/ expr' +/ !"]" ->/ middle
+and arg_list: AST list Rule = Option.defaultValue [] <-/ Optional (JoinedListOf (expr') !",")
+
+let expr() = expr'

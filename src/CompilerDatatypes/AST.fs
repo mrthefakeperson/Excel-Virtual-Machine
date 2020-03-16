@@ -1,5 +1,6 @@
 module CompilerDatatypes.AST
 open CompilerDatatypes.DT
+open Utils
 
 type 'v AST =
   |Apply of 'v AST * 'v AST list  // f(a, b, ...)
@@ -46,9 +47,11 @@ module Hooks =
 
 open Hooks
 
-let unparse : 'v AST -> string =
-  let indent (s: string) = String.concat "\n" (Seq.map ((+) "  ") (s.Split('\n')))
-  let unparse_hook : ASTHook<'v, string> = fun (|P|) (|Q|) ->
+let private indent (s: string) =
+  String.concat "\n" (Seq.map ((+) "  ") (s.Split('\n')))
+
+let pprint_ast_structure : 'v AST -> string =
+  let pprint_ast_structure_hook : ASTHook<'v, string> = fun (|P|) (|Q|) ->
     let (|PBlock|) = function Block xs -> (|P|) (Block xs) | x -> (|P|) (Block [x])
     function
     |V value -> value.ToString()
@@ -63,7 +66,37 @@ let unparse : 'v AST -> string =
       let (Q args') = List.map Declare args
       sprintf "%A fn(%s) %s" ret (String.concat ", " args') body
     |GlobalParse (Q xprs) -> String.concat "\n" xprs
-  fun ast -> apply_hook unparse_hook ast
+  fun ast -> apply_hook pprint_ast_structure_hook ast
+
+let pprint_c_program : 'v AST -> string =
+  let pprint_c_program_hook : ASTHook<'v, string> = fun (|P|) (|Q|) ->
+    let (|PBlock|) = function Block xs -> (|P|) (Block xs) | x -> (|P|) (Block [x])
+    function
+    |V value -> value.ToString()
+    |Apply(P f as f_ast, Q args) ->
+      match f, args with
+      |("." | "->") as accessor, [arg1; arg2] -> arg1 + accessor + arg2
+      |Regex "\\+|\\-|\\*|\\/|%|\\|\\||\\&\\&|==|>=|<=|<|>|!=" _ as infix, [arg1; arg2] ->
+        sprintf "(%s) %s (%s)" arg1 infix arg2
+      |Regex "\\+\\+|\\-\\-|!|.prefix" _ as prefix, [arg1] ->
+        sprintf "%s(%s)" (prefix.Replace("prefix", "")) arg1
+      |Regex "..suffix" _ as suffix, [arg1] ->
+        sprintf "(%s)%s" arg1 (suffix.Replace("suffix", ""))
+      |_ ->
+        match f_ast with
+        |V _ -> sprintf "%s(%s)" f (String.concat "," args)
+        |_ -> sprintf "(%s)(%s)" f (String.concat "," args)
+    |Assign(P l, P r) -> sprintf "%s = %s" l r
+    |Declare(s, dt) -> sprintf "%A %s" dt s
+    |Return (P x) -> sprintf "return %s" x
+    |Block (Q xprs) -> sprintf "{\n%s;\n}" (indent (String.concat ";\n" xprs))
+    |If(P cond, PBlock thn, PBlock els) -> sprintf "if (%s) %s\nelse %s" cond thn els
+    |While(P cond, PBlock body) -> sprintf "while (%s) %s" cond body
+    |Function(ret, args, PBlock body) ->
+      let (Q args') = List.map Declare args
+      sprintf "%A fn(%s) %s" ret (String.concat ", " args') body
+    |GlobalParse (Q xprs) -> String.concat "\n" xprs
+  fun ast -> apply_hook pprint_c_program_hook ast
 
 module SyntaxAST =
   type AST = Token.Value AST
