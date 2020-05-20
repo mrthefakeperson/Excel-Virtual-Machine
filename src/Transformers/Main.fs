@@ -10,5 +10,5 @@ open Utils
 
 [<EntryPoint>]
 let main argv =
-  CLI.interact "Transformers" (transform_from_string >> AST.unparse)
+  CLI.interact "Transformers" (transform_from_string >> AST.pprint_ast_structure)
   0

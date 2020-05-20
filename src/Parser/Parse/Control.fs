@@ -24,13 +24,13 @@ let declarable_expr dt : AST list Rule =
   array |/ (ptr |/ _var') ->/ List.singleton
 
 let declare_expr: AST list Rule =
-  let init_list = !"{" +/ JoinedListOf (expr()) !"," +/ !"}" ->/ middle
+  let init_list = !"{" +/ JoinedListOf expr !"," +/ !"}" ->/ middle
   let decl_with_assign dt = SequenceOf {
     let! Declare(name, dt)::_ | Strict(name, dt) as decl = declarable_expr dt
     match! Optional !"=" with
     |None -> return decl
     |Some () ->
-      match! Optional (expr()) with
+      match! Optional expr with
       |Some x -> return decl @ [Assign(V (Var(name, dt)), x)]
       |None ->
         let! init_values = init_list
@@ -56,50 +56,57 @@ let declare_expr: AST list Rule =
    }
 
 let return_expr: AST Rule =
-  !"return" +/ Optional (expr()) ->/ (snd >> Option.defaultValue Value.unit >> Return)
+  !"return" +/ Optional expr ->/ (snd >> Option.defaultValue Value.unit >> Return)
 
 
-let rec statement() : AST list Rule =
-  let _if: AST Rule = SequenceOf {
-    do! !"if"
-    let! cond = bracketed
-    let! thn = code_body
-    match! Optional !"else" with
-    |Some () -> let! els = code_body in return If(cond, Block thn, Block els)
-    |None -> return If(cond, Block thn, Value.unit)
-   }
-  let _while: AST Rule = SequenceOf {
-    do! !"while"
-    let! cond = bracketed
-    let! loop = code_body
-    return While(cond, Block loop)
-   }
-  let _for: AST Rule = SequenceOf {
-    do! !"for"
-    do! !"("
-    let! decl = Optional (declare_expr |/ expr() ->/ List.singleton)
-    let decl = Option.defaultValue [] decl
-    do! !";"
-    let! cond = Optional (expr())
-    let cond = Option.defaultValue (V(Lit("1", Byte))) cond
-    do! !";"
-    let! incr = Optional (expr())
-    let incr = Option.defaultValue Value.unit incr
-    do! !")"
-    let! body = code_body
-    let loop_body = Block (body @ [incr])
-    return Block (decl @ [While(cond, loop_body)])
-   }
-  OneOf [
-    OneOf [_if; _for; _while] ->/ List.singleton
-    return_expr +/ !";" ->/ (fst >> List.singleton)  // keywords (eg. if, while, return) before declare_expr
-    declare_expr +/ !";" ->/ fst
-    expr() +/ !";" ->/ (fst >> List.singleton)  // a * b gets incorrectly parsed as decl (b: a*)
-    !";" ->/ fun _ -> []
-   ]
+let rec statement : AST list Rule =
+  lazy
+    fun err input ->
+      let _if: AST Rule = SequenceOf {
+        do! !"if"
+        let! cond = bracketed
+        let! thn = code_body
+        match! Optional !"else" with
+        |Some () -> let! els = code_body in return If(cond, Block thn, Block els)
+        |None -> return If(cond, Block thn, Value.unit)
+       }
+      let _while: AST Rule = SequenceOf {
+        do! !"while"
+        let! cond = bracketed
+        let! loop = code_body
+        return While(cond, Block loop)
+       }
+      let _for: AST Rule = SequenceOf {
+        do! !"for"
+        do! !"("
+        let! decl = Optional (declare_expr |/ expr ->/ List.singleton)
+        let decl = Option.defaultValue [] decl
+        do! !";"
+        let! cond = Optional expr
+        let cond = Option.defaultValue (V(Lit("1", Byte))) cond
+        do! !";"
+        let! incr = Optional expr
+        let incr = Option.defaultValue Value.unit incr
+        do! !")"
+        let! body = code_body
+        let loop_body = Block (body @ [incr])
+        return Block (decl @ [While(cond, loop_body)])
+       }
+      let aggregate =
+        OneOf [
+          OneOf [_if; _for; _while] ->/ List.singleton
+          return_expr +/ !";" ->/ (fst >> List.singleton)  // keywords (eg. if, while, return) before declare_expr
+          declare_expr +/ !";" ->/ fst
+          expr +/ !";" ->/ (fst >> List.singleton)  // a * b gets incorrectly parsed as decl (b: a*)
+          code_block ->/ (Block >> List.singleton)
+          !";" ->/ fun _ -> []
+         ]
+      aggregate.Force() err input
+         
 and code_block: AST list Rule =
-  !"{" +/ OptionalListOf (statement()) +/ !"}" ->/ (middle >> List.concat)
-and code_body: AST list Rule = statement() |/ code_block
+  !"{" +/ OptionalListOf statement +/ !"}" ->/ (middle >> List.concat)
+
+and code_body: AST list Rule = code_block |/ statement
 
 
 let declare_function: AST list Rule =

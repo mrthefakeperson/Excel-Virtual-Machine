@@ -13,7 +13,7 @@ let parse_global_scope: AST Expr.Rule =
       Control.declare_expr +/ !";" ->/ fst
       Typedef.parse_typedecl
      ]
-  ListOf try_parse_decl +/ (lazy End |/ try_parse_decl ->/ ignore)  // try_parse_decl in parallel with EOF to get correct error messages
+  ListOf try_parse_decl +/ (End () |/ try_parse_decl ->/ ignore)  // try_parse_decl in parallel with EOF to get correct error messages
    ->/ (fst >> List.concat >> GlobalParse)
 
 let parse_tokens_to_ast_with: AST Expr.Rule -> Token list -> AST = fun rule tokens ->
@@ -25,7 +25,7 @@ let parse_string_to_ast: string -> AST =
    >> parse_tokens_to_ast_with parse_global_scope
 
 let parse_string_to_expr: string -> AST =
-  Lex.tokenize_text >> parse_tokens_to_ast_with (Expr.expr())
+  Lex.tokenize_text >> parse_tokens_to_ast_with Expr.expr
 
 let parse_string_to_control: string -> AST =
   Lex.tokenize_text >> parse_tokens_to_ast_with (Block <-/ Control.code_body)

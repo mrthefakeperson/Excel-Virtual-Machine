@@ -5,13 +5,13 @@ open CompilerDatatypes.Semantics.InterpreterValue
 open CompilerDatatypes.PseudoASM
 
 let interpret_semantics_ast: SemanticAST.AST -> Boxed * string =
-  InterpretAST.interpret_ast
+  Interpreter.InterpretAST.interpret_ast
 
 let interpret_syntax_ast: SyntaxAST.AST -> Boxed * string =
-  Transformers.Main.transform >> InterpretAST.interpret_ast
+  Transformers.Main.transform >> Interpreter.InterpretAST.interpret_ast
 
 let interpret_string: string -> Boxed * string =
-  Transformers.Main.transform_from_string >> InterpretAST.interpret_ast
+  Transformers.Main.transform_from_string >> Interpreter.InterpretAST.interpret_ast
 
 let simulate_pasm: Flat.Asm list -> Boxed * string =
   Simple.convert_from_flat >> PAsmMachine.eval >> fun e -> (e.regs.[R 0], e.stdout)

@@ -89,7 +89,7 @@ let preprocess = %%PREPROCESSOR_LINE ->/ fun name -> Lit(name, DT.Void)
 let parse_tokens tkn : Rule<SrcCode, Token list> =
   let parse_token =
     OneOf [token_null; token_num; token_var; token_string; token_char; token_symbol; preprocess]
-  OptionalListOf (lexeme tkn parse_token) +/ (garbage +/ lazy End) ->/ fst
+  OptionalListOf (lexeme tkn parse_token) +/ (garbage +/ End ()) ->/ fst
 
 let rec tokenize filename (s: string) : Token list =
   let array_rc = Array.create s.Length (0, 0)

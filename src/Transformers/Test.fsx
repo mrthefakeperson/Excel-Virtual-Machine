@@ -27,8 +27,7 @@ let test_transform message f input expected_output =
 let test_typecheck() =
   let mutable input = ""
   let mutable expected = V (Lit Boxed.Void)
-  let test msg =
-    test_transform msg TypeCheck.resolve_types input expected
+  let test msg = test_transform msg TypeCheck.resolve_types input expected
 
   let parse_semantics = parse_string_to_ast >> from_syntax_ast
   

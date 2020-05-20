@@ -8,46 +8,58 @@ open CompilerDatatypes.PseudoASM
 let REAL_REGS = [SP; BP; RX; PSR_EQ; PSR_GT; PSR_LT]  // don't do R0, since it's needed to store return values
 
 type State = {
-  mem: Boxed[]
+  mem: Map<int, Boxed>
   pc: int
   regs: Map<Register, Boxed>
   next_alloc: int
   stdout: string
  }
   with
-    static member copy (state: State) = {state with mem = Array.copy state.mem}
     static member initialize (code: #(Asm seq)) =
-      let initial = {
-        mem = Array.create (max STACK_START CODE_START * 2) Void
+      let mem_with_code =
+        Seq.collect (function
+          |Data data -> Seq.ofArray data
+          |Label _ -> Seq.empty
+          |_ -> Seq.singleton Void
+         ) code
+         |> Seq.mapi (fun offset instr -> (offset, instr))
+         |> Seq.fold (fun mem (offset, instr) ->
+              Map.add (CODE_START + offset) instr mem
+             ) Map.empty
+      let empty_registers = Map (List.map (fun r -> (r, Void)) (R 0::REAL_REGS))
+      let initial_registers =
+        empty_registers
+         |> Map.add BP (Ptr(STACK_START, DT.Byte))
+         |> Map.add SP (Ptr(STACK_START, DT.Byte))
+      {
+        mem = mem_with_code
         pc = CODE_START
-        regs = Map (List.map (fun r -> (r, Void)) (R 0::REAL_REGS))
+        regs = initial_registers
         next_alloc = 1
         stdout = ""
-       }
-      let code_as_boxed = Array.ofSeq code |> Array.collect (function Data data -> data | Label _ -> [||] | _ -> [|Void|])
-      Array.blit code_as_boxed 0 initial.mem CODE_START code_as_boxed.Length
-      let init_registers = [(BP, Ptr(STACK_START, DT.Byte)); (SP, Ptr(STACK_START, DT.Byte))]
-      { initial with
-          regs = List.fold (fun acc (k, v) -> Map.add k v acc) initial.regs init_registers }
-    static member branch pc' state = {state with pc = pc'}
+      }
+    static member branch pc' state = { state with pc = pc' }
     static member to_next_pc state = State.branch (state.pc + 1) state
     static member current_pc (state: State) = Ptr(state.pc, DT.Void)
+    static member memory_at addr state =
+      Map.tryFind addr state.mem |> Option.defaultValue Void
     
     static member read_register reg (state: State) =
       match reg with
       |_ when state.regs.ContainsKey reg -> state.regs.[reg]
       |Register.R n | Strict n ->
         let Ptr(bp, DT.Byte) | Strict bp = state.regs.[BP]
-        state.mem.[bp + n]
+        State.memory_at (bp + n) state
     static member write_register reg value (state: State) =
       match reg with
       |_ when state.regs.ContainsKey reg -> { state with regs = Map.add reg value state.regs }
       |Register.R n | Strict n ->
         let Ptr(bp, DT.Byte) | Strict bp = state.regs.[BP]
-        state.mem.[bp + n] <- value; state
-    static member read_mem (Ptr(addr, _) | Strict addr) (state: State) = state.mem.[addr]
+        { state with mem = Map.add (bp + n) value state.mem }
+    static member read_mem (Ptr(addr, _) | Strict addr) (state: State) =
+      State.memory_at addr state
     static member write_mem (Ptr(addr, _) | Strict addr) value (state: State) =
-      state.mem.[addr] <- value; state
+      { state with mem = Map.add addr value state.mem }
       
     // convention: current stack ptr is the top of the stack (full); do stack_peek before stack_pop
     static member stack_peek state =
@@ -98,13 +110,15 @@ type State = {
         |fmt -> failwithf "unrecognized printf format: %%%c" fmt
       |c -> State.printf arg (incr addr) (State.print (string c) state)
 
-    static member trace ({pc = pc; mem = mem; regs = regs; next_alloc = next_alloc} as state) =
+    static member trace ({pc = pc; mem = _; regs = regs; next_alloc = next_alloc} as state) =
+      let memory_range start length =
+        Array.init length (fun offset -> State.memory_at (start + offset) state)
       String.concat "\n" [
         sprintf "pc: %i" pc
         sprintf "psr: (eq %A, lt %A, gt %A)" regs.[PSR_EQ] regs.[PSR_LT] regs.[PSR_GT]
-        sprintf "sp: %A, bp: %A, stack: %A" regs.[SP] regs.[BP] mem.[STACK_START..STACK_START + 30]
-        sprintf "next alloc: %A, mem: %A" next_alloc mem.[..50]
-        sprintf "code: %A" mem.[CODE_START..CODE_START + 50]
+        sprintf "sp: %A, bp: %A, stack: %A" regs.[SP] regs.[BP] (memory_range STACK_START 30)
+        sprintf "next alloc: %A, mem: %A" next_alloc (memory_range 0 50)
+        sprintf "code: %A" (memory_range CODE_START 50)
         sprintf "R0: %A, RX: %A" regs.[R 0] regs.[RX]
        ]
        |> printfn "%s"
@@ -182,6 +196,8 @@ let rec eval': Asm -> State -> State = function
       |DivMod -> State.write_register reg (a / b) >> State.write_register RX (a % b)
     check <<* opnd1
      >> (op <<*. opnd1 <<* opnd2)
+
+let eval_one_instr = eval'
      
 let EXTERN_CALL_ADDR = CODE_START - 7
 

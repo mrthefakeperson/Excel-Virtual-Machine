@@ -125,15 +125,17 @@ let inline Match (rgx: string) : Rule< ^I, 'o> =
 let inline (~%%) rgx = Match rgx
 let inline (!!) rgx = Match rgx ->/ ignore
 
-let inline End err (input: ^I): ParseResult< ^I, unit> =
-  let empty = (^I: (static member empty: ^I) ())
-  if input = empty
-   then Some(empty, ())
-   else
-    Error err {
-      message = lazy "expected end of stream"
-      priority = (^I: (member length: int) input)
-     }
+let inline End () : Rule< ^I, unit> =
+  lazy
+    fun err (input: ^I) ->
+      let empty = (^I: (static member empty: ^I) ())
+      if input = empty
+       then Some(empty, ())
+       else
+        Error err {
+          message = lazy "expected end of stream"
+          priority = (^I: (member length: int) input)
+         }
 
 let inline run_parser (parse_rule: Rule< ^I, 'o>) (input: ^I) : 'o =
   let error = ref {message = lazy ""; priority = 99999999}

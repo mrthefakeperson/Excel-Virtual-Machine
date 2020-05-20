@@ -17,6 +17,7 @@ targets are divided into two categories:
     - build `Stagename.dll` (run with `dotnet Stagename.dll`)
     - executables contain basic tests
     - `fake build -t TestSamples` to run stages on code samples found in `Utils/TestUtils/Samples`
+      - requires a file named `.env.fsx` containing a path to fsi, fuchu, and a bash command
 
 ionide tips:
   - open this folder in VSCode

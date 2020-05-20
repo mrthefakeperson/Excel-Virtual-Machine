@@ -1,4 +1,4 @@
-﻿module Sim.InterpretAST
+﻿module Interpreter.InterpretAST
 open System.Collections.Generic
 open Utils
 open CompilerDatatypes.DT

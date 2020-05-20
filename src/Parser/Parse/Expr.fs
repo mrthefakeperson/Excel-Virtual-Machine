@@ -75,18 +75,19 @@ let datatype: DT Rule =
     _var ->/ fun (Var(t, _) | Strict t) -> TypeDef (Alias t)
    ]
 
-let rec expr' : AST Rule =
+let rec expr : AST Rule =
   lazy
     fun err input ->
-      let apply_and_index_expr = SequenceOf {
-        let! v = V <-/ basic_value |/ bracketed
-        let! result =
-          FoldListOf (fun acc ->
-            !"(" +/ arg_list +/ !")" ->/ fun parsed -> Apply(acc, middle parsed)
-             |/ square_bracketed ->/ fun i -> BuiltinASTs.index acc i
-           ) v
-        return result
-       }
+      let apply_and_index_expr =
+        SequenceOf {
+          let! v = V <-/ basic_value |/ bracketed
+          let! result =
+            FoldListOf (fun acc ->
+              !"(" +/ arg_list +/ !")" ->/ fun parsed -> Apply(acc, middle parsed)
+               |/ square_bracketed ->/ fun i -> BuiltinASTs.index acc i
+             ) v
+          return result
+         }
       let cast_expr =
         SequenceOf {
           do! !"("
@@ -148,9 +149,10 @@ let rec expr' : AST Rule =
           |Strict x -> x
          ) (ternary_expr +/ assignment) ternary_expr
       assignment_expr.Force() err input
-and bracketed : AST Rule =
-  !"(" +/ expr' +/ !")" ->/ middle
-and square_bracketed: AST Rule = !"[" +/ expr' +/ !"]" ->/ middle
-and arg_list: AST list Rule = Option.defaultValue [] <-/ Optional (JoinedListOf (expr') !",")
 
-let expr() = expr'
+and bracketed : AST Rule = !"(" +/ expr +/ !")" ->/ middle
+
+and square_bracketed: AST Rule = !"[" +/ expr +/ !"]" ->/ middle
+
+and arg_list: AST list Rule =
+  Option.defaultValue [] <-/ Optional (JoinedListOf expr !",")

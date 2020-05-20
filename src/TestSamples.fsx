@@ -7,6 +7,7 @@
 #r "./build/Transformers.dll"
 #r "./build/Sim.dll"
 #r "./build/Codegen.dll"
+#r "./build/Codewriters.dll"
 #load "./Utils/TestUtils/E2e.fsx"
 #load "./.env.fsx"
 open Utils
@@ -20,7 +21,7 @@ module TestParser =
 
   E2e.add_test_stage "Lexer" (Lex.tokenize_text >> Preproc.preprocessor_pass) parser_data
   E2e.add_test_stage "Parser" (Main.parse_tokens_to_ast_with Main.parse_global_scope) parser_data
-  E2e.add_test_stage "Pprint" (unparse: SyntaxAST.AST -> string) parser_data
+  E2e.add_test_stage "Pprint" (pprint_ast_structure: SyntaxAST.AST -> string) parser_data
 
   open E2e.Operators
   "Lexer" ==> "Parser" ==> "Pprint"
@@ -33,7 +34,7 @@ module TestAST =
   let data = E2e.Samples.sample_data |> Seq.take 18
 
   E2e.add_test_stage "Transform" Transformers.Main.transform data
-  E2e.add_test_stage "TransformPprint" (Transformers.Main.transform >> unparse) data
+  E2e.add_test_stage "TransformPprint" (Transformers.Main.transform >> pprint_ast_structure) data
 
   let interpret: SemanticAST.AST -> Boxed * string = Sim.Main.interpret_semantics_ast
   E2e.add_test_stage "Interpret" interpret data
@@ -50,12 +51,18 @@ module TestAST =
 module TestFullCompile =
   open CompilerDatatypes
   open Parser
-  E2e.add_test_stage "FullCompile" (
+
+  let compile_to_pasm =
     Lex.tokenize_text
      >> Preproc.preprocessor_pass
      >> Main.parse_tokens_to_ast_with Main.parse_global_scope
      >> Transformers.Main.transform
      >> Codegen.Main.generate_pasm
-   ) TestAST.data
+
+  E2e.add_test_stage "FullCompile" compile_to_pasm TestAST.data
+  E2e.add_test_stage "CompileToNasm" Codewriters.Main.write_nasm TestAST.data
+
+  open E2e.Operators
+  "FullCompile" ==> "CompileToNasm"
 
 E2e.run_e2e()

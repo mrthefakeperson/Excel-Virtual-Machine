@@ -90,7 +90,7 @@ let generate_pasm: AST -> Asm list =
       |V (Var("\stack_alloc", (Global (DT.Function([DT.Int], dt)) | Strict dt))) ->
         let extract_int (Int sz | Strict sz) = sz
         let sz =
-          List.map (Sim.InterpretAST.interpret_ast >> fst >> extract_int) args
+          List.map (Interpreter.InterpretAST.interpret_ast >> fst >> extract_int) args
            |> List.fold (*) 1
         [Alloc(sz, dt)]
       |V (Var(f, Global dt)) when List.exists (fst >> (=) f) SymbolTable.builtins ->
@@ -131,15 +131,15 @@ let generate_pasm: AST -> Asm list =
         |[] -> [|Boxed.default_value dt|]
         |Assign(_, BuiltinASTs.StackAlloc(dt', [sz_ast]))::init_values ->
           let empty =
-            let Int sz | Strict sz = fst (Sim.InterpretAST.interpret_ast sz_ast)
+            let Int sz | Strict sz = fst (Interpreter.InterpretAST.interpret_ast sz_ast)
             Array.create sz (Boxed.default_value dt')
           let data =
             Array.ofList init_values
-             |> Array.map (extract_assign >> Sim.InterpretAST.interpret_ast >> fst)
+             |> Array.map (extract_assign >> Interpreter.InterpretAST.interpret_ast >> fst)
           Array.append data (Array.skip data.Length empty)
         |init_values ->
           Array.ofList init_values
-           |> Array.map (extract_assign >> Sim.InterpretAST.interpret_ast >> fst)
+           |> Array.map (extract_assign >> Interpreter.InterpretAST.interpret_ast >> fst)
       [Label name] @ [Data init_data] @ generate (GlobalParse rest)
     |GlobalParse [] -> []
     |GlobalParse (hd::_) -> failwithf "invalid global expression: %A" hd

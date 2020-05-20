@@ -68,10 +68,15 @@ let pprint_ast_structure : 'v AST -> string =
     |GlobalParse (Q xprs) -> String.concat "\n" xprs
   fun ast -> apply_hook pprint_ast_structure_hook ast
 
-let pprint_c_program : 'v AST -> string =
-  let pprint_c_program_hook : ASTHook<'v, string> = fun (|P|) (|Q|) ->
-    let (|PBlock|) = function Block xs -> (|P|) (Block xs) | x -> (|P|) (Block [x])
-    function
+let pprint_c_program : Token.Value AST -> string =
+  let rec pprint_c_datatype = function
+    |DT.Ptr dt -> sprintf "%s*" (pprint_c_datatype dt)
+    |TypeDef(Array(1, dt)) -> pprint_c_datatype (Ptr dt)
+    |TypeDef(Array(dim, dt)) when dim > 1 -> pprint_c_datatype (TypeDef(Array(dim - 1, dt)))
+    |Int64 -> "long"
+    |Byte -> "char"
+    |dt -> dt.ToString().ToLower()
+  let pprint_c_program_hook : ASTHook<Token.Value, string> = fun (|P|) (|Q|) -> function
     |V value -> value.ToString()
     |Apply(P f as f_ast, Q args) ->
       match f, args with
@@ -84,18 +89,48 @@ let pprint_c_program : 'v AST -> string =
         sprintf "(%s)%s" arg1 (suffix.Replace("suffix", ""))
       |_ ->
         match f_ast with
+        |V (Token.Var("\cast", dt)) ->
+          sprintf "(%s)(%s)" (pprint_c_datatype dt) (String.concat "," args)
+        |V (Token.Var("\stack_alloc", dt)) -> sprintf "malloc()"
         |V _ -> sprintf "%s(%s)" f (String.concat "," args)
         |_ -> sprintf "(%s)(%s)" f (String.concat "," args)
     |Assign(P l, P r) -> sprintf "%s = %s" l r
-    |Declare(s, dt) -> sprintf "%A %s" dt s
+    |Declare(s, dt) -> sprintf "%s %s" (pprint_c_datatype dt) s
     |Return (P x) -> sprintf "return %s" x
     |Block (Q xprs) -> sprintf "{\n%s;\n}" (indent (String.concat ";\n" xprs))
-    |If(P cond, PBlock thn, PBlock els) -> sprintf "if (%s) %s\nelse %s" cond thn els
-    |While(P cond, PBlock body) -> sprintf "while (%s) %s" cond body
-    |Function(ret, args, PBlock body) ->
-      let (Q args') = List.map Declare args
-      sprintf "%A fn(%s) %s" ret (String.concat ", " args') body
-    |GlobalParse (Q xprs) -> String.concat "\n" xprs
+    |If(P cond, (P thn as then_ast), (P els as else_ast)) ->
+      match then_ast, else_ast with
+      |Block _, _ | _, Block _ -> sprintf "if (%s) %s\nelse %s" cond thn els
+      |_ -> sprintf "(%s) ? (%s) : (%s)" cond thn els
+    |While(P cond, P body) -> sprintf "while (%s) %s" cond body
+    |Function(ret, args, P body) & Strict x -> x
+    |GlobalParse xprs ->
+      match xprs with
+      |Declare(fname, (DT.Function(_, ret) | DT.Function2 ret)) :: rest ->
+        let ret_string = pprint_c_datatype ret
+        let fn_string, rest =
+          match rest with
+          |Assign(V (Token.Var(fname', _)), Function(ret', args, P body)) :: rest
+            when fname = fname' && ret = ret' ->
+            let (Q args) = List.map Declare args
+            let args_list = String.concat ", " args
+            let fn_string = sprintf "%s %s(%s) %s" ret_string fname args_list body
+            fn_string, rest
+          |_ ->
+            let fn_string = sprintf "%s %s();" ret_string fname
+            fn_string, rest
+        let (P rest) = GlobalParse rest
+        fn_string + "\n" + rest
+      |Declare(vname, dt) :: Assign(V (Token.Var(vname', _)), P rhs) :: rest
+        when vname = vname' ->
+        let dt = pprint_c_datatype dt
+        let decl_string = sprintf "%s %s = %s" dt vname rhs
+        let (P rest) = GlobalParse rest
+        decl_string + ";\n" + rest
+      |P xpr :: rest ->
+        let (P rest) = GlobalParse rest
+        xpr + ";\n" + rest
+      |[] -> ""
   fun ast -> apply_hook pprint_c_program_hook ast
 
 module SyntaxAST =

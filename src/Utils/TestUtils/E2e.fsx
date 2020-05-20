@@ -3,8 +3,11 @@ open System.IO
 open System.Collections.Generic
 open Fuchu
 
-let approval_test fname obj =
-  let serialized = sprintf "%A" obj
+let approval_test fname (obj : obj) =
+  let serialized =
+    match obj with
+    | :? string -> obj :?> string
+    | _ -> sprintf "%A" obj
   let fpath = Path.Combine(__SOURCE_DIRECTORY__, "Approval", fname)
   let record =
     try File.ReadAllText fpath

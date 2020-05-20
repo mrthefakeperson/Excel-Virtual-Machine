@@ -50,9 +50,10 @@ let targets = [
   "CompilerDatatypes"
   "Parser"
   "Transformers"
-  "Sim"
+  "Interpreter"
   "Codegen"
   "Codewriters"
+  "Sim"
   "Main"
  ]
 
