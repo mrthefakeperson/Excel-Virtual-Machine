@@ -2,6 +2,7 @@
 **/*.fsx.lock
 *.dll
 *.exe
+*.fsproj
 **/samples
 .vs
 .ionide
@@ -9,4 +10,3 @@
 **/obj
 **/bin
 **/packages
-**/.env.fsx

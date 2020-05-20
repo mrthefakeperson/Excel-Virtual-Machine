@@ -1,0 +1,11 @@
+delay_ms = 1500
+log_dir = log
+max_logs = 10
+rebuild_on_file_update = true
+status_regex = ^Starting target .*
+status_regex = ^Finished \(.*\) .* in .*
+status_regex = warning [A-Z]*[0-9]*: .*
+status_regex = error [A-Z]*[0-9]*: .*
+status_regex = No executable found matching command .*
+status_regex = [Tt]est output.*
+status_regex = ^Stopped due to error$

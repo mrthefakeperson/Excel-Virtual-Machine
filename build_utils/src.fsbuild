@@ -1,0 +1,14 @@
+output:
+  script
+files:
+  // scripts:
+    // parse_fsbuild.fsx
+    // schema.fsx
+    // build_targets.fsx
+    // generate.fsx
+  main:
+    main.fsx
+  data:
+    src.fsbuild
+  test:
+    ../test
