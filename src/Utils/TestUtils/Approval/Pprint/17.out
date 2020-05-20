@@ -1,8 +1,8 @@
-"Function2 Int main
+Function2 Int main
 main = Int fn() {
   Ptr Int ptr;
   ptr = 0;
   printf("The value of ptr is : %x
   ", ptr);
   return 0;
-}"
+}

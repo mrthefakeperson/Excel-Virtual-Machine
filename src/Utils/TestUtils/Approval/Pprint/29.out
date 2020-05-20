@@ -1,4 +1,4 @@
-"Function2 Int main
+Function2 Int main
 main = Int fn() {
   Int c;
   printf("Enter a value :");
@@ -7,4 +7,4 @@ main = Int fn() {
   You entered: ");
   putchar(c);
   return 0;
-}"
+}

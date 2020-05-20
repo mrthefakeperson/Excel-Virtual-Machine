@@ -1,4 +1,4 @@
-"Ptr Byte $63_6f_75_6e_74_20_69_73_20_25_64_a
+Ptr Byte $63_6f_75_6e_74_20_69_73_20_25_64_a
 $63_6f_75_6e_74_20_69_73_20_25_64_a = \stack_alloc(Int 13)
 *prefix(+($63_6f_75_6e_74_20_69_73_20_25_64_a, *(Ptr (1,Byte), \cast(Int 0)))) = Byte 99uy
 *prefix(+($63_6f_75_6e_74_20_69_73_20_25_64_a, *(Ptr (1,Byte), \cast(Int 1)))) = Byte 111uy
@@ -17,4 +17,4 @@ Int count
 Function ([],Void) write_extern
 write_extern = Void fn() {
   printf($63_6f_75_6e_74_20_69_73_20_25_64_a, count);
-}"
+}

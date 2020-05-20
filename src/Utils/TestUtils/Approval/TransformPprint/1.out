@@ -1,4 +1,4 @@
-"Ptr Byte $48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a
+Ptr Byte $48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a
 $48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a = \stack_alloc(Int 16)
 *prefix(+($48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a, *(Ptr (1,Byte), \cast(Int 0)))) = Byte 72uy
 *prefix(+($48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a, *(Ptr (1,Byte), \cast(Int 1)))) = Byte 101uy
@@ -20,4 +20,4 @@ Function2 Int main
 main = Int fn() {
   printf($48_65_6c_6c_6f_2c_20_57_6f_72_6c_64_21_20_a);
   return Int 0;
-}"
+}

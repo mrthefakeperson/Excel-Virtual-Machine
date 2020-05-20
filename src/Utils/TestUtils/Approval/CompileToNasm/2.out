@@ -1,0 +1,56 @@
+
+section .data
+  $53_74_6f_72_61_67_65_20_73_69_7a_65_20_66_6f_72_20_69_6e_74_20_3a_20_25_64_20_a:
+  .byte 83
+  .byte 116
+  .byte 111
+  .byte 114
+  .byte 97
+  .byte 103
+  .byte 101
+  .byte 32
+  .byte 115
+  .byte 105
+  .byte 122
+  .byte 101
+  .byte 32
+  .byte 102
+  .byte 111
+  .byte 114
+  .byte 32
+  .byte 105
+  .byte 110
+  .byte 116
+  .byte 32
+  .byte 58
+  .byte 32
+  .byte 37
+  .byte 100
+  .byte 32
+  .byte 10
+  .byte 0
+
+section .text
+  global start
+  extern printf
+
+start:
+  jmp main
+  main:
+  push esp
+  push ebp
+  push ebx
+  push Int 4
+  mov eax, $53_74_6f_72_61_67_65_20_73_69_7a_65_20_66_6f_72_20_69_6e_74_20_3a_20_25_64_20_a
+  push eax
+  mov ebp, esp
+  add ebp, 1
+  call printf
+  sub esp, 2
+  pop esp
+  pop ebp
+  pop ebx
+  mov eax, 0
+  mov esp, ebp
+  ret
+  ret

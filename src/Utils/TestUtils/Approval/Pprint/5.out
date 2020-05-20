@@ -1,4 +1,4 @@
-"Function ([],Void) func
+Function ([],Void) func
 Int count
 \get_static(count, {
   count = 5;
@@ -19,4 +19,4 @@ func = Void fn() {
   -(i = +(i, 1), 1);
   printf("i is %d and count is %d
   ", i, count);
-}"
+}

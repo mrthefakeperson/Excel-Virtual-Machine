@@ -1,4 +1,4 @@
-"Function2 Int main
+Function2 Int main
 main = Int fn() {
   Int var;
   var = 20;
@@ -11,4 +11,4 @@ main = Int fn() {
   printf("Value of *ip variable: %d
   ", *prefix(ip));
   return 0;
-}"
+}

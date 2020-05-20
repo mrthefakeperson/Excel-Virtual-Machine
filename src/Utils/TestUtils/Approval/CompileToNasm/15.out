@@ -1,0 +1,71 @@
+
+section .data
+  $41_64_64_72_65_73_73_20_6f_66_20_76_61_72_31_20_76_61_72_69_61_62_6c_65_3a_20_25_78_a:
+  .byte 65
+  .byte 100
+  .byte 100
+  .byte 114
+  .byte 101
+  .byte 115
+  .byte 115
+  .byte 32
+  .byte 111
+  .byte 102
+  .byte 32
+  .byte 118
+  .byte 97
+  .byte 114
+  .byte 49
+  .byte 32
+  .byte 118
+  .byte 97
+  .byte 114
+  .byte 105
+  .byte 97
+  .byte 98
+  .byte 108
+  .byte 101
+  .byte 58
+  .byte 32
+  .byte 37
+  .byte 120
+  .byte 10
+  .byte 0
+  $41_64_64_72_65_73_73_20_6f_66_20_76_61_72_32_20_76_61_72_69_61_62_6c_65_3a_20_25_78_a:
+  .byte 65
+  .byte 100
+  .byte 100
+  .byte 114
+  .byte 101
+  .byte 115
+  .byte 115
+  .byte 32
+  .byte 111
+  .byte 102
+  .byte 32
+  .byte 118
+  .byte 97
+  .byte 114
+  .byte 50
+  .byte 32
+  .byte 118
+  .byte 97
+  .byte 114
+  .byte 105
+  .byte 97
+  .byte 98
+  .byte 108
+  .byte 101
+  .byte 58
+  .byte 32
+  .byte 37
+  .byte 120
+  .byte 10
+  .byte 0
+
+section .text
+  global start
+  extern printf
+
+start:
+  ERROR

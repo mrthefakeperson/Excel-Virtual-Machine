@@ -1,4 +1,4 @@
-"TypeDef
+TypeDef
   (DeclStruct
      ("_anon",
       [StructField ("widthValidated",Int,0,4);
@@ -15,4 +15,4 @@ main = Int fn() {
   printf("Memory size occupied by status2 : %d
   ", sizeof(status2));
   return 0;
-}"
+}

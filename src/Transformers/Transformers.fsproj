@@ -1,9 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
-    <RuntimeIdentifiers>ubuntu.16.04-x64</RuntimeIdentifiers>
     <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="SimplifyAST.fs" />
+    <Compile Include="TypeCheck.fs" />
+    <Compile Include="Main.fs" />
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="Utils">
       <HintPath>../build/Utils.dll</HintPath>
@@ -14,8 +18,5 @@
     <Reference Include="Parser">
       <HintPath>../build/Parser.dll</HintPath>
     </Reference>
-    <Compile Include="SimplifyAST.fs" />
-    <Compile Include="TypeCheck.fs" />
-    <Compile Include="Main.fs" />
   </ItemGroup>
 </Project>

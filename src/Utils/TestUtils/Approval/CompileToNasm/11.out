@@ -1,0 +1,48 @@
+
+section .data
+  $76_61_6c_75_65_20_6f_66_20_61_20_3d_20_25_64_2c_20_62_20_3d_20_25_64_20_61_6e_64_20_67_20_3d_20_25_64_a:
+  .byte 118
+  .byte 97
+  .byte 108
+  .byte 117
+  .byte 101
+  .byte 32
+  .byte 111
+  .byte 102
+  .byte 32
+  .byte 97
+  .byte 32
+  .byte 61
+  .byte 32
+  .byte 37
+  .byte 100
+  .byte 44
+  .byte 32
+  .byte 98
+  .byte 32
+  .byte 61
+  .byte 32
+  .byte 37
+  .byte 100
+  .byte 32
+  .byte 97
+  .byte 110
+  .byte 100
+  .byte 32
+  .byte 103
+  .byte 32
+  .byte 61
+  .byte 32
+  .byte 37
+  .byte 100
+  .byte 10
+  .byte 0
+  g:
+  .int 0
+
+section .text
+  global start
+  extern printf
+
+start:
+  ERROR

@@ -1,4 +1,4 @@
-"Function2 Int main
+Function2 Int main
 main = Int fn() {
   Ptr (TypeDef (Alias "FILE")) fp;
   fp = fopen("/tmp/test.txt", "w+");
@@ -7,4 +7,4 @@ main = Int fn() {
   fputs("This is testing for fputs...
   ", fp);
   fclose(fp);
-}"
+}

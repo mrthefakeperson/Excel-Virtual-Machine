@@ -1,117 +1,97 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project ToolsVersion="15.0" DefaultTargets="Build">
   <PropertyGroup>
+    <Name>test</Name>
+    <AssemblyName>test</AssemblyName>
+    <RootNamespace>test</RootNamespace>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>8dbcfbe5-841a-475b-ab3b-b965bbbc8f4f</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>test</RootNamespace>
-    <AssemblyName>test</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFSharpCoreVersion>4.4.1.0</TargetFSharpCoreVersion>
-    <Name>test</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>Full</DebugType>
     <Optimize>false</Optimize>
     <Tailcalls>false</Tailcalls>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DocumentationFile>bin\$(Configuration)\$(AssemblyName).XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>PdbOnly</DebugType>
     <Optimize>true</Optimize>
     <Tailcalls>true</Tailcalls>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DocumentationFile>bin\$(Configuration)\$(AssemblyName).XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup>
-    <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
-  </PropertyGroup>
-  <Choose>
-    <When Condition="'$(VisualStudioVersion)' == '11.0'">
-      <PropertyGroup Condition=" '$(FSharpTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets') ">
-        <FSharpTargetsPath>$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets</FSharpTargetsPath>
-      </PropertyGroup>
-    </When>
-    <Otherwise>
-      <PropertyGroup Condition=" '$(FSharpTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets') ">
-        <FSharpTargetsPath>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets</FSharpTargetsPath>
-      </PropertyGroup>
-    </Otherwise>
-  </Choose>
-  <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="..\src\Utils.fs">
+    <Compile Include="../src/Utils.fs">
       <Link>Utils.fs</Link>
     </Compile>
     <Compile Include="TestUtils.fs" />
-    <Compile Include="..\src\lexer\Preprocessor.fs">
-      <Link>lexer\Preprocessor.fs</Link>
+    <Compile Include="../src/lexer/Preprocessor.fs">
+      <Link>lexer/Preprocessor.fs</Link>
     </Compile>
-    <Compile Include="..\src\lexer\Main.fs">
-      <Link>lexer\Main.fs</Link>
+    <Compile Include="../src/lexer/Main.fs">
+      <Link>lexer/Main.fs</Link>
     </Compile>
-    <Compile Include="..\src\parser\Datatype.fs">
-      <Link>parser\Datatype.fs</Link>
+    <Compile Include="../src/parser/Datatype.fs">
+      <Link>parser/Datatype.fs</Link>
     </Compile>
-    <Compile Include="..\src\parser\AST.fs">
-      <Link>parser\AST.fs</Link>
+    <Compile Include="../src/parser/AST.fs">
+      <Link>parser/AST.fs</Link>
     </Compile>
-    <Compile Include="..\src\parser\Combinators.fs">
-      <Link>parser\Combinators.fs</Link>
+    <Compile Include="../src/parser/Combinators.fs">
+      <Link>parser/Combinators.fs</Link>
     </Compile>
-    <Compile Include="..\src\parser\Main.fs">
-      <Link>parser\Main.fs</Link>
+    <Compile Include="../src/parser/Main.fs">
+      <Link>parser/Main.fs</Link>
     </Compile>
-    <Compile Include="parser\TestParser.fs" />
-    <Compile Include="..\src\codegen\Tables.fs">
-      <Link>codegen\Tables.fs</Link>
+    <Compile Include="parser/TestParser.fs" />
+    <Compile Include="../src/codegen/Tables.fs">
+      <Link>codegen/Tables.fs</Link>
     </Compile>
-    <Compile Include="..\src\codegen\PAsm.fs">
-      <Link>codegen\PAsm.fs</Link>
+    <Compile Include="../src/codegen/PAsm.fs">
+      <Link>codegen/PAsm.fs</Link>
     </Compile>
-    <Compile Include="..\src\codegen\Hooks.fs">
-      <Link>codegen\Hooks.fs</Link>
+    <Compile Include="../src/codegen/Hooks.fs">
+      <Link>codegen/Hooks.fs</Link>
     </Compile>
-    <Compile Include="codegen\TestHooks.fs" />
-    <Compile Include="..\src\codegen\TypeCheck.fs">
-      <Link>codegen\TypeCheck.fs</Link>
+    <Compile Include="codegen/TestHooks.fs" />
+    <Compile Include="../src/codegen/TypeCheck.fs">
+      <Link>codegen/TypeCheck.fs</Link>
     </Compile>
-    <Compile Include="codegen\TestTypeCheck.fs" />
-    <Compile Include="..\src\codegen\Interpreter.fs">
-      <Link>codegen\Interpreter.fs</Link>
+    <Compile Include="codegen/TestTypeCheck.fs" />
+    <Compile Include="../src/codegen/Interpreter.fs">
+      <Link>codegen/Interpreter.fs</Link>
     </Compile>
-    <Compile Include="codegen\TestInterpreter.fs" />
-    <Compile Include="..\src\codegen\BuiltinFunctions.fs">
-      <Link>codegen\BuiltinFunctions.fs</Link>
+    <Compile Include="codegen/TestInterpreter.fs" />
+    <Compile Include="../src/codegen/BuiltinFunctions.fs">
+      <Link>codegen/BuiltinFunctions.fs</Link>
     </Compile>
-    <Compile Include="..\src\codegen\Main.fs">
-      <Link>codegen\Main.fs</Link>
+    <Compile Include="../src/codegen/Main.fs">
+      <Link>codegen/Main.fs</Link>
     </Compile>
-    <Compile Include="codegen\TestMain.fs" />
-    <Compile Include="..\src\codewriters\Interpreter.fs">
-      <Link>codewriters\Interpreter.fs</Link>
+    <Compile Include="codegen/TestMain.fs" />
+    <Compile Include="../src/codewriters/Interpreter.fs">
+      <Link>codewriters/Interpreter.fs</Link>
     </Compile>
-    <Compile Include="codewriters\TestInterpreter.fs" />
-    <Compile Include="..\src\codewriters\Nasm.fs">
-      <Link>codewriters\Nasm.fs</Link>
+    <Compile Include="codewriters/TestInterpreter.fs" />
+    <Compile Include="../src/codewriters/Nasm.fs">
+      <Link>codewriters/Nasm.fs</Link>
     </Compile>
-    <Compile Include="..\src\codewriters\Xlsx.fs">
-      <Link>codewriters\Xlsx.fs</Link>
+    <Compile Include="../src/codewriters/Xlsx.fs">
+      <Link>codewriters/Xlsx.fs</Link>
     </Compile>
     <Compile Include="E2e.fs" />
     <Compile Include="Program.fs" />
@@ -134,11 +114,18 @@
       <Private>True</Private>
     </Reference>
   </ItemGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" />
+  <Choose xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <When Condition="'$(VisualStudioVersion)' == '11.0'">
+      <PropertyGroup Condition=" '$(FSharpTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets') ">
+        <FSharpTargetsPath>$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets</FSharpTargetsPath>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup Condition=" '$(FSharpTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets') ">
+        <FSharpTargetsPath>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets</FSharpTargetsPath>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+  <Import Project="$(FSharpTargetsPath)" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" />
 </Project>

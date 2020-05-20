@@ -1,4 +1,4 @@
-"TypeDef
+TypeDef
   (DeclStruct
      ("Books",
       [StructField ("title",TypeDef (Array (1,Byte)),0,50);
@@ -32,4 +32,4 @@ printBook = Void fn(TypeDef (Struct "Books") book) {
   ", .(book, subject));
   printf("Book book_id : %d
   ", .(book, book_id));
-}"
+}

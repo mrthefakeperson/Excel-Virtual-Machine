@@ -1,4 +1,4 @@
-"Function2 Int main
+Function2 Int main
 main = Int fn() {
   TypeDef (Array (1,Int)) n;
   n = \stack_alloc(10);
@@ -20,4 +20,4 @@ main = Int fn() {
     };
   };
   return 0;
-}"
+}

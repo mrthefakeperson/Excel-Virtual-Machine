@@ -1,4 +1,4 @@
-"Int a
+Int a
 Int b
 Int c
 Float f
@@ -17,4 +17,4 @@ main = Int fn() {
   printf("value of f : %f 
   ", f);
   return 0;
-}"
+}

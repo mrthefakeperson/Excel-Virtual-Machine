@@ -1,4 +1,4 @@
-"TypeDef (DeclStruct ("_anon", [StructField ("age",Int,3,4)])) Age
+TypeDef (DeclStruct ("_anon", [StructField ("age",Int,3,4)])) Age
 Function2 Int main
 main = Int fn() {
   .(Age, age) = 4;
@@ -13,4 +13,4 @@ main = Int fn() {
   printf("Age.age : %d
   ", .(Age, age));
   return 0;
-}"
+}

@@ -1,4 +1,4 @@
-"Function2 Int main
+Function2 Int main
 main = Int fn() {
   TypeDef (Array (1,Byte)) greeting;
   greeting = \stack_alloc(6);
@@ -11,4 +11,4 @@ main = Int fn() {
   printf("Greeting message: %s
   ", greeting);
   return 0;
-}"
+}

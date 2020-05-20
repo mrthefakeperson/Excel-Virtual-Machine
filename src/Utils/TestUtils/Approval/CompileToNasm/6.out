@@ -1,0 +1,25 @@
+
+section .data
+  count:
+  .int 0
+
+section .text
+  global start
+  extern write_extern
+
+start:
+  jmp main
+  main:
+  mov eax, 5
+  mov count, eax
+  push esp
+  push ebp
+  push ebx
+  mov ebp, esp
+  add ebp, 1
+  call write_extern
+  sub esp, 0
+  pop esp
+  pop ebp
+  pop ebx
+  ret

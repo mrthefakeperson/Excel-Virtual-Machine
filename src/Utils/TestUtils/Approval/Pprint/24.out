@@ -1,4 +1,4 @@
-"TypeDef
+TypeDef
   (DeclUnion
      ("Data",
       [StructField ("i",Int,0,4); StructField ("f",Float,0,4);
@@ -16,4 +16,4 @@ main = Int fn() {
   printf("data.str : %s
   ", .(data, str));
   return 0;
-}"
+}

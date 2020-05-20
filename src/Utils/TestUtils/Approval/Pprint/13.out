@@ -1,4 +1,4 @@
-"Function ([Int; Int],Int) sum
+Function ([Int; Int],Int) sum
 Int a
 a = 20
 Function2 Int main
@@ -23,4 +23,4 @@ sum = Int fn(Int a, Int b) {
   printf("value of b in sum() = %d
   ", b);
   return +(a, b);
-}"
+}

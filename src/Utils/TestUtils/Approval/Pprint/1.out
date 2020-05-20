@@ -1,6 +1,6 @@
-"Function2 Int main
+Function2 Int main
 main = Int fn() {
   printf("Hello, World! 
   ");
   return 0;
-}"
+}

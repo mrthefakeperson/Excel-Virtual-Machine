@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="InterpretAST.fs" />
+    <Compile Include="Main.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Utils">
+      <HintPath>../build/Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="CompilerDatatypes">
+      <HintPath>../build/CompilerDatatypes.dll</HintPath>
+    </Reference>
+    <Reference Include="Transformers">
+      <HintPath>../build/Transformers.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

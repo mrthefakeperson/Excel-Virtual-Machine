@@ -1,21 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
-    <RuntimeIdentifiers>ubuntu.16.04-x64</RuntimeIdentifiers>
     <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Nasm.fs" />
+    <Compile Include="Xlsx.fs" />
+    <Compile Include="Main.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Office.Excel" Version="14.0.4760.1000" />
+    <PackageReference Include="Microsoft.Office.Interop.Excel" Version="15.0.4795.1000" />
     <Reference Include="Utils">
       <HintPath>../build/Utils.dll</HintPath>
     </Reference>
     <Reference Include="CompilerDatatypes">
       <HintPath>../build/CompilerDatatypes.dll</HintPath>
     </Reference>
-    <Compile Include="Nasm.fs" />
-    <Compile Include="Xlsx.fs" />
-    <Compile Include="Main.fs" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Office" Version="14.0.4760.1000" />
+    <Reference Include="Transformers">
+      <HintPath>../build/Transformers.dll</HintPath>
+    </Reference>
+    <Reference Include="Codegen">
+      <HintPath>../build/Codegen.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

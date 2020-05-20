@@ -1,4 +1,4 @@
-"Function2 Int main
+Function2 Int main
 main = Int fn() {
   Int var1;
   TypeDef (Array (1,Byte)) var2;
@@ -8,4 +8,4 @@ main = Int fn() {
   printf("Address of var2 variable: %x
   ", &prefix(var2));
   return 0;
-}"
+}

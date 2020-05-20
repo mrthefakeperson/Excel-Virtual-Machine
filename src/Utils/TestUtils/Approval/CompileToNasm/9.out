@@ -1,0 +1,29 @@
+
+section .data
+  $4d_61_78_20_76_61_6c_75_65_20_69_73_20_3a_20_25_64_a:
+  .byte 77
+  .byte 97
+  .byte 120
+  .byte 32
+  .byte 118
+  .byte 97
+  .byte 108
+  .byte 117
+  .byte 101
+  .byte 32
+  .byte 105
+  .byte 115
+  .byte 32
+  .byte 58
+  .byte 32
+  .byte 37
+  .byte 100
+  .byte 10
+  .byte 0
+
+section .text
+  global start
+  extern printf
+
+start:
+  ERROR

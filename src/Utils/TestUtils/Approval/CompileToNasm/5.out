@@ -1,0 +1,41 @@
+
+section .data
+  $$static_var_0:
+  .int 0
+  $$static_flag_0:
+  .byte 1
+  $69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a:
+  .byte 105
+  .byte 32
+  .byte 105
+  .byte 115
+  .byte 32
+  .byte 37
+  .byte 100
+  .byte 32
+  .byte 97
+  .byte 110
+  .byte 100
+  .byte 32
+  .byte 99
+  .byte 111
+  .byte 117
+  .byte 110
+  .byte 116
+  .byte 32
+  .byte 105
+  .byte 115
+  .byte 32
+  .byte 37
+  .byte 100
+  .byte 10
+  .byte 0
+  count:
+  .int 5
+
+section .text
+  global start
+  extern printf
+
+start:
+  ERROR

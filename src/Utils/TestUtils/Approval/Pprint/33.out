@@ -1,4 +1,4 @@
-"Function2 Int main
+Function2 Int main
 main = Int fn() {
   Ptr (TypeDef (Alias "FILE")) fp;
   TypeDef (Array (1,Byte)) buff;
@@ -14,4 +14,4 @@ main = Int fn() {
   printf("3: %s
   ", buff);
   fclose(fp);
-}"
+}

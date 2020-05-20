@@ -1,4 +1,4 @@
-"Int g
+Int g
 Function2 Int main
 main = Int fn() {
   Int a;
@@ -9,4 +9,4 @@ main = Int fn() {
   printf("value of a = %d, b = %d and g = %d
   ", a, b, g);
   return 0;
-}"
+}

@@ -1,4 +1,4 @@
-"TypeDef
+TypeDef
   (DeclUnion
      ("Data",
       [StructField ("i",Int,0,4); StructField ("f",Float,0,4);
@@ -9,4 +9,4 @@ main = Int fn() {
   printf("Memory size occupied by data : %d
   ", sizeof(data));
   return 0;
-}"
+}

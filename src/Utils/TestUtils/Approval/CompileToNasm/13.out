@@ -1,0 +1,121 @@
+
+section .data
+  $76_61_6c_75_65_20_6f_66_20_61_20_69_6e_20_6d_61_69_6e_28_29_20_3d_20_25_64_a:
+  .byte 118
+  .byte 97
+  .byte 108
+  .byte 117
+  .byte 101
+  .byte 32
+  .byte 111
+  .byte 102
+  .byte 32
+  .byte 97
+  .byte 32
+  .byte 105
+  .byte 110
+  .byte 32
+  .byte 109
+  .byte 97
+  .byte 105
+  .byte 110
+  .byte 40
+  .byte 41
+  .byte 32
+  .byte 61
+  .byte 32
+  .byte 37
+  .byte 100
+  .byte 10
+  .byte 0
+  $76_61_6c_75_65_20_6f_66_20_61_20_69_6e_20_73_75_6d_28_29_20_3d_20_25_64_a:
+  .byte 118
+  .byte 97
+  .byte 108
+  .byte 117
+  .byte 101
+  .byte 32
+  .byte 111
+  .byte 102
+  .byte 32
+  .byte 97
+  .byte 32
+  .byte 105
+  .byte 110
+  .byte 32
+  .byte 115
+  .byte 117
+  .byte 109
+  .byte 40
+  .byte 41
+  .byte 32
+  .byte 61
+  .byte 32
+  .byte 37
+  .byte 100
+  .byte 10
+  .byte 0
+  $76_61_6c_75_65_20_6f_66_20_62_20_69_6e_20_73_75_6d_28_29_20_3d_20_25_64_a:
+  .byte 118
+  .byte 97
+  .byte 108
+  .byte 117
+  .byte 101
+  .byte 32
+  .byte 111
+  .byte 102
+  .byte 32
+  .byte 98
+  .byte 32
+  .byte 105
+  .byte 110
+  .byte 32
+  .byte 115
+  .byte 117
+  .byte 109
+  .byte 40
+  .byte 41
+  .byte 32
+  .byte 61
+  .byte 32
+  .byte 37
+  .byte 100
+  .byte 10
+  .byte 0
+  $76_61_6c_75_65_20_6f_66_20_63_20_69_6e_20_6d_61_69_6e_28_29_20_3d_20_25_64_a:
+  .byte 118
+  .byte 97
+  .byte 108
+  .byte 117
+  .byte 101
+  .byte 32
+  .byte 111
+  .byte 102
+  .byte 32
+  .byte 99
+  .byte 32
+  .byte 105
+  .byte 110
+  .byte 32
+  .byte 109
+  .byte 97
+  .byte 105
+  .byte 110
+  .byte 40
+  .byte 41
+  .byte 32
+  .byte 61
+  .byte 32
+  .byte 37
+  .byte 100
+  .byte 10
+  .byte 0
+  a:
+  .int 20
+
+section .text
+  global start
+  extern printf
+
+start:
+  ERROR

@@ -1,4 +1,4 @@
-"Int $$static_var_0
+Int $$static_var_0
 Byte $$static_flag_0
 $$static_flag_0 = Byte 1uy
 Ptr Byte $69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a
@@ -51,4 +51,4 @@ func = Void fn() {
   -(i = +(i, Int 1), Int 1);
   printf($69_20_69_73_20_25_64_20_61_6e_64_20_63_6f_75_6e_74_20_69_73_20_25_64_a, i, count);
   $$static_var_0 = i;
-}"
+}
