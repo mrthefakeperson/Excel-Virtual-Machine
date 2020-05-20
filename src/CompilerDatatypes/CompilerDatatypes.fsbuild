@@ -1,0 +1,10 @@
+output:
+  lib
+files:
+  source:
+    DT.fs
+    Token.fs
+    Semantics.fs
+    AST.fs
+    SymbolTable.fs
+    PseudoASM.fs

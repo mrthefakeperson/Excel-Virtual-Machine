@@ -1,0 +1,10 @@
+output:
+  exe
+files:
+  source:
+    Nasm.fs
+    Xlsx.fs
+  main:
+    Main.fs
+  test:
+    ../../test/Codewriters

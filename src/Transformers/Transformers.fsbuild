@@ -1,0 +1,10 @@
+output:
+  exe
+files:
+  source:
+    SimplifyAST.fs
+    TypeCheck.fs
+  main:
+    Main.fs
+  test:
+    ../../test/Transformers

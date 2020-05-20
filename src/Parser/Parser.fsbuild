@@ -1,0 +1,13 @@
+output:
+  exe
+files:
+  source:
+    Preproc.fs
+    Lex.fs
+    Parse/Expr.fs
+    Parse/Control.fs
+    Parse/Typedef.fs
+  main:
+    Main.fs
+  test:
+    ../../test/Parser

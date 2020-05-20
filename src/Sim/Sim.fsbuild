@@ -1,0 +1,10 @@
+output:
+  exe
+files:
+  source:
+    PAsmMachine.fs
+    NRegisterMachine.fs
+  main:
+    Main.fs
+  test:
+    ../../test/Sim

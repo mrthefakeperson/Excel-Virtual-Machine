@@ -1,0 +1,9 @@
+output:
+  exe
+files:
+  source:
+    InterpretAST.fs
+  main:
+    Main.fs
+  test:
+    ../../test/Interpreter
