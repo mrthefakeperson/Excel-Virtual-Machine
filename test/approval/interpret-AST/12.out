@@ -1,6 +1,0 @@
-(Int 0,
- "value of a in main() = %d
- (fmt [Int 10])value of a in sum() = %d
- (fmt [Int 10])value of b in sum() = %d
- (fmt [Int 20])value of c in main() = %d
- (fmt [Int 30])")

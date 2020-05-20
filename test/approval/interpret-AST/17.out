@@ -1,2 +1,0 @@
-(Int 0, "Greeting message: %s
- (fmt [Ptr (1022,Byte)])")

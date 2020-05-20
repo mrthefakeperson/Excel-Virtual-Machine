@@ -1,7 +1,0 @@
-(Int 0,
- "i is %d and count is %d
- (fmt [Int 6; Int 4])i is %d and count is %d
- (fmt [Int 6; Int 3])i is %d and count is %d
- (fmt [Int 6; Int 2])i is %d and count is %d
- (fmt [Int 6; Int 1])i is %d and count is %d
- (fmt [Int 6; Int 0])")

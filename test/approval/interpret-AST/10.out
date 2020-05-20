@@ -1,2 +1,0 @@
-(Int 0, "value of a = %d, b = %d and g = %d
- (fmt [Int 10; Int 20; Int 30])")

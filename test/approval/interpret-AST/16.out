@@ -1,2 +1,0 @@
-(Int 0, "The value of ptr is : %x
- (fmt [Ptr (0,Int)])")
