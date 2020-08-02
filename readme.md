@@ -16,7 +16,7 @@ targets are divided into two categories:
     - contain a `Main.fs`, a `Main.fsproj`, and optionally a `Test.fsx`
     - build `Stagename.dll` (run with `dotnet Stagename.dll`)
     - executables contain basic tests
-    - `fake build -t TestSamples` to run stages on code samples found in `Utils/TestUtils/Samples`
+    - `fake run build_utils/build.fsx -t TestSamples`, then `dotnet build/TestSamples.dll` to run stages on code samples found in `Utils/TestUtils/Samples`
       - requires a file named `.env.fsx` containing a path to fsi, fuchu, and a bash command
 
 ionide tips:
@@ -24,4 +24,4 @@ ionide tips:
   - open a file from one of the targets
   - wait for the project to load (indicator at bottom, clicking it seems to help)
   - if the target depends on others, build the DLLs for those targets
-  - `dotnet restore; dotnet clean; fake build -t All` seems to sometimes fix intellisense errors
+  - `fsi build_utils/main.fsx -restore; fsi build_utils/main.fsx -clean; fake run build_utils/build.fsx -t All` seems to sometimes fix intellisense errors

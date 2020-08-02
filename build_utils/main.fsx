@@ -64,7 +64,7 @@ let persistent_run (dir : string) (config : config) (target : string) : unit =
       Option.map (fun log_dir ->
         let file_name = (sprintf "build-%O.txt" datetime).Replace(" ", "_").Replace(":", ".")
         let log_file = Path.Combine(log_dir, file_name)
-        printfn "%A" log_file
+        printfn "log file: %A" log_file
         File.AppendText log_file
        ) config.log_dir
     let write_to_log (message : string) =
@@ -102,7 +102,8 @@ let persistent_run (dir : string) (config : config) (target : string) : unit =
   while true do
     let last_modified = get_last_modified dir
     let process', log_file = start_process DateTime.Now
-    Console.Clear()
+    try Console.Clear()
+    with _ -> printfn "\n\n\n\n\n"
     printfn "Starting build..."
     process'.BeginOutputReadLine()
     process'.BeginErrorReadLine()
@@ -118,13 +119,35 @@ let persistent_run (dir : string) (config : config) (target : string) : unit =
         Thread.Sleep config.delay_ms
     Thread.Sleep config.delay_ms
 
+#load "generate.fsx"
+open Parse_fsbuild.Accessors
+open Generate
+
+let restore_all dotnet_command =
+  let project =
+    match read_build_file Environment.CurrentDirectory "fsproject" Schema.fsproject with
+    | Some project -> project
+    | None -> failwith "no project file found"
+  get_values (access "modules" project)
+   |> List.iter (fun module_path ->
+        let p = new Process()
+        p.StartInfo.FileName <- "dotnet"
+        p.StartInfo.Arguments <- (sprintf "%s %A" dotnet_command module_path)
+        p.StartInfo.UseShellExecute <- true
+        p.StartInfo.WindowStyle <- ProcessWindowStyle.Hidden
+        printfn "%s %s" dotnet_command module_path
+        ignore (p.Start())
+        p.WaitForExit()
+       )
+
 let main (argv : string []) : unit =
   match argv with
   | [| "-t"; target; "-c"; config_file |]
   | [| "-c"; config_file; "-t"; target |] ->
     let config = read_config config_file
     persistent_run Environment.CurrentDirectory config target
-  | _ -> failwith "usage: fsi main.fsx -t [target] -c [config_file]"
+  | [| "-restore" | "-clean" as dotnet_command |] -> restore_all (dotnet_command.[1..])
+  | _ -> failwith "usage: fsi main.fsx -t [target] -c [config_file] or fsi main.fsx -restore"
 
 main (Array.tail fsi.CommandLineArgs)
 

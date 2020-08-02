@@ -73,14 +73,19 @@ let generate_fsproj
       sprintf "<PackageReference Include=%A Version=%A />" package version
      ) (Map.toList packages)
   let make_reference_attr dependency =
-    let dependency_dll = Path.Combine(build_dir, dependency + ".dll")
+    // let dependency_dll = Path.Combine(build_dir, dependency + ".dll")
+    // sprintf """
+    // <Reference Include=%A>
+    //   <HintPath>%s</HintPath>
+    // </Reference>
+    //  """
+    //  dependency
+    //  dependency_dll
     sprintf """
-    <Reference Include=%A>
-      <HintPath>%s</HintPath>
-    </Reference>
+    <ProjectReference Include=%A />
      """
-     dependency
-     dependency_dll
+     (Path.Combine(dependency, get_module_name dependency + ".fsproj"))
+
   let dependency_attrs = List.map make_reference_attr dependencies
   let dependency_item_group_attr =
     sprintf """
@@ -145,6 +150,8 @@ let rec make_target
          (output_type = "exe")
       Module fsproj_path
     | _ -> failwith "fsbuild error: output type must be exe, lib, or script"
+
+  let dependencies = List.map get_module_name dependencies
   let test_target_path =
     try_access "test" files
      |> Option.map (fun test_path ->
@@ -203,7 +210,8 @@ let generate_project_targets (root_path : path) : Project =
       let deps =
         match target.target_path with
         | Script _ -> deps
-        | Module _ -> get_module_name module_path :: deps
+        // | Module _ -> get_module_name module_path :: deps
+        | Module _ -> module_path :: deps
       target, deps
      ) [] modules
   { build_dir = build_dir

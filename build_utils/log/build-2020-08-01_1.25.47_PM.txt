@@ -1,0 +1,280 @@
+The last restore is still up to date. Nothing left to do.
+project:
+NamedList
+  [("framework", Value "netcoreapp2.2");
+   ("modules",
+    List
+      [Value "src/Utils"; Value "src/CompilerDatatypes"; Value "src/Parser";
+       Value "src/Transformers"; Value "src/Interpreter"; Value "src/Codegen";
+       Value "src/Codewriters"; Value "src/Sim"; Value "src/Main"]);
+   ("packages",
+    List
+      [Named ("Microsoft.Office.Excel",Value "14.0.4760.1000");
+       Named ("Microsoft.Office.Interop.Excel",Value "15.0.4795.1000");
+       Named ("fuchu",Value "1.0.3.0")]);
+   ("script_packages",
+    List [Value "C:/Users/mrthe/.nuget/packages/fuchu/1.0.3/lib/Fuchu.dll"]);
+   ("fsi", Value ""C:/Program Files/dotnet/sdk/2.2.300/FSharp/fsi.exe"")]
+
+module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Utils:
+NamedList
+  [("output", Value "lib");
+   ("files",
+    NamedList
+      [("source", List [Value "Utils.fs"; Value "ParserCombinators.fs"])])]
+
+module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/CompilerDatatypes:
+NamedList
+  [("output", Value "lib");
+   ("files",
+    NamedList
+      [("source",
+        List
+          [Value "DT.fs"; Value "Token.fs"; Value "Semantics.fs"; Value "AST.fs";
+           Value "SymbolTable.fs"; Value "PseudoASM.fs"])])]
+
+module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Parser:
+NamedList
+  [("output", Value "exe");
+   ("files",
+    NamedList
+      [("source",
+        List
+          [Value "Preproc.fs"; Value "Lex.fs"; Value "Parse/Expr.fs";
+           Value "Parse/Control.fs"; Value "Parse/Typedef.fs"]);
+       ("main", Value "Main.fs"); ("test", Value "../../test/Parser")])]
+
+test module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Parser\../../test/Parser:
+NamedList
+  [("output", Value "script"); ("files", NamedList [("main", Value "Test.fsx")])]
+
+module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Transformers:
+NamedList
+  [("output", Value "exe");
+   ("files",
+    NamedList
+      [("source", List [Value "SimplifyAST.fs"; Value "TypeCheck.fs"]);
+       ("main", Value "Main.fs"); ("test", Value "../../test/Transformers")])]
+
+test module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Transformers\../../test/Transformers:
+NamedList
+  [("output", Value "script"); ("files", NamedList [("main", Value "Test.fsx")])]
+
+module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Interpreter:
+NamedList
+  [("output", Value "exe");
+   ("files",
+    NamedList
+      [("source", List [Value "InterpretAST.fs"]); ("main", Value "Main.fs");
+       ("test", Value "../../test/Interpreter")])]
+
+test module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Interpreter\../../test/Interpreter:
+NamedList
+  [("output", Value "script"); ("files", NamedList [("main", Value "Test.fsx")])]
+
+module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Codegen:
+NamedList
+  [("output", Value "exe");
+   ("files",
+    NamedList
+      [("source", List [Value "BuiltinFunctions.fs"; Value "GenPAsm.fs"]);
+       ("main", Value "Main.fs")])]
+
+module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Codewriters:
+NamedList
+  [("output", Value "exe");
+   ("files",
+    NamedList
+      [("source", List [Value "Nasm.fs"; Value "Xlsx.fs"]);
+       ("main", Value "Main.fs"); ("test", Value "../../test/Codewriters")])]
+
+test module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Codewriters\../../test/Codewriters:
+NamedList
+  [("output", Value "script"); ("files", NamedList [("main", Value "Test.fsx")])]
+
+module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Sim:
+NamedList
+  [("output", Value "exe");
+   ("files",
+    NamedList
+      [("source", List [Value "PAsmMachine.fs"; Value "NRegisterMachine.fs"]);
+       ("main", Value "Main.fs"); ("test", Value "../../test/Sim")])]
+
+test module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Sim\../../test/Sim:
+NamedList
+  [("output", Value "script"); ("files", NamedList [("main", Value "Test.fsx")])]
+
+module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Main:
+NamedList
+  [("output", Value "exe");
+   ("files",
+    NamedList
+      [("main", Value "Main.fs");
+       ("data", List [Value "Samples/input.txt"; Value "Samples/output.txt"]);
+       ("test", Value "../../test/Main")])]
+
+test module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Main\../../test/Main:
+NamedList
+  [("output", Value "script"); ("files", NamedList [("main", Value "Test.fsx")])]
+run All
+Building project with version: LocalBuild
+Shortened DependencyGraph for Target All:
+<== All
+   <== Utils
+      <== CopyData
+         <== CleanUtils
+         <== CleanCompilerDatatypes
+         <== CleanParser
+         <== CleanTransformers
+         <== CleanInterpreter
+         <== CleanCodegen
+         <== CleanCodewriters
+         <== CleanSim
+         <== CleanMain
+   <== CompilerDatatypes
+   <== Parser
+   <== Transformers
+   <== Interpreter
+   <== Codegen
+   <== Codewriters
+   <== Sim
+   <== Main
+
+The running order is:
+Group - 1
+  - CleanMain
+  - CleanSim
+  - CleanCodewriters
+  - CleanCodegen
+  - CleanInterpreter
+  - CleanTransformers
+  - CleanParser
+  - CleanCompilerDatatypes
+  - CleanUtils
+Group - 2
+  - CopyData
+Group - 3
+  - Utils
+Group - 4
+  - CompilerDatatypes
+Group - 5
+  - Parser
+Group - 6
+  - Transformers
+Group - 7
+  - Interpreter
+Group - 8
+  - Codegen
+Group - 9
+  - Codewriters
+Group - 10
+  - Sim
+Group - 11
+  - Main
+Group - 12
+  - All
+Starting target 'CleanMain'
+Finished (Success) 'CleanMain' in 00:00:00.0119196
+Starting target 'CleanSim'
+Finished (Success) 'CleanSim' in 00:00:00.0003552
+Starting target 'CleanCodewriters'
+Finished (Success) 'CleanCodewriters' in 00:00:00.0064542
+Starting target 'CleanCodegen'
+Finished (Success) 'CleanCodegen' in 00:00:00.0003252
+Starting target 'CleanInterpreter'
+Finished (Success) 'CleanInterpreter' in 00:00:00.0007370
+Starting target 'CleanTransformers'
+Finished (Success) 'CleanTransformers' in 00:00:00.0006869
+Starting target 'CleanParser'
+Finished (Success) 'CleanParser' in 00:00:00.0006075
+Starting target 'CleanCompilerDatatypes'
+Finished (Success) 'CleanCompilerDatatypes' in 00:00:00.0006002
+Starting target 'CleanUtils'
+Finished (Success) 'CleanUtils' in 00:00:00.0005619
+Starting target 'CopyData'
+Finished (Success) 'CopyData' in 00:00:00.0118520
+Starting target 'Utils'
+Starting task 'MSBuild': C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src\Utils\Utils.fsproj
+> "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe" /version /nologo (In: false, Out: true, Err: true)
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe "C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src\Utils\Utils.fsproj" /t:Build /m /nodeReuse:False /p:RestorePackages=False /p:OutputPath=C:%5CUsers%5Cmrthe%5CDesktop%5Cprogramming%5C__random_folder%5Ccompiler%5Cbuild%5C /p:Configuration=Debug "/bl:C:\Users\mrthe\AppData\Local\Temp\tmpA7C.tmp.binlog"
+C:\Users\mrthe\Desktop\programming\__random_folder\compiler> "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe" "C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src\Utils\Utils.fsproj" /t:Build /m /nodeReuse:False /p:RestorePackages=False /p:OutputPath=C:%5CUsers%5Cmrthe%5CDesktop%5Cprogramming%5C__random_folder%5Ccompiler%5Cbuild%5C /p:Configuration=Debug "/bl:C:\Users\mrthe\AppData\Local\Temp\tmpA7C.tmp.binlog" (In: false, Out: false, Err: false)
+Microsoft (R) Build Engine version 16.1.76+g14b0a930a7 for .NET Framework
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe /bl:C:\Users\mrthe\AppData\Local\Temp\tmpA7C.tmp.binlog /m /nodeReuse:False /p:RestorePackages=False /p:OutputPath=C:%5CUsers%5Cmrthe%5CDesktop%5Cprogramming%5C__random_folder%5Ccompiler%5Cbuild%5C /p:Configuration=Debug /t:Build C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src\Utils\Utils.fsproj
+Build started 2020-08-01 1:25:48 PM.
+     1>Project "C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src\Utils\Utils.fsproj" on node 1 (Build target(s)).
+     1>C:\Program Files\dotnet\sdk\2.2.300\Sdks\Microsoft.NET.Sdk\targets\Microsoft.PackageDependencyResolution.targets(208,5): error NETSDK1004: Assets file 'C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src\Utils\obj\project.assets.json' not found. Run a NuGet package restore to generate this file. [C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src\Utils\Utils.fsproj]
+     1>Done Building Project "C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src\Utils\Utils.fsproj" (Build target(s)) -- FAILED.
+Deferred Messages
+         
+         Detailed Build Summary
+         ======================
+             
+         
+         ============================== Build Hierarchy (IDs represent configurations) =====================================================
+         Id                  : Exclusive Time   Total Time   Path (Targets)
+         -----------------------------------------------------------------------------------------------------------------------------------
+         0                   : 0.339s           0.339s       C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src\Utils\Utils.fsproj (Build) 
+         
+         ============================== Node Utilization (IDs represent configurations) ====================================================
+         Timestamp:            1        Duration   Cumulative
+         -----------------------------------------------------------------------------------------------------------------------------------
+         637318995488715914:   0        0.340s     0.340s ######
+         -----------------------------------------------------------------------------------------------------------------------------------
+         Utilization:          100.0    Average Utilization: 100.0
+
+Build FAILED.
+
+       "C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src\Utils\Utils.fsproj" (Build target) (1) ->
+       (ResolvePackageAssets target) -> 
+         C:\Program Files\dotnet\sdk\2.2.300\Sdks\Microsoft.NET.Sdk\targets\Microsoft.PackageDependencyResolution.targets(208,5): error NETSDK1004: Assets file 'C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src\Utils\obj\project.assets.json' not found. Run a NuGet package restore to generate this file. [C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src\Utils\Utils.fsproj]
+
+    0 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:00.36
+ResolvePackageAssets: C:\Program Files\dotnet\sdk\2.2.300\Sdks\Microsoft.NET.Sdk\targets\Microsoft.PackageDependencyResolution.targets(208,5): error NETSDK1004: Assets file 'C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src\Utils\obj\project.assets.json' not found. Run a NuGet package restore to generate this file.
+Finished (Failed) 'MSBuild' in 00:00:01.0329855
+Finished (Failed) 'Utils' in 00:00:01.0717671
+
+---------------------------------------------------------------------
+Build Time Report
+---------------------------------------------------------------------
+Target                   Duration
+------                   --------
+CleanMain                00:00:00.0063864
+CleanSim                 00:00:00.0001934
+CleanCodewriters         00:00:00.0007604
+CleanCodegen             00:00:00.0002046
+CleanInterpreter         00:00:00.0001779
+CleanTransformers        00:00:00.0002220
+CleanParser              00:00:00.0001958
+CleanCompilerDatatypes   00:00:00.0001923
+CleanUtils               00:00:00.0001696
+CopyData                 00:00:00.0109338
+Utils                    00:00:01.0709438   (Exception of type 'Fake.DotNet.MSBuildException' was thrown.)
+CompilerDatatypes        00:00:00           (skipped)
+Parser                   00:00:00           (skipped)
+Transformers             00:00:00           (skipped)
+Interpreter              00:00:00           (skipped)
+Codegen                  00:00:00           (skipped)
+Codewriters              00:00:00           (skipped)
+Sim                      00:00:00           (skipped)
+Main                     00:00:00           (skipped)
+All                      00:00:00           (skipped)
+Total:                   00:00:01.2226724
+Status:                  Failure
+---------------------------------------------------------------------
+Script reported an error:
+-> BuildFailedException: Target 'Utils' failed.
+-> One or more errors occurred. (Exception of type 'Fake.DotNet.MSBuildException' was thrown.)
+-> MSBuildException: Exception of type 'Fake.DotNet.MSBuildException' was thrown.
+Hint: To further diagnose the problem you can run fake in verbose mode `fake -v run ...` or set the 'FAKE_DETAILED_ERRORS' environment variable to 'true'
+Performance:
+ - Cli parsing: 256 milliseconds
+ - Packages: 66 milliseconds
+ - Script analyzing: 24 milliseconds
+ - Script running: 1 second
+ - Script cleanup: 24 milliseconds
+ - Runtime: 2 seconds

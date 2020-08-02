@@ -1,0 +1,128 @@
+The last restore is still up to date. Nothing left to do.
+project:
+NamedList
+  [("framework", Value "netcoreapp2.2");
+   ("modules",
+    List
+      [Value "src/Utils"; Value "src/CompilerDatatypes"; Value "src/Parser";
+       Value "src/Transformers"; Value "src/Interpreter"; Value "src/Codegen";
+       Value "src/Codewriters"; Value "src/Sim"; Value "src/Main"]);
+   ("packages",
+    List
+      [Named ("Microsoft.Office.Excel",Value "14.0.4760.1000");
+       Named ("Microsoft.Office.Interop.Excel",Value "15.0.4795.1000");
+       Named ("fuchu",Value "1.0.3.0")]);
+   ("script_packages",
+    List [Value "C:/Users/mrthe/.nuget/packages/fuchu/1.0.3/lib/Fuchu.dll"]);
+   ("fsi", Value ""C:/Program Files/dotnet/sdk/2.2.300/FSharp/fsi.exe"")]
+
+module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Utils:
+NamedList
+  [("output", Value "lib");
+   ("files",
+    NamedList
+      [("source", List [Value "Utils.fs"; Value "ParserCombinators.fs"])])]
+
+module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/CompilerDatatypes:
+NamedList
+  [("output", Value "lib");
+   ("files",
+    NamedList
+      [("source",
+        List
+          [Value "DT.fs"; Value "Token.fs"; Value "Semantics.fs"; Value "AST.fs";
+           Value "SymbolTable.fs"; Value "PseudoASM.fs"])])]
+
+module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Parser:
+NamedList
+  [("output", Value "exe");
+   ("files",
+    NamedList
+      [("source",
+        List
+          [Value "Preproc.fs"; Value "Lex.fs"; Value "Parse/Expr.fs";
+           Value "Parse/Control.fs"; Value "Parse/Typedef.fs"]);
+       ("main", Value "Main.fs"); ("test", Value "../../test/Parser")])]
+
+test module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Parser\../../test/Parser:
+NamedList
+  [("output", Value "script"); ("files", NamedList [("main", Value "Test.fsx")])]
+
+module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Transformers:
+NamedList
+  [("output", Value "exe");
+   ("files",
+    NamedList
+      [("source", List [Value "SimplifyAST.fs"; Value "TypeCheck.fs"]);
+       ("main", Value "Main.fs"); ("test", Value "../../test/Transformers")])]
+
+test module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Transformers\../../test/Transformers:
+NamedList
+  [("output", Value "script"); ("files", NamedList [("main", Value "Test.fsx")])]
+
+module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Interpreter:
+NamedList
+  [("output", Value "exe");
+   ("files",
+    NamedList
+      [("source", List [Value "InterpretAST.fs"]); ("main", Value "Main.fs");
+       ("test", Value "../../test/Interpreter")])]
+
+test module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Interpreter\../../test/Interpreter:
+NamedList
+  [("output", Value "script"); ("files", NamedList [("main", Value "Test.fsx")])]
+
+module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Codegen:
+NamedList
+  [("output", Value "exe");
+   ("files",
+    NamedList
+      [("source", List [Value "BuiltinFunctions.fs"; Value "GenPAsm.fs"]);
+       ("main", Value "Main.fs")])]
+
+module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Codewriters:
+NamedList
+  [("output", Value "exe");
+   ("files",
+    NamedList
+      [("source", List [Value "Nasm.fs"; Value "Xlsx.fs"]);
+       ("main", Value "Main.fs"); ("test", Value "../../test/Codewriters")])]
+
+test module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Codewriters\../../test/Codewriters:
+NamedList
+  [("output", Value "script"); ("files", NamedList [("main", Value "Test.fsx")])]
+
+module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Sim:
+NamedList
+  [("output", Value "exe");
+   ("files",
+    NamedList
+      [("source", List [Value "PAsmMachine.fs"; Value "NRegisterMachine.fs"]);
+       ("main", Value "Main.fs"); ("test", Value "../../test/Sim")])]
+
+test module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Sim\../../test/Sim:
+NamedList
+  [("output", Value "script"); ("files", NamedList [("main", Value "Test.fsx")])]
+
+module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Main:
+NamedList
+  [("output", Value "exe");
+   ("files",
+    NamedList
+      [("main", Value "Main.fs");
+       ("data", List [Value "Samples/input.txt"; Value "Samples/output.txt"]);
+       ("test", Value "../../test/Main")])]
+
+test module C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Main\../../test/Main:
+NamedList
+  [("output", Value "script"); ("files", NamedList [("main", Value "Test.fsx")])]
+Script reported an error:
+-> fsbuild error: target TestCodewriters not found (C:\Users\mrthe\Desktop\programming\__random_folder\compiler\src/Codewriters\../../test/Codewriters\Test.fsx)
+Hint: To further diagnose the problem you can run fake in verbose mode `fake -v run ...` or set the 'FAKE_DETAILED_ERRORS' environment variable to 'true'
+Performance:
+ - Cli parsing: 296 milliseconds
+ - Packages: 53 milliseconds
+ - Script analyzing: 20 milliseconds
+ - Script running: 238 milliseconds
+ - Script cleanup: 0 milliseconds
+ - Runtime: 1 second

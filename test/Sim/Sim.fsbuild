@@ -1,0 +1,5 @@
+output:
+  script
+files:
+  main:
+    Test.fsx

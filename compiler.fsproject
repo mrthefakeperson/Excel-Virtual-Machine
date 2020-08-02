@@ -1,0 +1,24 @@
+framework:
+  netcoreapp2.2
+modules:
+  src/Utils
+  src/CompilerDatatypes
+  src/Parser
+  src/Transformers
+  src/Interpreter
+  src/Codegen
+  src/Codewriters
+  src/Sim
+  src/Main
+  test/TestSamples
+packages:
+  Microsoft.Office.Excel:
+    14.0.4760.1000
+  Microsoft.Office.Interop.Excel:
+    15.0.4795.1000
+  fuchu:
+    1.0.3.0
+script_packages:
+  C:/Users/mrthe/.nuget/packages/fuchu/1.0.3/lib/Fuchu.dll
+fsi:
+  "C:/Program Files/dotnet/sdk/2.2.300/FSharp/fsi.exe"

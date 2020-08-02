@@ -18,7 +18,7 @@ let eval_sizeof_hook: MappingASTHook = fun (|P|) (|Q|) -> function
   |Apply(V (Var("sizeof", _)), _) -> failwith "invalid sizeof expression"
   |_ -> None
 
-let label_of = Seq.map (sprintf "%x" << int) >> String.concat "_" >> (+) "$"
+let label_of = Seq.map (sprintf "%x" << int) >> String.concat "_" >> (+) "_$"
 
 // get string literals
 let find_strings ast : (string * string) list =

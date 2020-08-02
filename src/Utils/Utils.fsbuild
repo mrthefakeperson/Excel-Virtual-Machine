@@ -3,4 +3,5 @@ output:
 files:
   source:
     Utils.fs
+    TestUtils/E2e.fs
     ParserCombinators.fs

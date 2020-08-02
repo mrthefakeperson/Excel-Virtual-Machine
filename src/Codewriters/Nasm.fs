@@ -5,13 +5,13 @@ open CompilerDatatypes.PseudoASM
 open CompilerDatatypes.PseudoASM.Flat
 
 let data_to_string : Boxed -> string = function
-  |Int x -> sprintf ".int %i" x
-  |Int64 x -> sprintf ".long %i" x
-  |Byte x -> sprintf ".byte %i" x
-  |Float x -> sprintf ".float %f" x
-  |Double x -> sprintf ".double %f" x
+  |Int x -> sprintf "dd %i" x
+  |Int64 x -> sprintf "dq %i" x
+  |Byte x -> sprintf "db %i" x
+  |Float x -> sprintf "dd %f" x
+  |Double x -> sprintf "dt %f" x
   |Void -> failwith "cannot write void"
-  |Ptr(x, _) -> sprintf ".int %i" x
+  |Ptr(x, _) -> sprintf "dd %i" x
 
 let write_data: Asm seq -> string seq =
   let rec write_data = function
@@ -31,13 +31,14 @@ let extern_calls (instrs: Asm seq) : string seq =
   Seq.map ((+) "extern ") externs
 
 let reg_to_string : Register -> string = function
-  |R 0 -> "eax"
-  |RX -> "ebx"
-  |R 2 -> "ecx"
-  |R 3 -> "edx"
-  |R n -> failwithf "register %i does not exist" n
-  |BP -> "ebp"
-  |SP -> "esp"
+  |R 0 -> "rax"
+  |RX -> "rbx"
+  |R 1 -> "rcx"
+  |R 2 -> "rdx"
+  |R n when n > 0 -> sprintf "[rbp+%i]" (8 * (n - 3))
+  |R n -> failwithf "reg %i does not exist" n
+  |BP -> "rbp"
+  |SP -> "rsp"
   |PSR_EQ | PSR_GT | PSR_LT -> failwith "cannot access PSR directly"
 
 let const_to_string : Boxed -> string = function
@@ -58,10 +59,10 @@ let write_code : Asm seq -> string seq =
       match instr with
       |Label lbl -> yield lbl + ":"
       |Push reg -> yield "push " + reg_to_string reg
-      |PushC value -> yield sprintf "push %A" value
+      |PushC value -> yield sprintf "push %s" (const_to_string value)
       |PushRealRs -> yield! write_code [Push SP; Push BP; Push RX]  // let's see if not pushing PSR works
       |Pop reg -> yield "pop " + reg_to_string reg
-      |PopRealRs -> yield! write_code [Pop SP; Pop BP; Pop RX]
+      |PopRealRs -> yield! write_code [Pop RX; Pop BP; Pop SP]
       |ShiftStackDown _ -> failwith "shift stack down not supported yet"
       |MovRR(Rs ra, Rs rb) -> yield sprintf "mov %s, %s" ra rb
       |MovRM(Rs ra, Memory.Indirect (Rs rb)) -> yield sprintf "mov %s, [%s]" ra rb
@@ -74,6 +75,8 @@ let write_code : Asm seq -> string seq =
       |Add(4, Rs ra, Rs rb) -> yield sprintf "add %s, %s" ra rb
       |Add(8, Rs ra, Rs rb) -> yield sprintf "addl %s, %s" ra rb
       |Add _ -> failwith "unsupported size"
+      |AddC(4, (SP & Rs ra), Ptr(n, dt)) ->  // special case: reverse changes to SP and (*) 8
+        yield sprintf "sub %s, %s" ra (const_to_string (Ptr(n * 8, dt)))
       |AddC(4, Rs ra, constval) -> yield sprintf "add %s, %s" ra (const_to_string constval)
       |AddC(8, Rs ra, constval) -> yield sprintf "addl %s, %s" ra (const_to_string constval)
       |AddC _ -> failwith "unsupported size"
@@ -104,6 +107,8 @@ let write_code : Asm seq -> string seq =
       |Sub(4, Rs ra, Rs rb) -> yield sprintf "sub %s, %s" ra rb
       |Sub(8, Rs ra, Rs rb) -> yield sprintf "subl %s, %s" ra rb
       |Sub _ -> failwith "unsupported size"
+      |SubC(4, (SP & Rs ra), Ptr(n, dt)) ->  // special case: reverse changes to SP and (*) 8
+        yield sprintf "add %s, %s" ra (const_to_string (Ptr(n * 8, dt)))
       |SubC(4, Rs ra, constval) -> yield sprintf "sub %s, %s" ra (const_to_string constval)
       |SubC(8, Rs ra, constval) -> yield sprintf "subl %s, %s" ra (const_to_string constval)
       |SubC _ -> failwith "unsupported size"
@@ -120,7 +125,7 @@ let write_nasm (instrs: Asm seq) : string =
     with _ -> [ "ERROR" ]
   let code =
     try write_code instrs |> List.ofSeq
-    with _ -> [ "ERROR" ]
+    with ex -> [ sprintf "ERROR: %A" ex ]
   sprintf
    """
 section .data
@@ -128,6 +133,7 @@ section .data
 
 section .text
   global start
+  global main  ; for gcc
   %s
 
 start:

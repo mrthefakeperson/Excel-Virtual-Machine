@@ -1,12 +1,12 @@
 #if !TEST
-#load "../.fake/build.fsx/intellisense.fsx"
+#load "../../build_utils/.fake/build.fsx/intellisense.fsx"
 #endif
-#r "../build/Utils.dll"
-#r "../build/CompilerDatatypes.dll"
-#r "../build/Parser.dll"
-#r "../build/Transformers.dll"
-#r "../build/Codegen.dll"
-#r "../build/Sim.dll"
+#r "../../build/Utils.dll"
+#r "../../build/CompilerDatatypes.dll"
+#r "../../build/Parser.dll"
+#r "../../build/Transformers.dll"
+#r "../../build/Codegen.dll"
+#r "../../build/Sim.dll"
 
 open Fuchu
 open CompilerDatatypes

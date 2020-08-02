@@ -1,15 +1,15 @@
-#if !TEST
-#load "../.fake/build.fsx/intellisense.fsx"
-#endif
-#r "./build/Utils.dll"
-#r "./build/CompilerDatatypes.dll"
-#r "./build/Parser.dll"
-#r "./build/Transformers.dll"
-#r "./build/Sim.dll"
-#r "./build/Codegen.dll"
-#r "./build/Codewriters.dll"
-#load "./Utils/TestUtils/E2e.fsx"
-#load "./.env.fsx"
+// #if !TEST
+// #load "../../build_utils/.fake/build.fsx/intellisense.fsx"
+// #endif
+// #r "./build/Utils.dll"
+// #r "./build/CompilerDatatypes.dll"
+// #r "./build/Parser.dll"
+// #r "./build/Transformers.dll"
+// #r "./build/Sim.dll"
+// #r "./build/Codegen.dll"
+// #r "./build/Codewriters.dll"
+// #load "./Utils/TestUtils/E2e.fsx"
+// #load "./.env.fsx"
 open Utils
 open Utils.TestUtils
 
